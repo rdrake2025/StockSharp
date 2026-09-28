@@ -13,6 +13,7 @@ Nasdaq-100 futures (NQ / MNQ). Open `index.html` in any browser.
 | Edge tools | Official FOMC / CPI / jobs-report calendar (auto news blackouts), similar-day pre-market outlook with walk-forward skill test, intraday range projection, noise-band exit manager, stop-placement analyzer from real trade excursions |
 | Backtest Lab | 41 strategies + benchmark tested on 2,630 real NQ sessions (2015 to Jul 2025): leaderboard, equity curves, yearly results, real example trades |
 | Learn | "Your strategy in 6 steps" on a real NQ morning; beginner course: 40-term glossary, candlestick / ticks-to-dollars / bracket / expectancy visuals, interactive trailing-drawdown simulator, consistency-rule checker, why evals fail, 8-question quiz; plus workflow, order book, futures vs. QQQ, contract specs and roll calendar, costs, learning path |
+| Study | Study the market: daily 4-step session, Market Lab (filter 2,630 sessions by weekday, gap, first 30 min, prior day, volatility, Fed/opex days and years; average path, time of high/low, gap fills, trend days, significance tags), read-the-day chart practice, spaced-repetition flashcards, and a pre/post-market notebook |
 | Replay | Signal drill (20 rapid-fire "long / short / no trade" questions at real check moments), then trade 160 real NQ sessions bar by bar with a bracket, optional system-managed exits and 12:00 hand-off, a "Next check" jump, and grading against the strategy's signals in your window (keys: B, S, F, →, Space, N) |
 | Risk tools | Position sizer, reward:risk planner, Monte Carlo simulator that loads any backtested strategy |
 | Journal | Trade log, stats, your results vs. the backtest per setup, CSV copy/import |
@@ -66,6 +67,7 @@ NQ_DATA=/path/to/data python3 funded.py       # funded-account year simulations 
 NQ_DATA=/path/to/data python3 window.py       # time-window variants of noise-band
 NQ_DATA=/path/to/data python3 personal.py     # morning + hand-off version: stats, eval plans, funded
 NQ_DATA=/path/to/data python3 aggressive.py   # bigger eval size with resets: tries, fees, time to pass
+NQ_DATA=/path/to/data python3 study.py      # per-session features for the Market Lab
 NQ_DATA=/path/to/data python3 edge.py         # outlook features, range tables, adverse-excursion quantiles
 NQ_DATA=/path/to/data python3 export.py       # writes ../bt-data.json
 cd .. && python3 build.py                 # src/app.html + bt-data.json -> index.html

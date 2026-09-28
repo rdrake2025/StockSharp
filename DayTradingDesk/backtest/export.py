@@ -108,6 +108,7 @@ out["edge"] = json.load(open(os.path.join(D, "edge.json")))
 out["funded"] = json.load(open(os.path.join(D, "funded.json")))
 out["personal"] = json.load(open(os.path.join(D, "personal.json")))
 out["aggressive"] = json.load(open(os.path.join(D, "aggressive.json")))
+out["study"] = json.load(open(os.path.join(D, "study.json")))
 # replay grading: what the proven strategy did on each replay day, and its noise bands at each check
 didx = {str(d["date"]): i for i, d in enumerate(days)}
 ntr = {}
