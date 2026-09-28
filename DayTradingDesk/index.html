@@ -255,6 +255,40 @@ ol.stepsl b{color:var(--ink)}
 .quiz-q .why{font-size:13.5px;margin-top:8px}
 .big-toggle{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
 input[type=range]{accent-color:var(--amber);width:100%}
+.cp-bar{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center;justify-content:space-between;margin-bottom:14px;padding:12px 16px}
+.cp-next{font:700 15px/1.3 var(--mono);color:var(--ink)}
+.cp-next small{display:block;font:500 12px/1.3 var(--body);color:var(--muted)}
+.toggle-btn[aria-pressed="true"]{background:var(--cyan-dim);border-color:var(--cyan);color:var(--cyan)}
+.gauge-wrap{margin-top:10px}
+.tt-side{display:flex;gap:6px}
+.tt-side button{flex:1}
+.tt-side button[aria-pressed="true"].l{background:var(--up);color:#032417;border-color:var(--up)}
+.tt-side button[aria-pressed="true"].s{background:var(--down);color:#2A0510;border-color:var(--down)}
+.chk{list-style:none;margin:10px 0 0;padding:0;display:grid;gap:4px}
+.chk li{display:grid;grid-template-columns:22px 1fr;gap:8px;font-size:13.5px;align-items:start}
+.chk li .i{width:18px;height:18px;border-radius:5px;display:grid;place-items:center;font:800 11px/1 var(--mono);margin-top:1px}
+.chk li.ok .i{background:var(--up-dim);color:var(--up)} .chk li.no .i{background:var(--down-dim);color:var(--down)} .chk li.wn .i{background:var(--amber-dim);color:var(--amber)}
+.intrade{border:2px solid var(--amber);border-radius:12px;padding:14px;background:var(--amber-dim)}
+.tilt{display:flex;gap:6px;flex-wrap:wrap}
+.tilt button{flex:1;min-width:90px}
+.plan-hero{display:grid;gap:16px;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr)}
+@media (max-width:980px){.plan-hero{grid-template-columns:1fr}}
+.rm{display:grid;gap:10px}
+.rm .ph{display:grid;grid-template-columns:40px 1fr auto;gap:12px;align-items:center;padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:rgba(10,16,34,.7)}
+.rm .ph.done{border-color:rgba(43,227,160,.4)} .rm .ph.now{border-color:var(--amber);box-shadow:0 0 18px rgba(255,160,60,.18)}
+.rm .n{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;font:800 14px/1 var(--mono);background:var(--surface-2);color:var(--muted)}
+.rm .done .n{background:var(--up);color:#032417} .rm .now .n{background:linear-gradient(135deg,var(--amber),var(--amber-2));color:#1A1203}
+.rm .bar{height:6px;border-radius:3px;background:var(--surface-2);overflow:hidden;margin-top:6px}
+.rm .bar i{display:block;height:100%;background:linear-gradient(90deg,var(--amber),var(--up))}
+.myrules{list-style:none;margin:0;padding:0;counter-reset:r;display:grid;gap:8px}
+.myrules li{counter-increment:r;display:grid;grid-template-columns:30px 1fr;gap:10px;font-size:14.5px}
+.myrules li::before{content:counter(r);font:800 13px/26px var(--mono);text-align:center;border-radius:8px;background:var(--surface-2);color:var(--amber)}
+.myrules b{color:var(--ink)}
+body.compact .ticker, body.compact .brand b, body.compact footer.foot, body.compact .cp-hide{display:none!important}
+body.compact .wrap{max-width:540px}
+body.compact .hero, body.compact .split, body.compact .g2, body.compact .plan-hero{grid-template-columns:1fr!important}
+body.compact section.panel{padding-top:14px}
+body.compact .clock{font-size:28px}
 footer.foot{margin-top:48px;padding-top:18px;border-top:1px solid var(--line);color:var(--faint);font-size:12.5px;max-width:95ch}
 @media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}.draw{stroke-dashoffset:0}}
 @media (max-width:640px){.clockmini{display:none}nav.tabs{margin-left:0;width:100%}nav.tabs button kbd{display:none}.big-out{font-size:36px}.rule{grid-template-columns:1fr;gap:2px}}
@@ -276,14 +310,15 @@ footer.foot{margin-top:48px;padding-top:18px;border-top:1px solid var(--line);co
     </a>
     <span class="clockmini"><span class="dot" id="mini-dot"></span><span id="mini-clk">--:-- ET</span></span>
     <nav class="tabs" role="tablist" aria-label="Sections">
-      <button role="tab" data-tab="today" id="t-today"><kbd>1</kbd>Today</button>
-      <button role="tab" data-tab="lab" id="t-lab"><kbd>2</kbd>Backtest Lab</button>
-      <button role="tab" data-tab="fleet" id="t-fleet"><kbd>3</kbd>Research fleet</button>
-      <button role="tab" data-tab="prop" id="t-prop"><kbd>4</kbd>Prop eval</button>
-      <button role="tab" data-tab="learn" id="t-learn"><kbd>5</kbd>Learn</button>
-      <button role="tab" data-tab="replay" id="t-replay"><kbd>6</kbd>Replay</button>
-      <button role="tab" data-tab="tools" id="t-tools"><kbd>7</kbd>Risk tools</button>
-      <button role="tab" data-tab="journal" id="t-journal"><kbd>8</kbd>Journal</button>
+      <button role="tab" data-tab="plan" id="t-plan"><kbd>1</kbd>My plan</button>
+      <button role="tab" data-tab="today" id="t-today"><kbd>2</kbd>Cockpit</button>
+      <button role="tab" data-tab="lab" id="t-lab"><kbd>3</kbd>Backtest Lab</button>
+      <button role="tab" data-tab="fleet" id="t-fleet"><kbd>4</kbd>Research fleet</button>
+      <button role="tab" data-tab="prop" id="t-prop"><kbd>5</kbd>Prop eval</button>
+      <button role="tab" data-tab="learn" id="t-learn"><kbd>6</kbd>Learn</button>
+      <button role="tab" data-tab="replay" id="t-replay"><kbd>7</kbd>Replay</button>
+      <button role="tab" data-tab="tools" id="t-tools"><kbd>8</kbd>Risk tools</button>
+      <button role="tab" data-tab="journal" id="t-journal"><kbd>9</kbd>Journal</button>
     </nav>
   </div>
   <div class="ticker" aria-label="Backtest highlights"><div class="ticker-track" id="ticker"></div></div>
@@ -291,8 +326,76 @@ footer.foot{margin-top:48px;padding-top:18px;border-top:1px solid var(--line);co
 
 <div class="wrap">
 
+<!-- ======================= MY PLAN ======================= -->
+<section class="panel" id="p-plan" role="tabpanel" aria-labelledby="t-plan">
+  <div class="panel-head">
+    <div class="eyebrow">Your personal guide · built from your profile</div>
+    <h2 id="pl-hello">Your plan to pass a Lucid eval, safely</h2>
+    <p class="lede">Everything here comes from your profile below, plus the 10-year backtests. Change the profile and the whole plan updates, including your hours, budget, size and rules. The cockpit, replay and journal all use these numbers.</p>
+  </div>
+  <div class="gate" id="pl-ready"></div>
+  <div class="plan-hero" style="margin-top:16px">
+    <div class="card hot">
+      <div class="eyebrow">Your plan at a glance</div>
+      <div class="stats" id="pl-glance" style="margin-top:12px"></div>
+      <h3 style="margin-top:18px">Your trading hours</h3>
+      <p class="small muted" id="pl-hours-cap"></p>
+      <div style="overflow-x:auto"><svg class="chart" id="pl-hours" viewBox="0 0 760 150" role="img" aria-label="Your hours versus the market"></svg></div>
+      <div id="pl-checks" class="small"></div>
+    </div>
+    <div class="card">
+      <div class="card-h"><h3>My profile</h3><span class="pill" id="pf-saved">Not saved yet</span></div>
+      <form class="form" id="pf" autocomplete="off" style="margin-top:10px">
+        <label class="f">First name<input id="pf-name" type="text" placeholder="optional"></label>
+        <label class="f">Your time zone<select id="pf-tz"></select></label>
+        <label class="f">Experience<select id="pf-exp"><option value="new">Brand new</option><option value="some">Some sim / paper trading</option><option value="live">Traded live before</option></select></label>
+        <label class="f">Money free each month ($)<input id="pf-free" type="number" class="mono" min="0" step="10"></label>
+        <label class="f">Can trade from (your time)<input id="pf-ws" type="time"></label>
+        <label class="f">Until (your time)<input id="pf-we" type="time"></label>
+        <label class="f" style="grid-column:1/-1">Busy blocks (your time, e.g. 08:00-09:30, 16:00-18:00)<input id="pf-busy" type="text" class="mono"></label>
+        <label class="f">Eval account<select id="pf-size"><option>25K</option><option selected>50K</option><option>100K</option><option>150K</option></select></label>
+        <label class="f">Priority<select id="pf-pace"><option value="safe">Don't fail (slower)</option><option value="balanced">Balanced</option><option value="fast">Pass faster (riskier)</option></select></label>
+      </form>
+      <p class="small muted" id="pf-note" style="margin-top:10px"></p>
+      <div class="row" style="margin-top:10px"><button class="btn primary" id="pf-save">Save my profile</button></div>
+    </div>
+  </div>
+
+  <div class="grid g2" style="margin-top:16px">
+    <div class="card">
+      <div class="eyebrow">Your rules</div><h3 style="margin-top:6px">Read these before every session</h3>
+      <ol class="myrules" id="pl-rules" style="margin-top:12px"></ol>
+    </div>
+    <div class="card">
+      <div class="eyebrow">Your money</div><h3 style="margin-top:6px">Eval budget, done safely</h3>
+      <div class="stats" id="pl-money" style="margin-top:12px;grid-template-columns:repeat(2,minmax(0,1fr))"></div>
+      <p class="small" id="pl-money-note" style="margin-top:10px"></p>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:16px">
+    <div class="eyebrow">Your roadmap</div><h3 style="margin-top:6px">From zero to funded, one checkpoint at a time</h3>
+    <p class="small muted">Progress fills in automatically from what you do in the app: the quiz, replay sessions, journal trades and the eval tracker.</p>
+    <div class="rm" id="pl-road" style="margin-top:12px"></div>
+  </div>
+
+  <div class="card" style="margin-top:16px">
+    <div class="eyebrow">Your session, step by step</div><h3 style="margin-top:6px">What a trading day looks like for you</h3>
+    <div class="rules" id="pl-day" style="margin-top:8px"></div>
+  </div>
+</section>
+
 <!-- ======================= TODAY ======================= -->
 <section class="panel" id="p-today" role="tabpanel" aria-labelledby="t-today">
+  <div class="card cp-bar">
+    <div class="cp-next" id="cp-next">Next event…</div>
+    <div class="row">
+      <label class="f" style="grid-template-columns:auto 150px;align-items:center" title="Scheduled releases today, New York time">News today (ET)<input id="cp-news" type="text" class="mono" value="08:30, 10:00"></label>
+      <button class="btn toggle-btn" id="cp-compact" aria-pressed="false">Side-by-side mode</button>
+      <button class="btn toggle-btn" id="cp-sound" aria-pressed="false">Sound alerts</button>
+      <button class="btn toggle-btn" id="cp-wake" aria-pressed="false">Keep screen on</button>
+    </div>
+  </div>
   <div class="hero">
     <div class="card hot">
       <div class="eyebrow">Nasdaq-100 futures · live session</div>
@@ -302,14 +405,53 @@ footer.foot{margin-top:48px;padding-top:18px;border-top:1px solid var(--line);co
       </div>
       <div class="row" style="margin-top:12px"><span class="phase"><span class="dot" id="phase-dot"></span><span id="phase-name">Loading…</span></span></div>
       <p class="small" id="phase-tip" style="margin-top:6px"></p>
-      <div style="overflow-x:auto;margin-top:14px"><svg class="tape-svg" id="tape" viewBox="0 0 640 84" role="img" aria-label="Futures trading day in New York time"></svg></div>
+      <div class="cp-hide" style="overflow-x:auto;margin-top:14px"><svg class="tape-svg" id="tape" viewBox="0 0 640 84" role="img" aria-label="Futures trading day in New York time"></svg></div>
     </div>
     <div class="card">
-      <div class="card-h"><h3>Can I trade right now?</h3><span class="pill" id="today-pnl-pill">Today $0</span></div>
+      <div class="card-h"><h3>Can I take a trade?</h3><span class="pill" id="today-pnl-pill">Today $0</span></div>
       <div id="gate" class="gate ok"></div>
+      <div class="small muted" style="margin-top:12px">How do you feel right now?</div>
+      <div class="tilt" id="tilt"><button class="btn" data-m="calm">😌 Calm</button><button class="btn" data-m="anxious">😬 Anxious</button><button class="btn" data-m="tilt">😤 Frustrated</button></div>
       <div class="small muted" style="margin-top:12px">Daily loss limit used</div>
       <div class="meter"><i id="pl-meter" style="width:0%"></i></div>
       <dl class="kv" id="pl-kv" style="margin-top:12px"></dl>
+    </div>
+  </div>
+
+  <div class="split" style="margin-top:16px">
+    <div class="card" id="tt-card">
+      <div class="card-h"><div><div class="eyebrow">Trade ticket · check before you click</div><h3 style="margin-top:6px">Every trade passes these checks first</h3></div><span class="pill" id="tt-state">Flat</span></div>
+      <div id="tt-form">
+        <div class="tt-side" style="margin-top:10px"><button class="btn l" id="tt-long" aria-pressed="true">Long</button><button class="btn s" id="tt-short" aria-pressed="false">Short</button></div>
+        <div class="form" style="margin-top:10px">
+          <label class="f">Entry<input id="tt-entry" type="number" class="mono" step="0.25" placeholder="23500"></label>
+          <label class="f">Stop<input id="tt-stop" type="number" class="mono" step="0.25" placeholder="23470"></label>
+          <label class="f">Target (optional)<input id="tt-tgt" type="number" class="mono" step="0.25"></label>
+          <label class="f">MNQ contracts<input id="tt-qty" type="number" class="mono" min="1" value="1"></label>
+          <label class="f" style="grid-column:1/-1">Setup<select id="tt-setup"></select></label>
+        </div>
+        <label class="check"><input type="checkbox" id="tt-c1"><span>This is a signal from my tested setup, not a hunch or a chase.</span></label>
+        <label class="check"><input type="checkbox" id="tt-c2"><span>My stop (and target) are placed in the platform as a bracket.</span></label>
+        <div class="stats" id="tt-num" style="margin-top:10px"></div>
+        <ul class="chk" id="tt-checks"></ul>
+        <button class="btn primary" id="tt-go" style="width:100%;margin-top:12px" disabled>I'm in: start the trade</button>
+      </div>
+      <div id="tt-open" hidden></div>
+    </div>
+    <div class="card" id="ev-card">
+      <div class="card-h"><div><div class="eyebrow">Eval tracker · LucidFlex rules</div><h3 style="margin-top:6px">How close am I to the line?</h3></div><span class="pill" id="ev-status">Not started</span></div>
+      <div class="form" style="margin-top:10px">
+        <label class="f">Account<select id="ev-size"><option>25K</option><option selected>50K</option><option>100K</option><option>150K</option></select></label>
+        <label class="f">Balance right now ($)<input id="ev-now" type="number" class="mono" step="1" placeholder="from your platform"></label>
+      </div>
+      <div class="gauge-wrap"><svg class="chart" id="ev-gauge" viewBox="0 0 520 110" role="img" aria-label="Balance between max loss limit and target"></svg></div>
+      <div class="stats" id="ev-num"></div>
+      <p class="small" id="ev-note" style="margin-top:10px"></p>
+      <details class="meth" style="margin-top:12px"><summary>Log end-of-day balances (<span id="ev-count">0</span> days)</summary><div>
+        <div class="form"><label class="f">Date<input id="ev-d" type="date"></label><label class="f">Closing balance<input id="ev-c" type="number" class="mono" step="1"></label><label class="f">Lowest balance today<input id="ev-l" type="number" class="mono" step="1" placeholder="optional"></label><div style="display:flex;align-items:end"><button class="btn" id="ev-add" style="width:100%">Add day</button></div></div>
+        <div class="table-wrap" style="margin-top:10px;max-height:220px"><table><thead><tr><th>Date</th><th class="n">Close</th><th class="n">Day P&amp;L</th><th class="n">Limit after</th><th></th></tr></thead><tbody id="ev-rows"></tbody></table></div>
+        <button class="btn ghost" id="ev-reset" style="margin-top:6px">Start a new eval</button>
+      </div></details>
     </div>
   </div>
 
@@ -327,7 +469,7 @@ footer.foot{margin-top:48px;padding-top:18px;border-top:1px solid var(--line);co
         <label class="f">Volatility scale<select id="nb-vol"><option value="0.8">Calm (×0.8)</option><option value="1" selected>Normal (×1.0)</option><option value="1.3">Hot (×1.3)</option><option value="1.7">Very hot (×1.7)</option></select></label>
       </div>
       <div class="gate" id="nb-signal" style="margin-top:12px"></div>
-      <div class="table-wrap" style="margin-top:12px;max-height:300px"><table><thead><tr><th>Check (ET)</th><th class="n">Short below</th><th class="n">Long above</th><th class="n">Band width</th></tr></thead><tbody id="nb-body"></tbody></table></div>
+      <div class="table-wrap cp-hide" style="margin-top:12px;max-height:300px"><table><thead><tr><th>Check (ET)</th><th class="n">Short below</th><th class="n">Long above</th><th class="n">Band width</th></tr></thead><tbody id="nb-body"></tbody></table></div>
       <p class="small muted">Band = max(open, prior close) × (1 + σ) and min(open, prior close) × (1 − σ). σ is the average move from the open at that time over the dataset's last 60 sessions. The exact method uses your own last 14 sessions. Exit a long when a check closes below the higher of the upper band and VWAP (reverse for shorts). Flat by 4:00.</p>
     </div>
     <div class="grid" style="align-content:start">
@@ -347,7 +489,7 @@ footer.foot{margin-top:48px;padding-top:18px;border-top:1px solid var(--line);co
       </div>
     </div>
   </div>
-  <div class="card" style="margin-top:16px">
+  <div class="card cp-hide" style="margin-top:16px">
     <div class="card-h"><h3>Key levels</h3><span class="small muted">Saved for today in this browser</span></div>
     <div class="form" id="levels"></div>
   </div>
@@ -915,15 +1057,16 @@ function hover(svg, getInfo){
 }
 
 /* ================= Tabs & keyboard ================= */
-const TABS = ["today","lab","fleet","prop","learn","replay","tools","journal"];
+const TABS = ["plan","today","lab","fleet","prop","learn","replay","tools","journal"];
 let current = "today", ready = false;
 function showTab(t){
-  if (!TABS.includes(t)) t = "today"; current = t;
+  if (!TABS.includes(t)) t = "plan"; current = t;
   $$("nav.tabs button").forEach(b => b.setAttribute("aria-selected", b.dataset.tab === t));
   $$("section.panel").forEach(p => p.classList.toggle("active", p.id === "p-"+t));
   store.set("tab", t);
   if (t === "journal") renderJournal();
-  if (t === "today") renderGate();
+  if (t === "today"){ renderGate(); renderEval(); renderTicket(); }
+  if (t === "plan") renderPlan();
   if (t === "lab" && !showTab.labDone){ showTab.labDone = true; renderLab(); }
   if (t === "learn" && !showTab.learnDone){ showTab.learnDone = true; initLearn(); }
   if (t === "fleet" && !showTab.fleetDone){ showTab.fleetDone = true; renderFleet(); }
@@ -990,7 +1133,8 @@ function tick(){
   $("#mini-clk").textContent = `${hh}:${mm} ET`;
   const p = currentPhase(n);
   if (p.name !== tick.last){ $("#phase-name").textContent = p.name; $("#phase-tip").textContent = p.tip; $("#phase-dot").className = $("#mini-dot").className = "dot " + p.k; tick.last = p.name; }
-  if (n.s === 0 || !tick.drawn){ drawTape(); tick.drawn = true; if (ready && current === "today") { renderNoise(); renderGate(); } }
+  if (n.s === 0 || !tick.drawn){ drawTape(); tick.drawn = true; if (ready && current === "today") { renderNoise(); } }
+  if (ready && current === "today"){ renderNext(); renderGate(); if (store.get("ticket", null)) renderTicket(); else if (n.s % 15 === 0) renderTicket(); }
 }
 
 /* ================= Contracts ================= */
@@ -1923,30 +2067,323 @@ function initJournal(){
   J.trades = store.get("trades", []); renderJournal();
   (async () => { try{
     if (!window.claude || typeof window.claude.use !== "function") return;
-    const db = await window.claude.use("db"); if (!db) return; J.db = db;
+    const db = await window.claude.use("db"); if (!db) return; J.db = db; loadKV(db);
     db.collection("trades").onSnapshot(snap => { J.mode = "db"; J.trades = snap.docs.map(d => ({id:d.id, ...d.data()})); renderJournal(); },
       err => { console.warn(err); J.db = null; J.mode = "local"; J.trades = store.get("trades", []); renderJournal(); });
   }catch(e){ console.warn(e); } })();
+}
+
+/* ================= Personal store (page database, falls back to this browser) ================= */
+const KV = {db:null, cache:{},
+  get(k, d){ if (k in this.cache) return this.cache[k]; const v = store.get("kv:"+k, undefined); return v === undefined ? d : v; },
+  set(k, v){ this.cache[k] = v; store.set("kv:"+k, v); if (this.db) this.db.collection("kv").doc(k).set({v:JSON.stringify(v), at:Date.now()}).catch(e => console.warn(e)); }
+};
+async function loadKV(db){
+  try{ const snap = await db.collection("kv").get(); snap.docs.forEach(d => { try{ const v = JSON.parse(d.data().v); KV.cache[d.id] = v; store.set("kv:"+d.id, v); }catch{} });
+    KV.db = db; applyProfile(); if (current === "plan") renderPlan(); if (current === "today"){ renderEval(); renderTicket(); renderGate(); } }
+  catch(e){ console.warn(e); KV.db = db; }
+}
+/* ---- time zones ---- */
+const LOCAL_TZ = (() => { try{ return Intl.DateTimeFormat().resolvedOptions().timeZone || "America/New_York"; }catch{ return "America/New_York"; } })();
+function tzOffsetMin(tz){ // minutes to ADD to New York time to get time in tz (current DST state)
+  const now = new Date(), f = z => { const p = new Intl.DateTimeFormat("en-US",{timeZone:z, hour12:false, year:"numeric", month:"2-digit", day:"2-digit", hour:"2-digit", minute:"2-digit"}).formatToParts(now); const g = t => +p.find(x => x.type === t).value; return Date.UTC(g("year"), g("month")-1, g("day"), g("hour") % 24, g("minute")); };
+  try{ return Math.round((f(tz) - f("America/New_York"))/60000); }catch{ return 0; } }
+const hm = m => { m = ((Math.round(m) % 1440) + 1440) % 1440; const h = Math.floor(m/60), mi = m % 60, ap = h >= 12 ? "pm" : "am"; return `${((h + 11) % 12) + 1}:${String(mi).padStart(2,"0")} ${ap}`; };
+const toMin = t => { const m = /^(\d{1,2}):(\d{2})/.exec(t || ""); return m ? +m[1]*60 + +m[2] : null; };
+const etHM = m => `${Math.floor(m/60)}:${String(m%60).padStart(2,"0")}`;
+
+/* ---- profile ---- */
+const PROFILE_DEFAULT = {name:"", tz:LOCAL_TZ, exp:"new", free:1330, ws:"", we:"", busy:"08:00-09:30, 16:00-18:00", size:"50K", pace:"safe"};
+function profile(){ const p = Object.assign({}, PROFILE_DEFAULT, KV.get("profile", {}) || {}); const off = tzOffsetMin(p.tz);
+  if (!p.ws) p.ws = etHM(600 + off).padStart(5,"0"); if (!p.we) p.we = etHM(690 + off).padStart(5,"0"); return p; }
+function derived(p = profile()){
+  const S = BT.lucid.sizes[p.size], mll = S.mll;
+  const contracts = p.pace === "fast" ? (p.size === "25K" ? 2 : 4) : p.pace === "balanced" ? (p.size === "25K" ? 1 : 2) : (p.size === "25K" ? 1 : p.exp === "live" ? 2 : 1);
+  const dailyStop = Math.round(mll * (p.pace === "fast" ? .25 : .2) / 10) * 10, perTrade = Math.round(dailyStop / 3 / 5) * 5;
+  const row = (BT.lucid.results.noise || []).find(r => r.size === p.size && r.micros === contracts) || {};
+  const off = tzOffsetMin(p.tz), wsE = toMin(p.ws) - off, weE = toMin(p.we) - off;
+  const busy = (p.busy || "").split(",").map(x => x.trim().split("-").map(toMin)).filter(x => x.length === 2 && x[0] != null && x[1] != null).map(([a,b]) => [a - off, b - off]);
+  const checks = []; for (let m = 600; m <= 930; m += 30){ const inW = m >= wsE && m <= weE, isBusy = busy.some(([a,b]) => m >= a && m < b); checks.push({et:m, local:m + off, ok: inW && !isBusy, busy:isBusy}); }
+  return {S, contracts, dailyStop, perTrade, maxTrades: p.exp === "new" ? 3 : 4, streak:2, row, off, wsE, weE, busy, checks, fee:S.fee};
+}
+function applyProfile(){
+  const p = profile(), d = derived(p);
+  const set = (id, v) => { const e = $("#"+id); if (e && !store.get("limits", null)) e.value = v; };
+  set("pl-maxloss", d.dailyStop); set("pl-maxtrades", d.maxTrades); set("pl-maxstreak", d.streak); set("pl-goal", Math.round(d.S.target * .3 / 10) * 10);
+  if ($("#tt-qty") && !store.get("ticket", null)) $("#tt-qty").value = d.contracts;
+  if ($("#rp-qty")) $("#rp-qty").value = d.contracts;
+  const ev = KV.get("eval", null); if (!ev && $("#ev-size")) $("#ev-size").value = p.size;
+}
+
+/* ================= My plan ================= */
+function fillProfileForm(){
+  const p = profile(), tzs = ["America/New_York","America/Chicago","America/Denver","America/Phoenix","America/Los_Angeles","America/Anchorage","Pacific/Honolulu"];
+  if (!tzs.includes(p.tz)) tzs.unshift(p.tz);
+  $("#pf-tz").innerHTML = tzs.map(z => `<option value="${z}" ${z===p.tz?"selected":""}>${z.replace("America/","").replace("_"," ")}</option>`).join("");
+  $("#pf-name").value = p.name; $("#pf-exp").value = p.exp; $("#pf-free").value = p.free; $("#pf-ws").value = p.ws; $("#pf-we").value = p.we; $("#pf-busy").value = p.busy; $("#pf-size").value = p.size; $("#pf-pace").value = p.pace;
+  $("#pf-note").innerHTML = KV.get("profile", null) ? "Saved to this page's database, so it's available wherever you open it." : "Prefilled from your <b>AnswerRank plan</b>: about <b>$1,330/month</b> free after living costs, and calling blocks around 8–9:30 am and 4–6 pm. Your time zone comes from this device. Edit anything that's changed, then save.";
+  $("#pf-saved").className = "pill " + (KV.get("profile", null) ? "up" : "amb"); $("#pf-saved").textContent = KV.get("profile", null) ? "Saved" : "Not saved yet";
+}
+function readProfileForm(){ return {name:$("#pf-name").value.trim(), tz:$("#pf-tz").value, exp:$("#pf-exp").value, free:+$("#pf-free").value || 0, ws:$("#pf-ws").value, we:$("#pf-we").value, busy:$("#pf-busy").value, size:$("#pf-size").value, pace:$("#pf-pace").value}; }
+function progress(){
+  const quiz = store.get("quiz", {}), qs = QUIZ.filter((q,i) => quiz[i] === q[2]).length;
+  const rp = (store.get("rpScore", null) || {}).done || 0;
+  const real = J.trades.filter(t => !t.example), A = real.filter(t => t.grade === "A").length;
+  const ev = evalCalc();
+  return {qs, rp, trades: real.length, aPct: real.length ? A/real.length : 0, ev};
+}
+function renderPlan(){
+  if (!showTab.planInit){ showTab.planInit = true; fillProfileForm();
+    $("#pf-save").onclick = () => { KV.set("profile", readProfileForm()); store.set("limits", null); applyProfile(); fillProfileForm(); renderPlan(); toast("Profile saved. Your plan and cockpit are updated."); };
+    $("#pf").addEventListener("input", () => { $("#pf-saved").className = "pill amb"; $("#pf-saved").textContent = "Unsaved changes"; }); }
+  const p = KV.get("profile", null) ? profile() : Object.assign(profile(), readProfileForm()), d = derived(p), pr = progress(), name = p.name ? `, ${esc(p.name)}` : "";
+  $("#pl-hello").innerHTML = `Your plan${name}: pass a Lucid ${p.size} eval <span class="grad">safely</span>`;
+  const passP = d.row.pass_rate, failP = d.row.fail_rate;
+  $("#pl-glance").innerHTML = [
+    ["Eval", `LucidFlex ${p.size}`, `target +${money0(d.S.target)} · max loss ${money0(d.S.mll)}`],
+    ["Your size", `${d.contracts} MNQ`, `$${d.contracts*2} per NQ point`],
+    ["Daily stop", money0(-d.dailyStop), `then you're done for the day`],
+    ["Max risk / trade", money0(d.perTrade), `= ${Math.floor(d.perTrade/(d.contracts*2))} pt stop on ${d.contracts} MNQ`],
+    ["Backtest pass rate", passP != null ? pct(passP) : "—", `${failP != null ? pct(failP) + " failed" : ""}${d.row.med_days ? " · median " + d.row.med_days + " sessions" : ""}`],
+    ["Strategy", "Noise-band", "the only proven one"]
+  ].map(([k,v,e]) => `<div class="stat"><small>${k}</small><b style="font-size:19px">${v}</b><em>${e}</em></div>`).join("");
+  // hours chart
+  const svg = $("#pl-hours"); svg.innerHTML = ""; const W = 760, L = 20, Rr = 20, X = m => L + (((m % 1440) + 1440) % 1440)/1440*(W - L - Rr), off = d.off;
+  el("rect",{x:L, y:40, width:W-L-Rr, height:34, rx:6, fill:"var(--surface-2)"}, svg);
+  const band = (a, b, fill, y = 40, h = 34) => { a += 0; const x1 = X(a), x2 = X(b); if (x2 >= x1) el("rect",{x:x1, y, width:Math.max(2, x2-x1), height:h, rx:5, fill}, svg); else { el("rect",{x:x1, y, width:W-Rr-x1, height:h, rx:5, fill}, svg); el("rect",{x:L, y, width:x2-L, height:h, rx:5, fill}, svg); } };
+  band(570 + off, 960 + off, "rgba(76,214,255,.22)");
+  d.busy.forEach(([a,b]) => band(a + off, b + off, "rgba(255,90,122,.35)", 78, 14));
+  band(toMin(p.ws), toMin(p.we), "rgba(43,227,160,.45)", 22, 14);
+  d.checks.forEach(c => el("rect",{x:X(c.local)-1.5, y:36, width:3, height:42, rx:1.5, fill: c.ok ? "var(--up)" : "var(--faint)"}, svg));
+  for (let h = 0; h <= 24; h += 2) txt(svg, X(h*60), 112, hm(h*60).replace(":00",""), {"text-anchor":"middle", "font-size":10});
+  txt(svg, L, 16, "YOUR TRADING WINDOW", {fill:"var(--up)", "font-weight":700, "font-size":10});
+  txt(svg, X(570 + off) + 4, 61, "Market 9:30–4:00 ET", {fill:"var(--cyan)", "font-weight":700, "font-size":10.5});
+  txt(svg, L, 140, "▮ green ticks = noise-band checks you can take · grey = outside your window · red strip = busy", {fill:"var(--muted)", "font-size":10.5});
+  const usable = d.checks.filter(c => c.ok);
+  $("#pl-hours-cap").textContent = `Shown in your time (${p.tz.replace("America/","").replace("_"," ")}). New York is ${off === 0 ? "your time zone" : Math.abs(off/60) + " hour" + (Math.abs(off) === 60 ? "" : "s") + (off < 0 ? " ahead of you" : " behind you")}.`;
+  $("#pl-checks").innerHTML = usable.length ? `<b class="up-t">${usable.length} of 12 checks fit your window:</b> ${usable.map(c => `<span class="pill up" style="margin:2px">${hm(c.local)}</span>`).join(" ")}<br><span class="muted">The first checks (10:00–11:00 ET) produce most entries, because momentum builds early.</span>` : `<b class="down-t">None of the 10:00–3:30 ET checks fit your window.</b> Practice in Replay until you can free up at least 60 minutes between ${hm(600 + off)} and ${hm(690 + off)} your time.`;
+  // rules
+  const firstCheck = usable[0] ? hm(usable[0].local) : hm(600 + off);
+  $("#pl-rules").innerHTML = [
+    `Trade only <b>noise-band momentum</b> signals at the :00/:30 checks. Everything else is a no.`,
+    `Size: <b>${d.contracts} MNQ</b>. Never more, not even after a great day.`,
+    `Every trade has a bracket. Risk per trade ≤ <b>${money0(d.perTrade)}</b> (≈ ${Math.floor(d.perTrade/(d.contracts*2))} points).`,
+    `Daily stop <b>${money0(-d.dailyStop)}</b>, or <b>${d.streak} losses in a row</b>, and you're done. Close the platform.`,
+    `After any losing trade, a <b>10-minute cool-off</b> before the next one. The cockpit enforces it.`,
+    `Flat <b>5 minutes before</b> scheduled news (8:30, 10:00, 2:00 FOMC ET) and flat by <b>${hm(955 + off)}</b> your time.`,
+    `Know today's <b>max loss limit</b> before your first trade. The cockpit shows it live.`,
+    `Keep any single day under <b>${money0(d.S.target * .4)}</b> (40% of the target) so the consistency rule never blocks your pass.`,
+    `Frustrated or anxious? Tap it in the cockpit. Frustrated means a 15-minute lockout.`
+  ].map(x => `<li><span>${x}</span></li>`).join("");
+  // money
+  const attempts = passP ? Math.ceil(1/passP) : 3, cost = d.fee * attempts, perMonth = Math.min(d.fee * 2, Math.max(d.fee, Math.round(p.free * .12)));
+  $("#pl-money").innerHTML = [["List price", money0(d.fee), `LucidFlex ${p.size}, one-time`], ["Attempts to expect", attempts, `at a ${passP ? pct(passP) : "—"} pass rate`], ["Budget for passing", money0(cost), `${p.free ? Math.round(cost/p.free*100) : "—"}% of one month's free money`], ["Max per month", money0(perMonth), `≈ ${p.free ? Math.round(perMonth/p.free*100) : "—"}% of $${p.free.toLocaleString()} free`]]
+    .map(([k,v,e]) => `<div class="stat"><small>${k}</small><b style="font-size:19px">${v}</b><em>${e}</em></div>`).join("");
+  $("#pl-money-note").innerHTML = `Rule of thumb: never buy a new eval the same day one fails. Wait until you've replayed 5 sessions and found what broke. The only money you ever put at risk is the eval fee. The firm's account absorbs the trading losses, so <b>don't open a personal futures account</b> while learning.`;
+  // roadmap
+  const phases = [
+    ["Learn the basics", "Learn tab: key terms, the drawdown simulator, and 7/8 on the quiz.", Math.min(1, pr.qs/7), `${pr.qs}/8 quiz`, "learn"],
+    ["Practice on real days", "10 replay sessions trading only noise-band signals.", Math.min(1, pr.rp/10), `${pr.rp}/10 sessions`, "replay"],
+    ["Prove you follow rules", "30 journal trades (replay or paper) with 80%+ graded A.", Math.min(1, pr.trades/30) * (pr.trades >= 30 && pr.aPct < .8 ? .9 : 1), `${pr.trades}/30 trades · ${pct(pr.aPct)} A`, "journal"],
+    ["Take the eval", `LucidFlex ${p.size} at ${d.contracts} MNQ. Log each day's close in the cockpit.`, pr.ev.state === "passed" ? 1 : pr.ev.days ? Math.min(.95, Math.max(0, pr.ev.prof)/d.S.target) : 0, pr.ev.days ? `${money0(pr.ev.prof,1)} of ${money0(d.S.target)}` : "not started", "today"],
+    ["Funded: protect it", "5 winning days of $150+, then a payout. The drawdown resets to the floor after each payout.", pr.ev.state === "passed" ? .05 : 0, pr.ev.state === "passed" ? "you're here" : "later", "prop"]
+  ];
+  const cur = phases.findIndex(x => x[2] < 1);
+  $("#pl-road").innerHTML = phases.map(([t, dsc, v, lab, tab], i) => `<div class="ph ${v >= 1 ? "done" : i === cur ? "now" : ""}"><span class="n">${v >= 1 ? "✓" : i+1}</span><div><b style="color:var(--ink)">${t}</b><div class="small muted">${dsc}</div><div class="bar"><i style="width:${Math.round(v*100)}%"></i></div></div><button class="btn ghost" data-go="${tab}">${lab} →</button></div>`).join("");
+  const ready = phases.slice(0,3).every(x => x[2] >= 1), g = $("#pl-ready");
+  if (pr.ev.state === "passed"){ g.className = "gate ok"; g.innerHTML = `<span class="dot live"></span><div><strong>Eval passed. Protect the funded account.</strong><div class="small">Same size, same rules. Your first job is to not give it back.</div></div>`; }
+  else if (ready){ g.className = "gate ok"; g.innerHTML = `<span class="dot live"></span><div><strong>You're ready to buy your eval</strong><div class="small">You've learned the rules, practiced 10 real sessions and followed your rules on 30+ trades. LucidFlex ${p.size}, ${d.contracts} MNQ, and the cockpit open beside your platform.</div></div>`; }
+  else { const left = phases.slice(0,3).filter(x => x[2] < 1).length; g.className = "gate warn"; g.innerHTML = `<span class="dot warn"></span><div><strong>Not yet: ${left} checkpoint${left>1?"s":""} before buying an eval</strong><div class="small">Practice is free and an eval isn't. Finish the roadmap steps below first. Next up: ${phases[cur][0].toLowerCase()}.</div></div>`; }
+  // day plan
+  $("#pl-day").innerHTML = [
+    [hm(540 + off), "Open the cockpit in <b>side-by-side mode</b> next to your platform. Enter today's news times. Check your max loss limit."],
+    [hm(565 + off), "Pre-market checklist. Mark yesterday's close, the overnight high/low and 9:30's open."],
+    [hm(570 + off), "Market opens. <b>Don't trade the first 30 minutes.</b> The first signal check is 10:00 ET."],
+    [firstCheck, "First check you can take. Enter today's open, prior close and price in the noise-band card. Signal → fill in the trade ticket, and only click in when every check is green."],
+    ["In a trade", "Hands off. The bracket manages it. Only exit early at a check that closes back through the band or VWAP."],
+    ["After a trade", "Log the exit in the ticket (it goes to your journal). Loss → the 10-minute cool-off starts automatically."],
+    [hm(955 + off), "Flat. Log the day's closing balance in the eval tracker. Grade your trades A/B/C."]
+  ].map(([t,x]) => `<div class="rule"><b>${t}</b><span>${x}</span></div>`).join("");
+}
+
+/* ================= Eval tracker ================= */
+function evalState(){ return KV.get("eval", null) || {size: profile().size, days:[]}; }
+function evalCalc(extraNow){
+  const st = evalState(), S = BT.lucid.sizes[st.size || "50K"]; let bal = S.start, peak = bal, mll = bal - S.mll, locked = false, best = 0, state = "active", failDay = null; const rows = [];
+  const days = (st.days || []).slice().sort((a,b) => a.date.localeCompare(b.date));
+  for (const d of days){
+    if (d.low != null && d.low !== "" && +d.low <= mll && state === "active"){ state = "failed"; failDay = d.date; }
+    const day = +d.close - bal; bal = +d.close; if (bal <= mll && state === "active"){ state = "failed"; failDay = d.date; }
+    best = Math.max(best, day); peak = Math.max(peak, bal);
+    if (!locked){ if (peak > S.start + S.mll + 100){ locked = true; mll = S.start + 100; } else mll = peak - S.mll; }
+    rows.push({...d, day, mll});
+    const prof = bal - S.start; if (state === "active" && prof >= S.target && best <= .5*prof && rows.length >= 2) state = "passed";
+  }
+  const now = extraNow != null && isFinite(extraNow) && extraNow > 0 ? extraNow : bal;
+  return {S, size: st.size || "50K", rows, bal, now, mll, locked, best, prof: bal - S.start, profNow: now - S.start, state, failDay, days: rows.length};
+}
+function renderEval(){
+  if (!$("#ev-size")) return;
+  if (!renderEval.init){ renderEval.init = true;
+    const st = evalState(); $("#ev-size").value = st.size || profile().size; $("#ev-d").value = todayNY(); $("#ev-now").value = store.get("evNow", "") || "";
+    $("#ev-size").onchange = () => { const s2 = evalState(); s2.size = $("#ev-size").value; KV.set("eval", s2); renderEval(); renderGate(); renderTicket(); };
+    $("#ev-now").oninput = () => { store.set("evNow", $("#ev-now").value); renderEval(); renderGate(); renderTicket(); };
+    $("#ev-add").onclick = () => { const c = +$("#ev-c").value; if (!(c > 0)){ toast("Enter the closing balance from your platform."); return; }
+      const s2 = evalState(); s2.days = (s2.days || []).filter(x => x.date !== $("#ev-d").value); s2.days.push({date:$("#ev-d").value, close:c, low: $("#ev-l").value ? +$("#ev-l").value : null}); KV.set("eval", s2);
+      $("#ev-c").value = ""; $("#ev-l").value = ""; toast("Day logged"); renderEval(); renderGate(); };
+    $("#ev-rows").onclick = e => { const b = e.target.closest("[data-evdel]"); if (!b) return; const s2 = evalState(); s2.days = s2.days.filter(x => x.date !== b.dataset.evdel); KV.set("eval", s2); renderEval(); };
+    let armed = false; $("#ev-reset").onclick = e => { if (!armed){ armed = true; e.target.textContent = "Tap again to clear all days"; setTimeout(() => { armed = false; e.target.textContent = "Start a new eval"; }, 3000); return; } KV.set("eval", {size: $("#ev-size").value, days: []}); armed = false; e.target.textContent = "Start a new eval"; renderEval(); };
+  }
+  const c = evalCalc(parseFloat($("#ev-now").value)), S = c.S, pv = derived().contracts * 2, room = c.now - c.mll, toT = S.start + S.target - c.now;
+  $("#ev-count").textContent = c.days;
+  const pill = $("#ev-status"); pill.className = "pill " + (c.state === "passed" ? "up" : c.state === "failed" ? "down" : c.days ? "amb" : ""); pill.textContent = c.state === "passed" ? "Passed" : c.state === "failed" ? "Failed" : c.days ? `Day ${c.days}` : "Not started";
+  const svg = $("#ev-gauge"); svg.innerHTML = ""; const W = 520, L = 14, Rr = 14, lo = c.mll - S.mll*.05, hi = S.start + S.target + S.mll*.05, X = v => L + (Math.min(hi, Math.max(lo, v)) - lo)/(hi - lo)*(W - L - Rr);
+  el("rect",{x:L, y:44, width:W-L-Rr, height:18, rx:9, fill:"var(--surface-2)"}, svg);
+  el("rect",{x:X(c.mll), y:44, width:X(c.mll + Math.min(room, S.mll*.25)) - X(c.mll), height:18, rx:9, fill:"var(--down-dim)"}, svg);
+  el("rect",{x:X(c.mll), y:44, width:Math.max(0, X(c.now) - X(c.mll)), height:18, rx:9, fill: room < S.mll*.25 ? "var(--down)" : room < S.mll*.5 ? "var(--amber)" : "url(#bandHot)"}, svg);
+  el("rect",{x:X(c.mll)-2, y:34, width:4, height:38, rx:2, fill:"var(--down)"}, svg); txt(svg, X(c.mll), 26, `LIMIT ${money0(c.mll)}${c.locked ? " (locked)" : ""}`, {"text-anchor":"start", fill:"var(--down)", "font-weight":800, "font-size":11});
+  el("rect",{x:X(S.start + S.target)-2, y:34, width:4, height:38, rx:2, fill:"var(--up)"}, svg); txt(svg, X(S.start + S.target), 26, `TARGET ${money0(S.start + S.target)}`, {"text-anchor":"end", fill:"var(--up)", "font-weight":800, "font-size":11});
+  el("circle",{cx:X(c.now), cy:53, r:10, fill:"var(--ink)", stroke:"var(--bg)", "stroke-width":3, filter:"url(#glow)"}, svg); txt(svg, X(c.now), 92, `NOW ${money0(c.now)}`, {"text-anchor":"middle", fill:"var(--ink)", "font-weight":800, "font-size":12});
+  $("#ev-num").innerHTML = [["Room to the limit", `<span class="${room < S.mll*.25 ? "glow-down" : room < S.mll*.5 ? "amb-t" : "glow-up"}">${money0(room)}</span>`, `= ${Math.floor(room/pv)} NQ pts on ${pv/2} MNQ`], ["To the target", toT > 0 ? money0(toT) : "Reached", toT > 0 ? `${Math.ceil(toT/pv)} pts on ${pv/2} MNQ` : "check consistency"], ["Biggest day", c.days ? money0(c.best) : "—", c.prof > 0 ? `${Math.round(c.best/Math.max(1,c.prof)*100)}% of profit (max 50%)` : "consistency rule"]]
+    .map(([k,v,e]) => `<div class="stat"><small>${k}</small><b style="font-size:19px">${v}</b><em>${e}</em></div>`).join("");
+  let note = "";
+  if (c.state === "failed") note = `<b class="down-t">This eval failed on ${c.failDay}.</b> Replay 5 sessions and find what broke before buying another.`;
+  else if (c.state === "passed") note = `<b class="up-t">Passed.</b> Target met with the biggest day under 50% of profit.`;
+  else if (room < S.mll*.25) note = `<b class="down-t">Danger zone.</b> One more ${money0(room)} loss ends the account. Halve your size or stop for today.`;
+  else if (c.prof >= S.target && c.best > .5*c.prof) note = `Target reached, but your biggest day is too large a share. Keep trading small until profit ≥ <b>${money0(c.best*2)}</b>.`;
+  else note = c.days ? `The limit trails your best close and ${c.locked ? "has <b>locked</b>. It won't move again" : `locks at ${money0(S.start + 100)} once you close above ${money0(S.start + S.mll + 100)}`}.` : "Log each day's closing balance (and the lowest point if you know it). Enter your live balance above while trading.";
+  $("#ev-note").innerHTML = note;
+  $("#ev-rows").innerHTML = c.rows.slice().reverse().map(r => `<tr><td class="mono">${r.date}</td><td class="n">${money0(r.close)}</td><td class="n ${cls(r.day)}">${money0(r.day,1)}</td><td class="n down-t">${money0(r.mll)}</td><td><button class="btn ghost" data-evdel="${r.date}">✕</button></td></tr>`).join("") || `<tr><td colspan="5" class="muted">No days logged yet.</td></tr>`;
+}
+
+/* ================= Trade ticket ================= */
+let ttSide = 1;
+function cooldown(){ const c = KV.get("cooldown", null); return c && c.until > Date.now() ? c : null; }
+function startCooldown(min, why){ KV.set("cooldown", {until: Date.now() + min*60000, why}); renderGate(); renderTicket(); }
+function newsTimes(){ return ($("#cp-news")?.value || "").split(/[ ,;]+/).map(toMin).filter(x => x != null); }
+function inBlackout(n = nyNow()){ const m = n.mins + n.s/60; return newsTimes().find(t => m >= t - 5 && m < t + 5); }
+function todayTrades(){ const today = todayNY(); return sortT(J.trades.filter(t => t.date === today)).map(t => ({t, ...tradeCalc(t)})); }
+function ticketChecks(){
+  const d = derived(), n = nyNow(), e = val("tt-entry"), st = val("tt-stop"), q = Math.max(1, Math.floor(val("tt-qty") || 1));
+  const risk = isFinite(e) && isFinite(st) ? Math.abs(e - st) * 2 * q + (+(store.get("fee", 1.24)) || 0) * q : NaN;
+  const pnl = todayTrades().reduce((a,c) => a + c.net, 0), ml = val("pl-maxloss") || d.dailyStop, roomDay = ml + Math.min(0, pnl);
+  const ev = evalCalc(parseFloat($("#ev-now")?.value)), evRoom = ev.now - ev.mll, bo = inBlackout(n), cd = cooldown();
+  const dirOK = isFinite(e) && isFinite(st) && (ttSide > 0 ? st < e : st > e);
+  const inWin = n.mins >= d.wsE && n.mins <= d.weE;
+  const out = [
+    [dirOK, dirOK ? `Stop is on the right side (${ttSide > 0 ? "below" : "above"} entry)` : "Enter an entry and a stop on the correct side"],
+    [dirOK && Math.abs(e - st) >= 10, `Stop is outside normal noise (≥ 10 pts; yours ${dirOK ? Math.abs(e - st).toFixed(2) : "—"})`],
+    [q <= d.contracts, `Size within your plan (${q} ≤ ${d.contracts} MNQ)`],
+    [isFinite(risk) && risk <= d.perTrade * 1.001, `Risk ≤ ${money0(d.perTrade)} per trade (this one ${isFinite(risk) ? money(risk) : "—"})`],
+    [isFinite(risk) && risk <= roomDay, `Fits today's loss room (${money0(roomDay)} left)`],
+    [!ev.days && !$("#ev-now")?.value ? "warn" : isFinite(risk) && evRoom - risk > ev.S.mll * .15, !ev.days && !$("#ev-now")?.value ? "Enter your eval balance to check the max loss limit" : `A full stop leaves ${money0(evRoom - (risk || 0))} above the max loss limit`],
+    [!cd, cd ? `Cool-off active: ${cd.why}` : "No cool-off running"],
+    [!bo, bo != null ? `News blackout (${etHM(bo)} ET release)` : "Not within 5 min of scheduled news"],
+    [n.mins < 950 && currentPhase(n).k !== "off", n.mins >= 950 ? "Too close to the close (after 3:50 pm ET)" : currentPhase(n).k === "off" ? "Market closed" : "Enough session left"],
+    [inWin ? true : "warn", inWin ? "Inside your trading window" : "Outside your planned trading window"],
+    [$("#tt-c1")?.checked, "It's a tested-setup signal"], [$("#tt-c2")?.checked, "Bracket placed in the platform"]
+  ];
+  return {out, risk, q, e, st, ok: out.every(([v]) => v === true || v === "warn")};
+}
+function renderTicket(){
+  if (!$("#tt-card")) return;
+  if (!renderTicket.init){ renderTicket.init = true;
+    $("#tt-setup").innerHTML = BT.strats.filter(s => ["proven","promising"].includes(s.verdict)).map(s => `<option>${s.name}</option>`).join("") + `<option>Replay drill</option><option>Other / unplanned</option>`;
+    $("#tt-long").onclick = () => { ttSide = 1; $("#tt-long").setAttribute("aria-pressed", true); $("#tt-short").setAttribute("aria-pressed", false); renderTicket(); };
+    $("#tt-short").onclick = () => { ttSide = -1; $("#tt-short").setAttribute("aria-pressed", true); $("#tt-long").setAttribute("aria-pressed", false); renderTicket(); };
+    ["tt-entry","tt-stop","tt-tgt","tt-qty","tt-c1","tt-c2"].forEach(id => $("#"+id).addEventListener("input", renderTicket));
+    $("#tt-go").onclick = () => { const c = ticketChecks(); if (!c.ok) return;
+      store.set("ticket", {side:ttSide, entry:c.e, stop:c.st, tgt: val("tt-tgt") || null, qty:c.q, setup:$("#tt-setup").value, at:Date.now(), time:`${String(nyNow().h).padStart(2,"0")}:${String(nyNow().m).padStart(2,"0")}`});
+      $("#tt-c1").checked = false; $("#tt-c2").checked = false; renderTicket(); renderGate(); };
+    $("#tt-open").addEventListener("click", async e => {
+      const tk = store.get("ticket", null); if (!tk) return;
+      if (e.target.id === "tt-cancel"){ store.set("ticket", null); renderTicket(); renderGate(); return; }
+      if (e.target.id === "tt-log"){ const x = val("tt-exit"); if (!isFinite(x)){ toast("Enter your exit price."); return; }
+        const grade = $("#tt-grade").value;
+        await saveTrade({date:todayNY(), time:tk.time, sym:"MNQ", side: tk.side > 0 ? "Long" : "Short", qty:tk.qty, entry:tk.entry, exit:x, stop:tk.stop, strategy:tk.setup, grade, notes:"Logged from the cockpit"});
+        const net = (x - tk.entry) * tk.side * 2 * tk.qty; store.set("ticket", null);
+        if (net < 0) startCooldown(10, "10-minute reset after a loss"); else renderGate();
+        toast(`Logged ${money(net,1)} to your journal`); renderTicket(); if ($("#ev-now").value){ $("#ev-now").value = Math.round(+$("#ev-now").value + net); store.set("evNow", $("#ev-now").value); renderEval(); } }
+    });
+  }
+  const tk = store.get("ticket", null);
+  $("#tt-form").hidden = !!tk; $("#tt-open").hidden = !tk;
+  $("#tt-state").className = "pill " + (tk ? "amb" : ""); $("#tt-state").textContent = tk ? "IN A TRADE" : "Flat";
+  if (tk){
+    const mins = Math.floor((Date.now() - tk.at)/60000), risk = Math.abs(tk.entry - tk.stop) * 2 * tk.qty;
+    if (!$("#tt-exit")) $("#tt-open").innerHTML = `<div class="intrade"><div class="row" style="justify-content:space-between"><b style="font-size:18px;color:var(--ink)" class="${tk.side>0?"up-t":"down-t"}">${tk.side>0?"LONG":"SHORT"} ${tk.qty} MNQ @ ${tk.entry.toFixed(2)}</b><span class="mono" id="tt-timer"></span></div>
+      <dl class="kv" style="margin-top:10px"><dt>Stop</dt><dd class="down-t">${tk.stop.toFixed(2)} (−${money0(risk)})</dd><dt>Target</dt><dd class="up-t">${tk.tgt ? tk.tgt.toFixed(2) + " (+" + money0(Math.abs(tk.tgt - tk.entry)*2*tk.qty) + ")" : "trailing (band / VWAP)"}</dd><dt>Setup</dt><dd>${esc(tk.setup)}</dd></dl>
+      <p class="small" style="margin-top:10px">Hands off. The bracket manages the trade. Don't move the stop away. Exit early only at a :00/:30 check that closes back through the band or VWAP.</p>
+      <div class="form" style="margin-top:10px"><label class="f">Exit price<input id="tt-exit" type="number" class="mono" step="0.25"></label><label class="f">Did you follow your rules?<select id="tt-grade"><option value="A">A · exactly to plan</option><option value="B">B · small slip</option><option value="C">C · broke a rule</option></select></label></div>
+      <div class="row" style="margin-top:10px"><button class="btn primary" id="tt-log">Log exit to journal</button><button class="btn ghost" id="tt-cancel">Didn't fill: cancel</button></div></div>`;
+    const tm = $("#tt-timer"); if (tm) tm.textContent = `${mins} min in trade`;
+    return;
+  }
+  const c = ticketChecks(), d = derived();
+  $("#tt-num").innerHTML = [["Risk", isFinite(c.risk) ? money(c.risk) : "—"], ["Reward", isFinite(val("tt-tgt")) && isFinite(c.e) ? money(Math.abs(val("tt-tgt") - c.e) * 2 * c.q) : "trailing"], ["Your max", money0(d.perTrade)]].map(([k,v]) => `<div class="stat"><small>${k}</small><b style="font-size:17px">${v}</b></div>`).join("");
+  $("#tt-checks").innerHTML = c.out.map(([v, l]) => `<li class="${v === true ? "ok" : v === "warn" ? "wn" : "no"}"><span class="i">${v === true ? "✓" : v === "warn" ? "!" : "✕"}</span><span>${l}</span></li>`).join("");
+  $("#tt-go").disabled = !c.ok; $("#tt-go").textContent = c.ok ? "I'm in: start the trade" : `Blocked: ${c.out.filter(([v]) => v !== true && v !== "warn").length} check(s) failing`;
+}
+
+/* ================= Cockpit: next event, sound, wake lock, compact ================= */
+let wakeLock = null, audioCtx = null, lastBeep = "";
+function beep(freq = 880, ms = 180){ try{ audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)(); const o = audioCtx.createOscillator(), g = audioCtx.createGain(); o.frequency.value = freq; g.gain.value = .08; o.connect(g); g.connect(audioCtx.destination); o.start(); o.stop(audioCtx.currentTime + ms/1000); }catch{} }
+function nextEvent(n = nyNow()){
+  const d = derived(), ev = [];
+  for (let m = 600; m <= 930; m += 30) ev.push([m, "noise-band check", d.checks.find(c => c.et === m)?.ok]);
+  newsTimes().forEach(t => ev.push([t - 5, `news blackout starts (${etHM(t)} ET release)`, true]));
+  ev.push([955, "flatten everything", true], [960, "cash close", true]);
+  const now = n.mins + n.s/60; ev.sort((a,b) => a[0] - b[0]);
+  return ev.find(e => e[0] > now) || null;
+}
+function renderNext(){
+  const el2 = $("#cp-next"); if (!el2) return; const n = nyNow(), ph = currentPhase(n);
+  if (ph.k === "off" && ph.name.startsWith("Weekend")){ el2.innerHTML = `Weekend: market closed<small>Replay a session or finish a roadmap step on the My plan tab.</small>`; return; }
+  const e = nextEvent(n), off = derived().off;
+  if (!e){ el2.innerHTML = `No more trading events today<small>Log today's closing balance in the eval tracker.</small>`; return; }
+  const sec = Math.max(0, Math.round((e[0] - n.mins)*60 - n.s)), mm = Math.floor(sec/60), ss = sec % 60;
+  el2.innerHTML = `Next: ${e[1]} · <span class="${sec < 120 ? "amb-t" : ""}">${mm >= 60 ? Math.floor(mm/60) + "h " + (mm%60) + "m" : mm + ":" + String(ss).padStart(2,"0")}</span><small>${etHM(e[0])} ET · ${hm(e[0] + off)} your time${e[2] === false ? " · outside your window" : ""}</small>`;
+  if (store.get("sound", false) && e[2] !== false){ const key = e[0] + "|" + todayNY(); if (sec <= 60 && sec > 57 && lastBeep !== key + "a"){ lastBeep = key + "a"; beep(660); } if (sec <= 1 && lastBeep !== key + "b"){ lastBeep = key + "b"; beep(990, 300); setTimeout(() => beep(990, 300), 380); } }
+}
+function initCockpit(){
+  const comp = store.get("compact", false); document.body.classList.toggle("compact", comp); $("#cp-compact").setAttribute("aria-pressed", comp);
+  $("#cp-compact").onclick = () => { const v = !document.body.classList.contains("compact"); document.body.classList.toggle("compact", v); store.set("compact", v); $("#cp-compact").setAttribute("aria-pressed", v); if (v) toast("Side-by-side mode: make this window narrow and put it next to your platform."); };
+  $("#cp-sound").setAttribute("aria-pressed", store.get("sound", false));
+  $("#cp-sound").onclick = () => { const v = !store.get("sound", false); store.set("sound", v); $("#cp-sound").setAttribute("aria-pressed", v); if (v){ beep(880); toast("Sound on: a beep 1 minute before each check and news blackout, and a double beep at the time."); } };
+  $("#cp-wake").onclick = async () => { try{ if (wakeLock){ await wakeLock.release(); wakeLock = null; $("#cp-wake").setAttribute("aria-pressed", false); return; } wakeLock = await navigator.wakeLock.request("screen"); $("#cp-wake").setAttribute("aria-pressed", true); wakeLock.addEventListener("release", () => { wakeLock = null; $("#cp-wake").setAttribute("aria-pressed", false); }); } catch { toast("This browser won't keep the screen on. Change your screen timeout instead."); } };
+  $("#cp-news").value = store.get("news:" + todayNY(), "08:30, 10:00");
+  $("#cp-news").addEventListener("input", () => { store.set("news:" + todayNY(), $("#cp-news").value); renderGate(); renderTicket(); });
+  $("#tilt").onclick = e => { const b = e.target.closest("[data-m]"); if (!b) return; const m = b.dataset.m; KV.set("mood", {m, at:Date.now(), date:todayNY()});
+    if (m === "tilt") startCooldown(15, "you said you're frustrated. Walk away for 15 minutes"); else { renderGate(); toast(m === "calm" ? "Good. Trade your plan." : "Anxious: halve your size or skip the next signal."); } };
+  applyProfile(); renderEval(); renderTicket(); renderNext();
 }
 
 /* ================= Today: gate, checklist, levels ================= */
 const CHECKS = ["Checked the economic calendar (8:30, 10:00, 2:00 ET)","Marked prior day high / low / close and overnight high / low","Noise bands calculated from today's open and prior close","Trading only backtested setups today (no fades)","Bracket orders ready on the platform","Daily loss limit set and I will honor it","Rested, focused, no revenge from yesterday"];
 const LEVELS = ["Prior day high","Prior day low","Prior day close","Overnight high","Overnight low","Opening range high","Opening range low"];
 function renderGate(){
-  const today = todayNY();
-  const tr = sortT(J.trades.filter(t => t.date === today)).map(t => ({t, ...tradeCalc(t)}));
+  const tr = todayTrades(), d = derived();
   const pnl = tr.reduce((a,c) => a + c.net, 0); let streak = 0; for (let i = tr.length-1; i >= 0 && tr[i].net <= 0; i--) streak++;
   const ml = val("pl-maxloss")||0, mt = val("pl-maxtrades")||0, ms = val("pl-maxstreak")||0, goal = val("pl-goal")||0, used = ml ? Math.max(0,-pnl)/ml : 0;
   const mtr = $("#pl-meter"); mtr.style.width = Math.min(100, used*100) + "%"; mtr.style.background = used >= 1 ? "var(--down)" : used >= .6 ? "var(--amber)" : "var(--up)"; mtr.style.color = mtr.style.background;
   $("#pl-kv").innerHTML = `<dt>Today's net</dt><dd class="${cls(pnl)}">${money(pnl,1)}</dd><dt>Trades</dt><dd>${tr.length} / ${mt}</dd><dt>Losses in a row</dt><dd>${streak} / ${ms}</dd><dt>Loss room left</dt><dd>${money0(Math.max(0, ml + Math.min(0,pnl)))}</dd>`;
   $("#today-pnl-pill").className = "pill " + (pnl > 0 ? "up" : pnl < 0 ? "down" : ""); $("#today-pnl-pill").textContent = "Today " + money0(pnl, 1);
-  const ph = currentPhase(nyNow()); let st = "ok", head = "Clear to trade", why = `${ph.name}. Stick to tested setups.`;
-  if (ml && pnl <= -ml){ st = "stop"; head = "Done for the day"; why = "Daily loss limit hit. Close the platform."; }
-  else if (ms && streak >= ms){ st = "stop"; head = "Stop: loss streak"; why = `${streak} losses in a row. Step away for at least an hour.`; }
+  const n = nyNow(), ph = currentPhase(n), cd = cooldown(), bo = inBlackout(n), ev = evalCalc(parseFloat($("#ev-now")?.value)), evRoom = ev.now - ev.mll, tk = store.get("ticket", null), mood = KV.get("mood", null);
+  let st = "ok", head = "Clear to trade", why = `${ph.name}. Wait for a noise-band signal at the next check, then fill in the trade ticket.`;
+  if (tk){ st = "warn"; head = "In a trade: hands off"; why = "Let the bracket work. Log the exit in the trade ticket when it closes."; }
+  else if (cd){ const s2 = Math.ceil((cd.until - Date.now())/1000); st = "stop"; head = `Cool-off: ${Math.floor(s2/60)}:${String(s2%60).padStart(2,"0")}`; why = `${cd.why.charAt(0).toUpperCase() + cd.why.slice(1)}. Stand up, look away from the chart.`; }
+  else if (ev.state === "failed"){ st = "stop"; head = "Eval failed"; why = "Don't buy another today. Replay 5 sessions first and find what broke."; }
+  else if (ml && pnl <= -ml){ st = "stop"; head = "Done for the day"; why = "Daily loss limit hit. Close the platform. Tomorrow is another session."; }
+  else if (ms && streak >= ms){ st = "stop"; head = "Stop: loss streak"; why = `${streak} losses in a row. That's your rule. Done for today.`; }
   else if (mt && tr.length >= mt){ st = "stop"; head = "Trade limit reached"; why = "You've taken your max trades for today."; }
-  else if (goal && pnl >= goal){ st = "warn"; head = "Goal reached"; why = "Stop, or cut size in half. Don't give it back."; }
-  else if ($$("#checklist input").some(c => !c.checked)){ st = "warn"; head = "Finish your checklist"; why = "Complete the pre-market checklist before your first trade."; }
+  else if ((ev.days || $("#ev-now")?.value) && evRoom < d.perTrade * 1.5){ st = "stop"; head = "Too close to the max loss limit"; why = `Only ${money0(evRoom)} of room. One more stop could end the eval. Done for today.`; }
+  else if (bo != null){ st = "stop"; head = "News blackout"; why = `${etHM(bo)} ET release. Stay flat until 5 minutes after.`; }
+  else if (n.mins >= 950 && n.mins < 960){ st = "stop"; head = "Flatten now"; why = "Last minutes of the session. No new trades; close anything open."; }
   else if (ph.k === "off"){ st = "warn"; head = "Market closed"; why = ph.tip; }
+  else if (goal && pnl >= goal){ st = "warn"; head = "Goal reached"; why = "Stop here. Protecting a good day matters more than adding to it (and it keeps you consistent)."; }
+  else if (mood && mood.date === todayNY() && mood.m === "anxious" && Date.now() - mood.at < 3600e3){ st = "warn"; head = "Anxious: trade smaller"; why = "Halve your size or skip the next signal."; }
+  else if ($$("#checklist input").some(c => !c.checked)){ st = "warn"; head = "Finish your checklist"; why = "Complete the pre-market checklist before your first trade."; }
+  else if (!(n.mins >= d.wsE && n.mins <= d.weE)){ st = "warn"; head = "Outside your trading window"; why = `Your plan says ${hm(d.wsE + d.off)}–${hm(d.weE + d.off)} your time.`; }
   const g = $("#gate"); g.className = "gate " + st; g.innerHTML = `<span class="dot ${st==="ok"?"live":st==="stop"?"off":"warn"}"></span><div><strong>${head}</strong><div class="small">${why}</div></div>`;
 }
 function initToday(){
@@ -1985,10 +2422,10 @@ function init(){
     const tr = e.target.closest("tr[data-k]"); if (tr){ selStrat = tr.dataset.k; renderDetail(); if (innerWidth < 980) $("#detail").scrollIntoView({behavior:"smooth"}); } });
   $("#lb").addEventListener("keydown", e => { const tr = e.target.closest("tr[data-k]"); if (tr && (e.key === "Enter" || e.key === " ")){ e.preventDefault(); selStrat = tr.dataset.k; renderDetail(); } });
   $("#ex-win").onclick = () => { exKind = "win"; renderExample(); }; $("#ex-loss").onclick = () => { exKind = "loss"; renderExample(); };
-  initToday(); initReplay(); initTools(); initJournal();
+  initToday(); initReplay(); initTools(); initJournal(); initCockpit();
   const h = (location.hash || "").slice(1);
   ready = true;
-  showTab(TABS.includes(h) ? h : store.get("tab", "today"));
+  showTab(h === "cockpit" ? "today" : TABS.includes(h) ? h : store.get("tab", store.get("kv:profile", null) ? "today" : "plan"));
 }
 init();
 window.NQDESK = {luEval, luSeries, LU};  // exposed for verification

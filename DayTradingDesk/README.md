@@ -5,7 +5,8 @@ Nasdaq-100 futures (NQ / MNQ). Open `index.html` in any browser.
 
 | Tab | What it does |
 | --- | --- |
-| Today | Live New York session clock, front-month contract, trade/no-trade gate from your daily limits, noise-band signal calculator, checklist, key levels |
+| My plan | Personal guide generated from your profile: hours in your time zone, eval size and contracts, daily stop, budget, rules, roadmap with auto progress, readiness gate |
+| Cockpit | Side-by-side live trading panel: next-event countdown with sound, GO/STOP gate, trade ticket that blocks trades failing risk checks, LucidFlex eval tracker (max-loss distance), cool-offs after losses, tilt check. Also: Live New York session clock, front-month contract, trade/no-trade gate from your daily limits, noise-band signal calculator, checklist, key levels |
 | Research fleet | Eight research agents modeled on the AnswerRank pipeline (Scout, Auditor, Skeptic, Regime analyst, Portfolio builder, Risk officer, Reporter, Bookkeeper), regime heatmap, portfolios, correlations, Scout research ledger |
 | Prop eval | Lucid Trading LucidFlex rules, pass-rate simulator by size and contracts, luck baseline, how to get the eval |
 | Backtest Lab | 41 strategies + benchmark tested on 2,630 real NQ sessions (2015 to Jul 2025): leaderboard, equity curves, yearly results, real example trades |
