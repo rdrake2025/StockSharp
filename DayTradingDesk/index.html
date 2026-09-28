@@ -1,0 +1,1265 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>NQ Day Trading Desk</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@100..125,500..900&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+:root{
+  color-scheme: light;
+  --bg:#EEF1F5; --surface:#FFFFFF; --surface-2:#F6F8FB; --ink:#111827; --muted:#586174; --faint:#8A93A6;
+  --line:#D8DDE6; --grid:#E7EBF1;
+  --accent:#A86A0C; --accent-soft:#F7E9CF; --accent-ink:#5B3A05;
+  --up:#12805A; --up-soft:#DDF3EA; --down:#C23048; --down-soft:#F9E0E4;
+  --ema1:#2F5BE0; --ema2:#8446D9; --focus:#2F5BE0;
+  --display:"Archivo","Arial Narrow",system-ui,sans-serif;
+  --body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,"SFMono-Regular",Menlo,Consolas,monospace;
+  --r:10px;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme: dark;
+    --bg:#0D1220; --surface:#151C2E; --surface-2:#1B2338; --ink:#E7EAF1; --muted:#A1A9BC; --faint:#6F7890;
+    --line:#2A3450; --grid:#1F2840;
+    --accent:#F0B341; --accent-soft:#3A2C12; --accent-ink:#F7D48C;
+    --up:#35C48F; --up-soft:#10352A; --down:#F2667C; --down-soft:#3B1720;
+    --ema1:#6F92FF; --ema2:#B38BFF; --focus:#6F92FF;
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme: dark;
+  --bg:#0D1220; --surface:#151C2E; --surface-2:#1B2338; --ink:#E7EAF1; --muted:#A1A9BC; --faint:#6F7890;
+  --line:#2A3450; --grid:#1F2840;
+  --accent:#F0B341; --accent-soft:#3A2C12; --accent-ink:#F7D48C;
+  --up:#35C48F; --up-soft:#10352A; --down:#F2667C; --down-soft:#3B1720;
+  --ema1:#6F92FF; --ema2:#B38BFF; --focus:#6F92FF;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:15px/1.55 var(--body);-webkit-font-smoothing:antialiased}
+.wrap{max-width:1180px;margin:0 auto;padding-inline:clamp(16px,3vw,32px);padding-block:0 64px}
+h1,h2,h3{font-family:var(--display);text-wrap:balance;margin:0;line-height:1.1}
+h2{font-size:clamp(24px,3.2vw,34px);font-weight:800;font-stretch:112%;letter-spacing:-.01em}
+h3{font-size:18px;font-weight:700;font-stretch:108%}
+p{margin:0}
+.lede{color:var(--muted);max-width:68ch}
+.mono,.num{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.eyebrow{font:600 11px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--accent)}
+a{color:var(--focus)}
+:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+button,input,select,textarea{font:inherit;color:inherit}
+
+/* ---------- header ---------- */
+header.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.top-inner{max-width:1180px;margin:0 auto;padding:10px clamp(16px,3vw,32px);display:flex;gap:18px;align-items:center;flex-wrap:wrap}
+.brand{display:flex;align-items:baseline;gap:10px}
+.brand b{font:900 20px/1 var(--display);font-stretch:125%;letter-spacing:-.01em}
+.brand span{font:500 11px/1 var(--mono);color:var(--muted);letter-spacing:.08em}
+nav.tabs{display:flex;gap:2px;flex-wrap:wrap;margin-left:auto}
+nav.tabs button{border:0;background:none;padding:8px 12px;border-radius:8px;cursor:pointer;color:var(--muted);font-weight:500;font-size:14px}
+nav.tabs button:hover{color:var(--ink);background:var(--surface-2)}
+nav.tabs button[aria-selected="true"]{color:var(--ink);background:var(--surface);box-shadow:inset 0 -2px 0 var(--accent)}
+
+/* ---------- session tape ---------- */
+.tape{margin-top:22px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px 18px 12px}
+.tape-head{display:flex;flex-wrap:wrap;gap:8px 22px;align-items:baseline;margin-bottom:12px}
+.clock{font:600 26px/1 var(--mono);font-variant-numeric:tabular-nums}
+.phase{display:inline-flex;align-items:center;gap:8px;font-weight:600}
+.dot{width:9px;height:9px;border-radius:50%;background:var(--faint);flex:none}
+.dot.live{background:var(--up);box-shadow:0 0 0 4px var(--up-soft)}
+.dot.warn{background:var(--accent);box-shadow:0 0 0 4px var(--accent-soft)}
+.dot.off{background:var(--down)}
+.tape-meta{color:var(--muted);font-size:13px}
+.tape-svg{width:100%;height:auto;display:block}
+.tape-scroll{overflow-x:auto}
+
+/* ---------- layout ---------- */
+section.panel{display:none;padding-top:34px}
+section.panel.active{display:block}
+.panel-head{display:grid;gap:10px;margin-bottom:24px}
+.grid{display:grid;gap:16px}
+.g2{grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr))}
+.g3{grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr))}
+.g4{grid-template-columns:repeat(auto-fit,minmax(min(100%,210px),1fr))}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:18px}
+.card > * + *{margin-top:10px}
+.muted{color:var(--muted)}
+.small{font-size:13px}
+.pill{display:inline-flex;align-items:center;gap:6px;font:600 11px/1 var(--mono);letter-spacing:.06em;text-transform:uppercase;padding:5px 8px;border-radius:999px;background:var(--surface-2);color:var(--muted);border:1px solid var(--line)}
+.pill.up{background:var(--up-soft);color:var(--up);border-color:transparent}
+.pill.down{background:var(--down-soft);color:var(--down);border-color:transparent}
+.pill.acc{background:var(--accent-soft);color:var(--accent-ink);border-color:transparent}
+.up-t{color:var(--up)} .down-t{color:var(--down)}
+ul.clean{margin:0;padding-left:18px} ul.clean li+li{margin-top:4px}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;font-size:14px}
+.kv dt{color:var(--muted)} .kv dd{margin:0;font-family:var(--mono);font-variant-numeric:tabular-nums}
+.callout{border-left:3px solid var(--accent);background:var(--accent-soft);color:var(--ink);padding:12px 14px;border-radius:0 8px 8px 0;font-size:14px}
+.callout.danger{border-left-color:var(--down);background:var(--down-soft)}
+.table-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:var(--r);background:var(--surface)}
+table{border-collapse:collapse;width:100%;font-size:14px}
+th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--line);white-space:nowrap}
+th{font:600 11px/1.2 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);background:var(--surface-2)}
+td.n,th.n{text-align:right;font-family:var(--mono);font-variant-numeric:tabular-nums}
+tr:last-child td{border-bottom:0}
+tr.hl td{background:var(--accent-soft)}
+
+/* ---------- steps ---------- */
+.steps{counter-reset:s;display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(min(100%,250px),1fr))}
+.step{counter-increment:s;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px 16px 16px 56px;position:relative}
+.step::before{content:counter(s);position:absolute;left:16px;top:14px;width:28px;height:28px;border-radius:50%;display:grid;place-items:center;font:700 13px/1 var(--mono);background:var(--ink);color:var(--surface)}
+.step h3{font-size:16px;margin-bottom:4px}
+
+/* ---------- ladder ---------- */
+.ladder{font-family:var(--mono);font-variant-numeric:tabular-nums;font-size:13px;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.ladder div{display:grid;grid-template-columns:1fr 90px 1fr;border-bottom:1px solid var(--grid)}
+.ladder div:last-child{border-bottom:0}
+.ladder span{padding:3px 10px}
+.ladder .px{text-align:center;background:var(--surface-2);font-weight:600}
+.ladder .bid{text-align:right;color:var(--up)} .ladder .ask{color:var(--down)}
+.ladder .inside .px{background:var(--accent-soft);color:var(--accent-ink)}
+
+/* ---------- strategies ---------- */
+.strat-list{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:18px}
+.chip{border:1px solid var(--line);background:var(--surface);padding:8px 12px;border-radius:999px;cursor:pointer;font-size:14px;font-weight:500}
+.chip:hover{border-color:var(--faint)}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--surface);border-color:var(--ink)}
+.strat{display:grid;gap:18px;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr)}
+@media (max-width:860px){.strat{grid-template-columns:1fr}}
+.chart{width:100%;height:auto;display:block}
+.legend{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:12px;color:var(--muted)}
+.legend i{display:inline-block;width:14px;height:3px;border-radius:2px;vertical-align:middle;margin-right:6px}
+.rules{display:grid;gap:10px}
+.rule{display:grid;grid-template-columns:78px 1fr;gap:10px;font-size:14px;padding-bottom:10px;border-bottom:1px solid var(--grid)}
+.rule:last-child{border-bottom:0;padding-bottom:0}
+.rule b{font:600 11px/1.6 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+
+/* ---------- forms ---------- */
+.form{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(min(100%,140px),1fr))}
+label.f{display:grid;gap:4px;font-size:12px;color:var(--muted);font-weight:500}
+input[type=number],input[type=text],input[type=date],input[type=time],select,textarea{width:100%;background:var(--surface-2);border:1px solid var(--line);border-radius:8px;padding:8px 10px;font-size:14px;color:var(--ink)}
+input.mono{font-family:var(--mono)}
+textarea{resize:vertical;min-height:38px}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--focus);outline-offset:0;border-color:transparent}
+.btn{border:1px solid var(--line);background:var(--surface);padding:9px 14px;border-radius:8px;cursor:pointer;font-weight:600;font-size:14px;display:inline-flex;align-items:center;gap:8px;justify-content:center}
+.btn:hover{border-color:var(--faint)}
+.btn.primary{background:var(--ink);color:var(--surface);border-color:var(--ink)}
+.btn.buy{background:var(--up);border-color:var(--up);color:#fff}
+.btn.sell{background:var(--down);border-color:var(--down);color:#fff}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn.ghost{background:none;border-color:transparent;color:var(--muted);padding:6px 8px}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.stats{display:grid;gap:1px;background:var(--line);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;grid-template-columns:repeat(auto-fit,minmax(min(100%,150px),1fr))}
+#j-stats{grid-template-columns:repeat(4,minmax(0,1fr))}
+@media (max-width:760px){#j-stats{grid-template-columns:repeat(2,minmax(0,1fr))}}
+#j-bystrat td:first-child{white-space:normal}
+.stat{background:var(--surface);padding:14px 16px}
+.stat small{display:block;font:600 10.5px/1.2 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+.stat b{font:600 22px/1.1 var(--mono);font-variant-numeric:tabular-nums}
+.big-out{font:700 40px/1 var(--mono);font-variant-numeric:tabular-nums}
+.check{display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-bottom:1px solid var(--grid);font-size:14px;cursor:pointer}
+.check:last-child{border-bottom:0}
+.check input{margin-top:3px;width:16px;height:16px;accent-color:var(--accent)}
+.meter{height:10px;border-radius:999px;background:var(--surface-2);border:1px solid var(--line);overflow:hidden}
+.meter i{display:block;height:100%;background:var(--up);transition:width .3s}
+.gate{display:flex;align-items:center;gap:14px;padding:16px 18px;border-radius:var(--r);font-weight:600}
+.gate.ok{background:var(--up-soft);color:var(--up)}
+.gate.stop{background:var(--down-soft);color:var(--down)}
+.gate.warn{background:var(--accent-soft);color:var(--accent-ink)}
+.gate strong{font:800 20px/1.1 var(--display);font-stretch:115%}
+footer.foot{margin-top:48px;padding-top:18px;border-top:1px solid var(--line);color:var(--faint);font-size:12.5px;max-width:90ch}
+@media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important}}
+@media (max-width:640px){nav.tabs{margin-left:0;width:100%;overflow-x:auto;flex-wrap:nowrap}.clock{font-size:22px}.big-out{font-size:32px}}
+</style>
+
+<header class="top">
+  <div class="top-inner">
+    <div class="brand"><b>NQ DESK</b><span>DAY TRADING · LEARN · PRACTICE · REVIEW</span></div>
+    <nav class="tabs" role="tablist" aria-label="Sections">
+      <button role="tab" data-tab="learn" id="t-learn">How it works</button>
+      <button role="tab" data-tab="market" id="t-market">NQ futures</button>
+      <button role="tab" data-tab="strategies" id="t-strategies">Strategies</button>
+      <button role="tab" data-tab="practice" id="t-practice">Replay drill</button>
+      <button role="tab" data-tab="tools" id="t-tools">Risk tools</button>
+      <button role="tab" data-tab="journal" id="t-journal">Journal</button>
+      <button role="tab" data-tab="plan" id="t-plan">Game plan</button>
+    </nav>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <!-- Session tape: always visible -->
+  <div class="tape" aria-label="Trading session clock">
+    <div class="tape-head">
+      <div class="clock" id="clk">--:--:--</div>
+      <div class="phase"><span class="dot" id="phase-dot"></span><span id="phase-name">Loading session…</span></div>
+      <div class="tape-meta" id="phase-tip"></div>
+      <div class="tape-meta" style="margin-left:auto" id="front-month"></div>
+    </div>
+    <div class="tape-scroll"><svg class="tape-svg" id="tape" viewBox="0 0 1000 74" role="img" aria-label="Futures trading day in New York time"></svg></div>
+  </div>
+
+  <!-- ===================== LEARN ===================== -->
+  <section class="panel" id="p-learn" role="tabpanel" aria-labelledby="t-learn">
+    <div class="panel-head">
+      <div class="eyebrow">Module 1 · Foundations</div>
+      <h2>Day trading is risk management with a chart attached</h2>
+      <p class="lede">A day trader opens and closes every position in the same session, so nothing is held overnight. You make money by capturing a slice of the day's movement more often, or by a bigger amount, than the market takes from you. The edge is small, so costs, position size and discipline decide the outcome.</p>
+    </div>
+
+    <div class="steps">
+      <div class="step"><h3>Read context</h3><p class="small muted">Before the open: overnight high/low, prior day high/low/close, economic calendar (8:30 ET data, 10:00 ET data, FOMC at 2:00 ET). Decide whether today looks like a trend day or a range day.</p></div>
+      <div class="step"><h3>Wait for a setup</h3><p class="small muted">A setup is a pre-defined pattern with a reason to exist: a break of the opening range, a pullback to VWAP, a failed breakout. No setup, no trade.</p></div>
+      <div class="step"><h3>Size from the stop</h3><p class="small muted">Place the stop where the idea is proven wrong, then pick the contract count so that stop costs ≤ 1% of your account. Size is the output, never the input.</p></div>
+      <div class="step"><h3>Execute with a bracket</h3><p class="small muted">Enter with a stop-loss and profit target attached (an OCO bracket). The platform manages the exit, so you don't negotiate with a losing trade.</p></div>
+      <div class="step"><h3>Journal and review</h3><p class="small muted">Log every trade with the setup name and a grade. After 50–100 trades, the numbers show which setups actually pay you.</p></div>
+    </div>
+
+    <div class="grid g2" style="margin-top:22px">
+      <div class="card">
+        <div class="eyebrow">Market mechanics</div>
+        <h3>The order book and the spread</h3>
+        <p class="small muted">Buyers rest bids below the market, sellers rest offers above it. A <b>market order</b> takes the best price on the other side immediately. A <b>limit order</b> waits at your price. A <b>stop order</b> becomes a market order once price touches it. NQ normally trades one tick (0.25 pts) wide.</p>
+        <div class="ladder" id="ladder" aria-label="Sample depth of market"></div>
+        <p class="small muted">Sample depth-of-market around 24,500.00. Green = resting bids (buyers), red = resting offers (sellers).</p>
+      </div>
+      <div class="card">
+        <div class="eyebrow">Why futures for index day trading</div>
+        <h3>Futures vs. trading QQQ shares</h3>
+        <div class="table-wrap" style="border:0">
+        <table>
+          <thead><tr><th></th><th>MNQ / NQ futures</th><th>QQQ / TQQQ shares</th></tr></thead>
+          <tbody>
+            <tr><td>Pattern-day-trader rule</td><td class="up-t">Not subject</td><td>Applies to margin stock accounts (check current FINRA status)</td></tr>
+            <tr><td>Hours</td><td>~23 h/day, Sun 6 pm – Fri 5 pm ET</td><td>9:30–4:00 + limited extended hrs</td></tr>
+            <tr><td>Leverage</td><td>Built in; small margin controls large notional</td><td>Up to 4:1 intraday on margin</td></tr>
+            <tr><td>US tax (typical)</td><td>Section 1256: 60% long-term / 40% short-term</td><td>Short-term rates on day trades</td></tr>
+            <tr><td>Smallest unit</td><td>1 MNQ ≈ $2 per index point</td><td>1 share</td></tr>
+            <tr><td>Short selling</td><td>As easy as buying</td><td>Needs borrow / uptick rules</td></tr>
+          </tbody>
+        </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid g3" style="margin-top:16px">
+      <div class="card">
+        <div class="eyebrow">Leverage, in one line</div>
+        <h3>One MNQ at 24,500 controls $49,000</h3>
+        <p class="small muted">Notional = price × multiplier = 24,500 × $2. A normal 250-point NQ day moves one micro contract $500. The same move on one full NQ is $5,000. Leverage cuts both ways at exactly the same speed.</p>
+      </div>
+      <div class="card">
+        <div class="eyebrow">The math that matters</div>
+        <h3>Expectancy = (W × avg win) − (L × avg loss)</h3>
+        <p class="small muted">A 40% win rate is profitable if winners average 2R. A 70% win rate loses money if losers are 3× the winners. See the simulator under <a href="#tools" data-go="tools">Risk tools</a>.</p>
+      </div>
+      <div class="card">
+        <div class="eyebrow">Base rates</div>
+        <h3>Most retail day traders lose money</h3>
+        <p class="small muted">Academic studies of retail day traders consistently find that a large majority lose money over time and only a small minority are persistently profitable. Treat the first months as paid education: simulator first, then 1 micro contract.</p>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:16px">
+      <div class="eyebrow">Recommended path for you</div>
+      <h3>From zero to trading the Nasdaq-100 with real money</h3>
+      <div class="table-wrap" style="margin-top:12px">
+        <table>
+          <thead><tr><th>Phase</th><th>What you do</th><th>Move on when</th></tr></thead>
+          <tbody>
+            <tr><td><b>1 · Learn</b> (2–4 wks)</td><td>Study the 6 setups on the Strategies tab. Watch NQ live during 9:30–11:30 ET without trading. Mark the opening range, VWAP, prior day high/low every day.</td><td>You can name the setup forming before it triggers.</td></tr>
+            <tr><td><b>2 · Simulate</b> (4–8 wks)</td><td>Use a futures broker's paper account (most offer free sim with live data) plus the Replay drill here. Pick 1–2 setups only. Journal every trade.</td><td>60+ sim trades, positive expectancy, no daily-loss-limit breaches for 3 weeks.</td></tr>
+            <tr><td><b>3 · Micro live</b></td><td>Trade <b>1 MNQ</b> only. Risk ≤ 1% per trade, daily max loss ≈ 2–3%. Keep journaling.</td><td>3 profitable months at 1 contract.</td></tr>
+            <tr><td><b>4 · Scale</b></td><td>Add one micro at a time. 10 MNQ = 1 NQ in dollar risk. Consider a funded-trader evaluation only if you understand its drawdown rules.</td><td>Stats hold at the larger size.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="small muted">What you need: a futures-capable broker (futures commission merchant) with CME market data (the non-professional Nasdaq/CME data fee is a few dollars a month), a charting platform with VWAP and a DOM with bracket orders, and risk capital you can afford to lose. StockSharp itself, the repo this page lives in, can connect to many futures brokers for automated strategies later.</p>
+    </div>
+  </section>
+
+  <!-- ===================== MARKET ===================== -->
+  <section class="panel" id="p-market" role="tabpanel" aria-labelledby="t-market">
+    <div class="panel-head">
+      <div class="eyebrow">Module 2 · The instrument</div>
+      <h2>Trading the Nasdaq-100 through CME futures</h2>
+      <p class="lede">The E-mini Nasdaq-100 (NQ) and Micro E-mini Nasdaq-100 (MNQ) track the same index and move point-for-point. The micro is one tenth the size, which makes it the right contract to learn on.</p>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Symbol</th><th>Contract</th><th class="n">$ / point</th><th class="n">Tick size</th><th class="n">$ / tick</th><th class="n">Notional @ index</th><th class="n">100-pt move</th><th>Who it's for</th></tr></thead>
+        <tbody id="spec-body"></tbody>
+      </table>
+    </div>
+    <p class="small muted" style="margin-top:8px">Contract specs per CME Group. Notional uses the index level you set below. <label style="display:inline-flex;gap:6px;align-items:center">Index level <input id="idx-level" type="number" class="mono" value="24500" step="50" style="width:110px;padding:4px 8px"></label></p>
+
+    <div class="grid g2" style="margin-top:18px">
+      <div class="card">
+        <div class="eyebrow">Contract months & roll</div>
+        <h3>Which contract to trade today</h3>
+        <p class="small muted">Equity index futures expire quarterly on the third Friday of March (H), June (M), September (U) and December (Z). Volume moves to the next contract about 8 days before expiry. That's the roll. Always trade the contract with the most volume.</p>
+        <div class="table-wrap" style="margin-top:10px">
+          <table><thead><tr><th>Contract</th><th>Roll (approx.)</th><th>Expires</th><th>Status</th></tr></thead><tbody id="cal-body"></tbody></table>
+        </div>
+      </div>
+      <div class="card">
+        <div class="eyebrow">Costs & capital</div>
+        <h3>What trading MNQ really costs</h3>
+        <dl class="kv">
+          <dt>Commission + fees</dt><dd>~$0.50–$1.50 per micro, round trip (broker-dependent)</dd>
+          <dt>Slippage</dt><dd>0–1 tick on stops in fast markets (= $0.50/MNQ)</dd>
+          <dt>Day-trade margin</dt><dd>Set by broker; often low for micros</dd>
+          <dt>Overnight margin</dt><dd>Full CME maintenance margin (check current)</dd>
+          <dt>Data</dt><dd>CME non-pro real-time, low monthly fee</dd>
+          <dt>Sensible start</dt><dd>$5k–$10k account, 1 MNQ</dd>
+        </dl>
+        <div class="callout">Low day-trade margin is not a reason to trade bigger. With a 20-point stop, 1 MNQ risks $40. A $5,000 account at 1% risk can afford exactly one micro on that stop.</div>
+      </div>
+    </div>
+
+    <div class="grid g3" style="margin-top:16px">
+      <div class="card">
+        <div class="eyebrow">What moves NQ</div>
+        <h3>Scheduled catalysts</h3>
+        <ul class="clean small">
+          <li><b>8:30 ET</b> CPI, PPI, jobs report (1st Friday), jobless claims (Thu), retail sales</li>
+          <li><b>10:00 ET</b> ISM, consumer sentiment, JOLTS</li>
+          <li><b>2:00 ET</b> FOMC rate decision (8×/year), press conference 2:30</li>
+          <li><b>After 4:00 ET</b> Mega-cap earnings: NVDA, AAPL, MSFT, AMZN, GOOGL, META, TSLA</li>
+        </ul>
+      </div>
+      <div class="card">
+        <div class="eyebrow">Character</div>
+        <h3>How NQ behaves</h3>
+        <ul class="clean small">
+          <li>More volatile than ES (S&amp;P 500). Moves of 1–2% a day are common.</li>
+          <li>Top ~10 tech names are roughly half the index weight.</li>
+          <li>Opening 30–60 min carries the most range and volume.</li>
+          <li>Round numbers (24,500, 25,000) and prior-day levels act as magnets.</li>
+        </ul>
+      </div>
+      <div class="card">
+        <div class="eyebrow">Alternatives</div>
+        <h3>Other liquid day-trading futures</h3>
+        <ul class="clean small">
+          <li><b>MES / ES</b> S&amp;P 500: smoother, slower; good second market.</li>
+          <li><b>MYM / YM</b> Dow: $0.50 / $5 per point.</li>
+          <li><b>M2K / RTY</b> Russell 2000: choppier, small caps.</li>
+          <li><b>MCL / CL</b> Crude oil: news-driven, larger gaps. Not for beginners.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== STRATEGIES ===================== -->
+  <section class="panel" id="p-strategies" role="tabpanel" aria-labelledby="t-strategies">
+    <div class="panel-head">
+      <div class="eyebrow">Module 3 · Playbook</div>
+      <h2>Six setups that NQ day traders actually use</h2>
+      <p class="lede">Each chart is a 5-minute session from 9:30 ET, drawn from a simulated price path to show the pattern cleanly. Real charts are messier. Learn one or two setups well before adding more.</p>
+    </div>
+    <div class="strat-list" id="strat-chips" role="group" aria-label="Choose a strategy"></div>
+    <div class="strat">
+      <div class="card">
+        <div class="row" style="justify-content:space-between"><h3 id="s-title"></h3><div class="row" id="s-tags"></div></div>
+        <svg class="chart" id="s-chart" viewBox="0 0 720 340" role="img"></svg>
+        <div class="legend" id="s-legend"></div>
+      </div>
+      <div class="card">
+        <p id="s-summary" class="muted small"></p>
+        <div class="rules" id="s-rules"></div>
+        <div class="kv small" id="s-result" style="margin-top:14px"></div>
+      </div>
+    </div>
+    <div class="table-wrap" style="margin-top:18px">
+      <table>
+        <thead><tr><th>Setup</th><th>Type</th><th>Best time (ET)</th><th>Market condition</th><th>Typical R target</th><th>Difficulty</th></tr></thead>
+        <tbody id="strat-table"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ===================== PRACTICE ===================== -->
+  <section class="panel" id="p-practice" role="tabpanel" aria-labelledby="t-practice">
+    <div class="panel-head">
+      <div class="eyebrow">Module 4 · Practice</div>
+      <h2>Replay drill: trade a simulated NQ session bar by bar</h2>
+      <p class="lede">Each session is randomly generated: some trend, some chop. The first 30 minutes are shown so you can mark the opening range. Step forward, enter with a bracket, and see how your decisions play out. Nothing here is real market data.</p>
+    </div>
+    <div class="grid" style="grid-template-columns:minmax(0,1fr)">
+      <div class="card">
+        <div class="row" style="justify-content:space-between">
+          <div class="row"><span class="pill" id="rp-regime">Session</span><span class="pill" id="rp-time">09:30</span><span class="pill" id="rp-pos">Flat</span></div>
+          <div class="row"><span class="small muted">Day P&amp;L</span><b class="num" id="rp-pnl" style="font-size:20px">$0.00</b></div>
+        </div>
+        <svg class="chart" id="rp-chart" viewBox="0 0 1080 400" role="img" aria-label="Replay chart"></svg>
+        <div class="legend"><span><i style="background:var(--accent)"></i>VWAP</span><span><i style="background:var(--ema1)"></i>9 EMA</span><span><i style="background:var(--faint)"></i>Opening range (first 30 min)</span><span><i style="background:var(--up)"></i>Target</span><span><i style="background:var(--down)"></i>Stop</span></div>
+        <div class="form" style="margin-top:6px">
+          <label class="f">Contract<select id="rp-sym"><option value="MNQ">MNQ ($2/pt)</option><option value="NQ">NQ ($20/pt)</option></select></label>
+          <label class="f">Contracts<input id="rp-qty" type="number" class="mono" value="1" min="1" max="50"></label>
+          <label class="f">Stop (pts)<input id="rp-stop" type="number" class="mono" value="25" min="1" step="0.25"></label>
+          <label class="f">Target (pts)<input id="rp-tgt" type="number" class="mono" value="50" min="1" step="0.25"></label>
+        </div>
+        <div class="row" style="margin-top:12px">
+          <button class="btn buy" id="rp-buy">Buy</button>
+          <button class="btn sell" id="rp-sell">Sell short</button>
+          <button class="btn" id="rp-flat">Flatten</button>
+          <span style="flex:1"></span>
+          <button class="btn" id="rp-next">Next bar ▸</button>
+          <button class="btn" id="rp-play">Play</button>
+          <button class="btn primary" id="rp-new">New session</button>
+        </div>
+        <p class="small muted" id="rp-msg" style="margin-top:10px">Mark the opening range, decide your plan, then step forward.</p>
+      </div>
+      <div class="card">
+        <div class="row" style="justify-content:space-between"><h3>Replay trades</h3><button class="btn" id="rp-send" disabled>Add to journal</button></div>
+        <div class="table-wrap"><table><thead><tr><th>#</th><th>Side</th><th class="n">Qty</th><th class="n">Entry</th><th class="n">Exit</th><th>Exit reason</th><th class="n">Points</th><th class="n">P&amp;L</th></tr></thead><tbody id="rp-trades"><tr><td colspan="8" class="muted">No trades yet this session.</td></tr></tbody></table></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== TOOLS ===================== -->
+  <section class="panel" id="p-tools" role="tabpanel" aria-labelledby="t-tools">
+    <div class="panel-head">
+      <div class="eyebrow">Module 5 · Risk tools</div>
+      <h2>Size every trade, plan every exit</h2>
+      <p class="lede">Use the position sizer before every trade. Use the simulator to see what your win rate and reward-to-risk mean over hundreds of trades.</p>
+    </div>
+    <div class="grid g2">
+      <div class="card">
+        <div class="eyebrow">Position sizer</div>
+        <h3>How many contracts can I trade?</h3>
+        <div class="form">
+          <label class="f">Account size ($)<input id="ps-acct" type="number" class="mono" value="10000" min="0" step="500"></label>
+          <label class="f">Risk per trade (%)<input id="ps-risk" type="number" class="mono" value="1" min="0.1" step="0.1"></label>
+          <label class="f">Stop distance (pts)<input id="ps-stop" type="number" class="mono" value="20" min="0.25" step="0.25"></label>
+          <label class="f">Contract<select id="ps-sym"></select></label>
+        </div>
+        <div class="grid" style="grid-template-columns:auto 1fr;gap:18px;align-items:end;margin-top:14px">
+          <div><div class="small muted">Contracts</div><div class="big-out" id="ps-out">0</div></div>
+          <dl class="kv" id="ps-kv"></dl>
+        </div>
+        <p class="small" id="ps-note"></p>
+      </div>
+      <div class="card">
+        <div class="eyebrow">Trade planner</div>
+        <h3>Reward-to-risk before you click</h3>
+        <div class="form">
+          <label class="f">Direction<select id="tp-dir"><option value="1">Long</option><option value="-1">Short</option></select></label>
+          <label class="f">Entry<input id="tp-entry" type="number" class="mono" value="24500" step="0.25"></label>
+          <label class="f">Stop<input id="tp-stop" type="number" class="mono" value="24480" step="0.25"></label>
+          <label class="f">Target<input id="tp-tgt" type="number" class="mono" value="24545" step="0.25"></label>
+          <label class="f">Contract<select id="tp-sym"></select></label>
+          <label class="f">Contracts<input id="tp-qty" type="number" class="mono" value="1" min="1"></label>
+        </div>
+        <svg id="tp-viz" viewBox="0 0 520 90" class="chart" style="margin-top:12px" role="img" aria-label="Risk versus reward bar"></svg>
+        <div class="stats" id="tp-stats"></div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:16px">
+      <div class="eyebrow">Expectancy simulator</div>
+      <h3>What does your edge look like over many trades?</h3>
+      <div class="form" style="margin-top:8px">
+        <label class="f">Win rate (%)<input id="mc-wr" type="number" class="mono" value="45" min="1" max="99"></label>
+        <label class="f">Avg win (R)<input id="mc-rw" type="number" class="mono" value="1.8" min="0.1" step="0.1"></label>
+        <label class="f">Risk per trade (%)<input id="mc-risk" type="number" class="mono" value="1" min="0.1" step="0.1"></label>
+        <label class="f">Trades<input id="mc-n" type="number" class="mono" value="200" min="10" max="1000" step="10"></label>
+        <label class="f">Costs per trade (R)<input id="mc-cost" type="number" class="mono" value="0.05" min="0" step="0.01"></label>
+        <div style="display:flex;align-items:end"><button class="btn primary" id="mc-run" style="width:100%">Run 40 paths</button></div>
+      </div>
+      <svg class="chart" id="mc-chart" viewBox="0 0 900 300" role="img" aria-label="Simulated equity curves" style="margin-top:14px"></svg>
+      <div class="stats" id="mc-stats" style="margin-top:12px"></div>
+    </div>
+  </section>
+
+  <!-- ===================== JOURNAL ===================== -->
+  <section class="panel" id="p-journal" role="tabpanel" aria-labelledby="t-journal">
+    <div class="panel-head">
+      <div class="eyebrow">Module 6 · Trade analysis</div>
+      <h2>Trade journal</h2>
+      <p class="lede">Log each trade with its setup and a grade for how well you followed your rules. The stats below tell you which setups make money and which ones to drop.</p>
+      <div class="row"><span class="pill" id="j-store">Checking storage…</span><span class="pill acc" id="j-example" hidden>Showing example trades</span></div>
+    </div>
+
+    <div class="stats" id="j-stats"></div>
+
+    <div class="grid g2" style="margin-top:16px">
+      <div class="card">
+        <div class="row" style="justify-content:space-between"><h3>Equity curve</h3><span class="small muted" id="j-eq-note"></span></div>
+        <svg class="chart" id="j-equity" viewBox="0 0 560 240" role="img" aria-label="Cumulative net P&L"></svg>
+      </div>
+      <div class="card">
+        <h3>By setup</h3>
+        <div class="table-wrap" style="border:0"><table><thead><tr><th>Setup</th><th class="n">Trades</th><th class="n">Win %</th><th class="n">Net</th><th class="n">Avg R</th></tr></thead><tbody id="j-bystrat"></tbody></table></div>
+        <h3 style="margin-top:14px">By time of day</h3>
+        <svg class="chart" id="j-bytime" viewBox="0 0 560 140" role="img" aria-label="Net P&L by hour"></svg>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:16px">
+      <h3>Log a trade</h3>
+      <form id="j-form" class="form" autocomplete="off">
+        <label class="f">Date<input id="jf-date" type="date" required></label>
+        <label class="f">Time (ET)<input id="jf-time" type="time" value="09:45"></label>
+        <label class="f">Contract<select id="jf-sym"></select></label>
+        <label class="f">Side<select id="jf-side"><option>Long</option><option>Short</option></select></label>
+        <label class="f">Contracts<input id="jf-qty" type="number" class="mono" value="1" min="1" required></label>
+        <label class="f">Entry<input id="jf-entry" type="number" class="mono" step="0.25" required></label>
+        <label class="f">Exit<input id="jf-exit" type="number" class="mono" step="0.25" required></label>
+        <label class="f">Initial stop<input id="jf-stop" type="number" class="mono" step="0.25" placeholder="for R"></label>
+        <label class="f">Setup<select id="jf-strat"></select></label>
+        <label class="f">Grade<select id="jf-grade"><option value="A">A · followed plan</option><option value="B">B · minor slip</option><option value="C">C · broke rules</option></select></label>
+        <label class="f" style="grid-column:1/-1">Notes<textarea id="jf-notes" rows="2" placeholder="Why did you take it? What would you do differently?"></textarea></label>
+        <div class="row" style="grid-column:1/-1"><button class="btn primary" type="submit">Save trade</button><span class="small muted" id="jf-preview"></span></div>
+      </form>
+    </div>
+
+    <div class="card" style="margin-top:16px">
+      <div class="row" style="justify-content:space-between">
+        <h3>Trades</h3>
+        <div class="row">
+          <label class="f" style="grid-template-columns:auto auto;align-items:center">Round-trip fee / contract ($)<input id="j-fee" type="number" class="mono" value="1.24" step="0.01" min="0" style="width:90px"></label>
+          <button class="btn" id="j-copy">Copy CSV</button>
+        </div>
+      </div>
+      <div class="table-wrap"><table><thead><tr><th>Date</th><th>Time</th><th>Sym</th><th>Side</th><th class="n">Qty</th><th class="n">Entry</th><th class="n">Exit</th><th class="n">Pts</th><th class="n">R</th><th class="n">Net $</th><th>Setup</th><th>Grade</th><th>Notes</th><th></th></tr></thead><tbody id="j-rows"></tbody></table></div>
+      <p class="small muted" id="j-copy-msg"></p>
+    </div>
+  </section>
+
+  <!-- ===================== PLAN ===================== -->
+  <section class="panel" id="p-plan" role="tabpanel" aria-labelledby="t-plan">
+    <div class="panel-head">
+      <div class="eyebrow">Module 7 · Daily routine</div>
+      <h2>Today's game plan</h2>
+      <p class="lede">Set your limits before the open, when you're calm. Today's P&amp;L comes from journal trades dated today.</p>
+    </div>
+    <div id="gate" class="gate ok"></div>
+    <div class="grid g2" style="margin-top:16px">
+      <div class="card">
+        <h3>Daily limits</h3>
+        <div class="form">
+          <label class="f">Max daily loss ($)<input id="pl-maxloss" type="number" class="mono" value="200" min="0" step="10"></label>
+          <label class="f">Max trades / day<input id="pl-maxtrades" type="number" class="mono" value="4" min="1"></label>
+          <label class="f">Stop after N losses in a row<input id="pl-maxstreak" type="number" class="mono" value="2" min="1"></label>
+          <label class="f">Daily profit goal ($)<input id="pl-goal" type="number" class="mono" value="150" min="0" step="10"></label>
+        </div>
+        <div style="margin-top:14px" class="small muted">Loss limit used</div>
+        <div class="meter"><i id="pl-meter" style="width:0%"></i></div>
+        <dl class="kv" id="pl-kv" style="margin-top:12px"></dl>
+      </div>
+      <div class="card">
+        <div class="row" style="justify-content:space-between"><h3>Pre-market checklist</h3><span class="pill" id="ck-count">0 / 0</span></div>
+        <div id="checklist"></div>
+        <button class="btn ghost" id="ck-reset">Reset for today</button>
+      </div>
+    </div>
+    <div class="card" style="margin-top:16px">
+      <h3>Key levels for today</h3>
+      <p class="small muted">Write these down before 9:30 ET. They're the reference points every setup in the playbook uses.</p>
+      <div class="form" id="levels"></div>
+    </div>
+  </section>
+
+  <footer class="foot">Educational tool. Charts on the Strategies and Replay tabs use simulated prices, not market data. Futures trading involves substantial risk of loss and is not suitable for every investor. Nothing here is investment advice; verify contract specs, margins and tax treatment with CME Group, your broker and a tax professional.</footer>
+</div>
+
+<script>
+(() => {
+"use strict";
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const NS = "http://www.w3.org/2000/svg";
+const INSTR = {
+  MNQ:{name:"Micro E-mini Nasdaq-100", pv:2, tick:.25, who:"Learning, small accounts, scaling in 1 unit at a time"},
+  NQ:{name:"E-mini Nasdaq-100", pv:20, tick:.25, who:"Experienced traders; 1 NQ = 10 MNQ"},
+  MES:{name:"Micro E-mini S&P 500", pv:5, tick:.25, who:"Smoother second market"},
+  ES:{name:"E-mini S&P 500", pv:50, tick:.25, who:"Deepest index futures market"}
+};
+const store = {
+  get(k, d){ try{ const v = localStorage.getItem("nqdesk:"+k); return v == null ? d : JSON.parse(v); }catch{ return d; } },
+  set(k, v){ try{ localStorage.setItem("nqdesk:"+k, JSON.stringify(v)); }catch{} }
+};
+const money = (v, sign) => { const s = v < 0 ? "−" : (sign && v > 0 ? "+" : ""); return s + "$" + Math.abs(v).toLocaleString("en-US",{minimumFractionDigits:2, maximumFractionDigits:2}); };
+const num = (v, d = 2) => (v < 0 ? "−" : "") + Math.abs(v).toLocaleString("en-US",{minimumFractionDigits:d, maximumFractionDigits:d});
+const cls = v => v > 0 ? "up-t" : v < 0 ? "down-t" : "";
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+function el(tag, attrs = {}, parent){ const e = document.createElementNS(NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); if (parent) parent.appendChild(e); return e; }
+function rng(seed){ let a = seed >>> 0; return () => { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+const val = id => parseFloat($("#"+id).value);
+
+/* ---------------- Tabs ---------------- */
+const TABS = ["learn","market","strategies","practice","tools","journal","plan"];
+function showTab(t){
+  if (!TABS.includes(t)) t = "learn";
+  $$("nav.tabs button").forEach(b => b.setAttribute("aria-selected", b.dataset.tab === t));
+  $$("section.panel").forEach(p => p.classList.toggle("active", p.id === "p-"+t));
+  store.set("tab", t);
+  if (t === "journal") renderJournal();
+  if (t === "plan") renderPlan();
+}
+$$("nav.tabs button").forEach(b => b.addEventListener("click", () => { showTab(b.dataset.tab); try{ history.replaceState(null,"","#"+b.dataset.tab); }catch{} }));
+document.addEventListener("click", e => { const a = e.target.closest("[data-go]"); if (a){ e.preventDefault(); showTab(a.dataset.go); window.scrollTo({top:0}); } });
+
+/* ---------------- Time (New York) ---------------- */
+function nyNow(){
+  const p = new Intl.DateTimeFormat("en-US",{timeZone:"America/New_York",hour12:false,weekday:"short",year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit",second:"2-digit"}).formatToParts(new Date());
+  const g = t => p.find(x => x.type === t).value;
+  const h = +g("hour") % 24;
+  return { wd:g("weekday"), date:`${g("year")}-${g("month")}-${g("day")}`, h, m:+g("minute"), s:+g("second"), mins:h*60 + +g("minute") };
+}
+const todayNY = () => nyNow().date;
+
+const PHASES = [
+  {a:0,    b:8*60+30, name:"Overnight (Globex)", tip:"Thin volume. Note the overnight high and low.", k:"warn", band:"on"},
+  {a:8*60+30, b:9*60+30, name:"Pre-market / 8:30 data", tip:"Economic releases hit at 8:30. Mark levels, finish your checklist.", k:"warn", band:"pre"},
+  {a:9*60+30, b:10*60+30, name:"Opening drive", tip:"Highest volume and range. Opening range forms 9:30–10:00.", k:"live", band:"open"},
+  {a:10*60+30, b:11*60+30, name:"Morning session", tip:"Trends often continue or reverse off VWAP.", k:"live", band:"am"},
+  {a:11*60+30, b:13*60+30, name:"Lunch chop", tip:"Lower volume, false breakouts. Many pros sit out.", k:"warn", band:"lunch"},
+  {a:13*60+30, b:15*60, name:"Afternoon", tip:"Watch for 2:00 FOMC days. Trends resume into the close.", k:"live", band:"pm"},
+  {a:15*60, b:16*60, name:"Power hour", tip:"Volume returns into the 4:00 cash close.", k:"live", band:"close"},
+  {a:16*60, b:17*60, name:"Post-close", tip:"Mega-cap earnings land after 4:00. Futures still trade.", k:"warn", band:"post"},
+  {a:17*60, b:18*60, name:"Daily halt", tip:"CME maintenance break, 5:00–6:00 pm ET.", k:"off", band:"halt"},
+  {a:18*60, b:24*60, name:"Overnight (Globex)", tip:"Asia and Europe sessions. Thin volume.", k:"warn", band:"on"}
+];
+function currentPhase(n){
+  const wk = n.wd;
+  if (wk === "Sat" || (wk === "Fri" && n.mins >= 17*60) || (wk === "Sun" && n.mins < 18*60))
+    return {name:"Weekend: market closed", tip:"CME Globex reopens Sunday 6:00 pm ET.", k:"off"};
+  return PHASES.find(p => n.mins >= p.a && n.mins < p.b);
+}
+function drawTape(){
+  const svg = $("#tape"); svg.innerHTML = "";
+  const X = m => 22 + (m / (24*60)) * 950;
+  const bands = [
+    [0, 8*60+30, "var(--grid)", ""], [8*60+30, 9*60+30, "var(--accent-soft)", "Pre"],
+    [9*60+30, 10*60+30, "var(--up)", "Open"], [10*60+30, 11*60+30, "var(--up-soft)", "AM"],
+    [11*60+30, 13*60+30, "var(--surface-2)", "Lunch"], [13*60+30, 15*60, "var(--up-soft)", "PM"],
+    [15*60, 16*60, "var(--up)", "Close"], [16*60, 17*60, "var(--grid)", ""], [17*60, 18*60, "var(--down-soft)", "Halt"],
+    [18*60, 24*60, "var(--grid)", "Globex"]
+  ];
+  bands.forEach(([a,b,f,l]) => {
+    el("rect",{x:X(a), y:14, width:X(b)-X(a), height:22, fill:f, stroke:"var(--surface)", "stroke-width":1}, svg);
+    if (l && X(b)-X(a) > l.length*7+6){ const t = el("text",{x:(X(a)+X(b))/2, y:29, "text-anchor":"middle", "font-size":10.5, "font-family":"var(--mono)", fill: (f==="var(--up)")? "var(--surface)":"var(--muted)"}, svg); t.textContent = l; }
+  });
+  for (let h = 0; h <= 24; h += 3){
+    el("line",{x1:X(h*60), x2:X(h*60), y1:36, y2:42, stroke:"var(--faint)"}, svg);
+    const t = el("text",{x:X(h*60), y:55, "text-anchor":"middle", "font-size":10.5, "font-family":"var(--mono)", fill:"var(--muted)"}, svg);
+    t.textContent = h === 24 ? "24:00" : String(h).padStart(2,"0")+":00";
+  }
+  const n = nyNow();
+  const x = X(n.mins + n.s/60);
+  el("line",{x1:x, x2:x, y1:6, y2:44, stroke:"var(--ink)", "stroke-width":2}, svg);
+  el("path",{d:`M${x-5} 4 L${x+5} 4 L${x} 10 Z`, fill:"var(--ink)"}, svg);
+  const lab = el("text",{x:Math.min(Math.max(x,30),970), y:70, "text-anchor":"middle", "font-size":10.5, "font-weight":600, "font-family":"var(--mono)", fill:"var(--ink)"}, svg);
+  lab.textContent = "NOW (ET)";
+}
+function tick(){
+  const n = nyNow();
+  $("#clk").textContent = `${String(n.h).padStart(2,"0")}:${String(n.m).padStart(2,"0")}:${String(n.s).padStart(2,"0")} ET`;
+  const p = currentPhase(n);
+  $("#phase-name").textContent = p.name; $("#phase-tip").textContent = p.tip;
+  $("#phase-dot").className = "dot " + p.k;
+  if (n.s === 0 || !tick.drawn){ drawTape(); tick.drawn = true; }
+}
+
+/* ---------------- Contract calendar ---------------- */
+const MCODE = {3:"H",6:"M",9:"U",12:"Z"};
+const MNAME = {3:"Mar",6:"Jun",9:"Sep",12:"Dec"};
+function thirdFriday(y, m){ const d = new Date(Date.UTC(y, m-1, 1)); const off = (5 - d.getUTCDay() + 7) % 7; return new Date(Date.UTC(y, m-1, 1 + off + 14)); }
+const iso = d => d.toISOString().slice(0,10);
+const pretty = d => d.toLocaleDateString("en-US",{timeZone:"UTC",weekday:"short",month:"short",day:"numeric",year:"numeric"});
+function contracts(){
+  const today = todayNY(); const y0 = +today.slice(0,4); const out = [];
+  for (let y = y0 - 1; y <= y0 + 1; y++) for (const m of [3,6,9,12]){
+    const exp = thirdFriday(y, m); const roll = new Date(exp.getTime() - 8*864e5);
+    out.push({code:`${MCODE[m]}${String(y).slice(2)}`, label:`${MNAME[m]} ${y}`, exp, roll});
+  }
+  const iFront = out.findIndex(c => iso(c.roll) > today);
+  return {list: out.slice(Math.max(0, iFront - 1), iFront + 3), front: out[iFront], today};
+}
+function renderCalendar(){
+  const {list, front, today} = contracts();
+  $("#front-month").innerHTML = `Front month <b class="mono">NQ${front.code} / MNQ${front.code}</b> · rolls ~${pretty(front.roll).replace(/^\w+, /,"")}`;
+  $("#cal-body").innerHTML = list.map(c => {
+    let st = `<span class="pill">Upcoming</span>`;
+    if (iso(c.exp) < today) st = `<span class="pill">Expired</span>`;
+    else if (c === front) st = `<span class="pill up">Trade this</span>`;
+    else if (iso(c.roll) <= today) st = `<span class="pill acc">Rolled off</span>`;
+    return `<tr class="${c===front?"hl":""}"><td class="mono"><b>NQ${c.code}</b> · ${c.label}</td><td class="mono">${pretty(c.roll)}</td><td class="mono">${pretty(c.exp)}</td><td>${st}</td></tr>`;
+  }).join("");
+}
+function renderSpecs(){
+  const lvl = val("idx-level") || 24500;
+  $("#spec-body").innerHTML = Object.entries(INSTR).map(([k,i]) =>
+    `<tr class="${k==="MNQ"?"hl":""}"><td class="mono"><b>${k}</b></td><td>${i.name}</td><td class="n">${money(i.pv)}</td><td class="n">${i.tick}</td><td class="n">${money(i.pv*i.tick)}</td><td class="n">${money(lvl*i.pv).replace(".00","")}</td><td class="n">${money(100*i.pv).replace(".00","")}</td><td class="small">${i.who}</td></tr>`).join("");
+}
+function renderLadder(){
+  const mid = 24500, r = rng(7); let h = "";
+  for (let i = 5; i >= -4; i--){
+    const px = mid + i*0.25; const ask = i > 0; const inside = i === 1 || i === 0;
+    const size = Math.round(4 + r()*30 + (Math.abs(i) === 3 ? 40 : 0));
+    h += `<div class="${inside?"inside":""}"><span class="bid">${ask?"":size}</span><span class="px">${px.toFixed(2)}</span><span class="ask">${ask?size:""}</span></div>`;
+  }
+  $("#ladder").innerHTML = `<div><span class="bid" style="color:var(--muted)">BIDS</span><span class="px" style="color:var(--muted)">PRICE</span><span class="ask" style="color:var(--muted)">OFFERS</span></div>` + h;
+}
+
+/* ---------------- Bar generation & indicators ---------------- */
+function genBars({anchors, n, vol, seed, base = 24500}){
+  const r = rng(seed); const bars = []; let noise = 0; let prevClose = null;
+  const path = i => { for (let k = 0; k < anchors.length - 1; k++){ const [i0,p0] = anchors[k], [i1,p1] = anchors[k+1]; if (i >= i0 && i <= i1) return p0 + (p1-p0) * (i-i0)/(i1-i0); } return anchors[anchors.length-1][1]; };
+  for (let i = 0; i < n; i++){
+    noise = noise*0.55 + (r()-0.5)*vol;
+    const c = base + path(i) + noise;
+    const o = prevClose == null ? base + path(0) - (r()-0.5)*vol : prevClose;
+    const h = Math.max(o,c) + r()*vol*0.7, l = Math.min(o,c) - r()*vol*0.7;
+    const q = x => Math.round(x*4)/4;
+    bars.push({o:q(o), h:q(h), l:q(l), c:q(c), v: 900*(1.9 - i/n) + r()*500 + (i < 6 ? 800 : 0)});
+    prevClose = q(c);
+  }
+  return bars;
+}
+function vwap(bars){ let pv = 0, v = 0; return bars.map(b => { const tp = (b.h+b.l+b.c)/3; pv += tp*b.v; v += b.v; return pv/v; }); }
+function ema(bars, n){ const k = 2/(n+1); let e = bars[0].c; return bars.map(b => (e = b.c*k + e*(1-k))); }
+const barTime = i => { const m = 9*60+30 + i*5; return `${Math.floor(m/60)}:${String(m%60).padStart(2,"0")}`; };
+
+/* ---------------- Chart renderer ---------------- */
+function drawChart(svg, bars, o = {}){
+  svg.innerHTML = "";
+  const vb = svg.viewBox.baseVal, W = vb.width || 720, H = vb.height || 340, L = 8, R = 64, T = 14, B = 26;
+  const slots = o.slots || bars.length;
+  const vis = bars;
+  let lo = Math.min(...vis.map(b => b.l)), hi = Math.max(...vis.map(b => b.h));
+  (o.levels || []).forEach(l => { lo = Math.min(lo, l.y); hi = Math.max(hi, l.y); });
+  (o.extraY || []).forEach(y => { lo = Math.min(lo, y); hi = Math.max(hi, y); });
+  const pad = (hi - lo) * 0.08 || 5; lo -= pad; hi += pad;
+  const cw = (W - L - R) / slots;
+  const X = i => L + cw*i + cw/2, Y = p => T + (hi - p) / (hi - lo) * (H - T - B);
+  // grid
+  const step = niceStep((hi-lo)/5);
+  for (let p = Math.ceil(lo/step)*step; p <= hi; p += step){
+    el("line",{x1:L, x2:W-R, y1:Y(p), y2:Y(p), stroke:"var(--grid)", "stroke-width":1}, svg);
+    const t = el("text",{x:W-R+6, y:Y(p)+4, "font-size":10.5, "font-family":"var(--mono)", fill:"var(--muted)"}, svg); t.textContent = p.toLocaleString("en-US");
+  }
+  for (let i = 0; i < slots; i += 12){
+    const t = el("text",{x:X(i), y:H-8, "font-size":10.5, "font-family":"var(--mono)", fill:"var(--muted)", "text-anchor":"middle"}, svg); t.textContent = barTime(i);
+  }
+  // zones (opening range etc.)
+  (o.zones || []).forEach(z => {
+    el("rect",{x:L + cw*z.i0, y:Y(z.hi), width:cw*(z.i1 - z.i0), height:Math.max(1,Y(z.lo)-Y(z.hi)), fill:z.fill || "var(--surface-2)", stroke:z.stroke || "var(--faint)", "stroke-dasharray":"3 3", "fill-opacity":z.op ?? 1}, svg);
+    if (z.label){ const t = el("text",{x:L + cw*z.i0 + 4, y:Y(z.hi) - 5, "font-size":10.5, "font-family":"var(--mono)", fill:"var(--muted)"}, svg); t.textContent = z.label; }
+  });
+  // horizontal levels
+  (o.levels || []).forEach(l => {
+    const x0 = l.i0 != null ? X(l.i0) - cw/2 : L, x1 = l.i1 != null ? X(l.i1) + cw/2 : W - R;
+    el("line",{x1:x0, x2:x1, y1:Y(l.y), y2:Y(l.y), stroke:l.color, "stroke-width":l.w || 1.5, "stroke-dasharray":l.dash || "none"}, svg);
+    if (l.label){
+      const tx = l.labelLeft ? x0 + 4 : x1 - 4;
+      const t = el("text",{x:tx, y:Y(l.y) - 5, "font-size":10.5, "font-weight":600, "font-family":"var(--mono)", fill:l.color, "text-anchor": l.labelLeft ? "start":"end"}, svg); t.textContent = l.label;
+    }
+  });
+  // lines
+  const line = (arr, color, w, dash) => { if (!arr) return; const d = arr.map((v,i) => `${i?"L":"M"}${X(i).toFixed(1)} ${Y(v).toFixed(1)}`).join(""); el("path",{d, fill:"none", stroke:color, "stroke-width":w, "stroke-dasharray":dash || "none", "stroke-linejoin":"round"}, svg); };
+  // candles
+  const bw = Math.max(1.5, cw*0.62);
+  bars.forEach((b,i) => {
+    const up = b.c >= b.o, col = up ? "var(--up)" : "var(--down)";
+    el("line",{x1:X(i), x2:X(i), y1:Y(b.h), y2:Y(b.l), stroke:col, "stroke-width":1}, svg);
+    el("rect",{x:X(i)-bw/2, y:Y(Math.max(b.o,b.c)), width:bw, height:Math.max(1, Math.abs(Y(b.o)-Y(b.c))), fill: up ? "var(--up)" : "var(--down)"}, svg);
+  });
+  line(o.vwap, "var(--accent)", 2);
+  line(o.ema1, "var(--ema1)", 1.5);
+  line(o.ema2, "var(--ema2)", 1.5);
+  // markers
+  (o.markers || []).forEach(m => {
+    const long = m.dir > 0, x = X(m.i), y = Y(m.price);
+    const col = m.exit ? "var(--ink)" : long ? "var(--up)" : "var(--down)";
+    const dy = long ? 1 : -1;
+    if (m.exit){ el("circle",{cx:x, cy:y, r:5, fill:"var(--surface)", stroke:col, "stroke-width":2}, svg); }
+    else el("path",{d:`M${x} ${y+dy*3} L${x-7} ${y+dy*15} L${x+7} ${y+dy*15} Z`, fill:col, stroke:"var(--surface)", "stroke-width":1}, svg);
+    if (m.label){ const t = el("text",{x, y: m.exit ? y - 10 : y + dy*28, "text-anchor":"middle", "font-size":11, "font-weight":700, "font-family":"var(--mono)", fill:col}, svg); t.textContent = m.label; }
+  });
+  // last price tag
+  if (o.lastTag && bars.length){
+    const b = bars[bars.length-1]; const y = Y(b.c);
+    el("rect",{x:W-R+2, y:y-9, width:R-4, height:18, rx:3, fill:"var(--ink)"}, svg);
+    const t = el("text",{x:W-R+6, y:y+4, "font-size":10.5, "font-weight":600, "font-family":"var(--mono)", fill:"var(--surface)"}, svg); t.textContent = b.c.toFixed(2);
+  }
+  return {X, Y};
+}
+function niceStep(raw){ const p = Math.pow(10, Math.floor(Math.log10(raw))); const f = raw / p; return (f < 1.5 ? 1 : f < 3 ? 2 : f < 7 ? 5 : 10) * p; }
+
+/* ---------------- Strategies ---------------- */
+const STRATS = [
+  {id:"orb", name:"Opening range breakout", type:"Trend", time:"9:30–11:00", cond:"Trend days, news-driven opens", rt:"1.5–2R", diff:2,
+   summary:"The first 30 minutes set a range of where buyers and sellers agree. A decisive break of that range often starts the day's trend.",
+   rules:{Setup:"Mark the high and low of 9:30–10:00 ET (six 5-min bars).", Entry:"Buy the first 5-min close above the range high (short: close below the low). Stronger if price is above VWAP.", Stop:"Middle of the opening range, or the far side if the range is small.", Target:"2× your risk, or trail under each higher 5-min low.", Avoid:"Very wide ranges (risk too big), or right before 10:00 data releases."},
+   anchors:[[0,0],[2,40],[4,-15],[6,20],[9,25],[11,62],[25,120],[40,105],[59,150]], vol:9, seed:11,
+   build(b){ const orH = Math.max(...b.slice(0,6).map(x=>x.h)), orL = Math.min(...b.slice(0,6).map(x=>x.l)); let i = b.findIndex((x,k)=>k>=6 && x.c>orH); if(i<0)i=10; const e=b[i].c, s=(orH+orL)/2; return {dir:1, i, entry:e, stop:s, target:e+2*(e-s), zones:[{i0:0,i1:6,hi:orH,lo:orL,label:"Opening range"}], show:{vwap:1}}; }},
+  {id:"vwap-pb", name:"VWAP pullback", type:"Trend", time:"9:45–11:30, 1:30–3:30", cond:"Clear trend, price holding one side of VWAP", rt:"2R", diff:2,
+   summary:"VWAP is the average price weighted by volume, the 'fair value' institutions benchmark against. In a trend, the first pullback to VWAP is where trapped traders and algos step back in.",
+   rules:{Setup:"Price trends away from VWAP and stays on one side for 30+ minutes.", Entry:"When price pulls back to VWAP, buy the first bar that closes back up (a bullish rejection candle).", Stop:"A few points below the pullback low.", Target:"Retest of the session high, then 2R.", Avoid:"Price chopping back and forth across VWAP. That's a range day."},
+   anchors:[[0,0],[8,70],[14,95],[22,35],[26,42],[40,130],[59,155]], vol:8, seed:23,
+   build(b,vw){ let i=-1; for(let k=18;k<32;k++){ if(b[k].l<=vw[k]+4 && b[k].c>b[k].o && b[k].c>vw[k]){ i=k; break; } } if(i<0)i=24; const e=b[i].c, s=Math.min(...b.slice(i-3,i+1).map(x=>x.l))-4; return {dir:1,i,entry:e,stop:s,target:e+2*(e-s),show:{vwap:1}}; }},
+  {id:"vwap-rev", name:"VWAP mean reversion", type:"Reversion", time:"10:00–14:00", cond:"Range days, overextended moves", rt:"1–1.5R", diff:3,
+   summary:"When price stretches far from VWAP with fading momentum, it tends to snap back toward it. This is a counter-trend trade: smaller targets, strict stops.",
+   rules:{Setup:"Price is extended 2+ ATR from VWAP after a fast move, and bars are getting smaller.", Entry:"First bar that closes back in the direction of VWAP after a new low (or high).", Stop:"Just beyond the extreme.", Target:"VWAP. Take it; don't hope for more.", Avoid:"Strong trend days and news spikes. Fading a real trend is the most expensive mistake on this list."},
+   anchors:[[0,0],[5,-20],[14,-140],[17,-152],[22,-110],[35,-62],[59,-72]], vol:8, seed:37,
+   build(b,vw){ let lo=Infinity, li=14; for(let k=10;k<22;k++) if(b[k].l<lo){lo=b[k].l;li=k;} let i=li+1; while(i<li+5 && !(b[i].c>b[i].o)) i++; const e=b[i].c, s=lo-5; return {dir:1,i,entry:e,stop:s,target:vw[i],targetLabel:"VWAP",show:{vwap:1}}; }},
+  {id:"ema", name:"9/20 EMA trend pullback", type:"Trend", time:"Any active session", cond:"Strong one-directional trend", rt:"2R+", diff:1,
+   summary:"Exponential moving averages track short-term trend. When the 9 EMA stays below the 20 EMA, sell rallies into them. The simplest trend-following entry there is.",
+   rules:{Setup:"9 EMA below 20 EMA, both sloping down, lower highs forming (reverse for longs).", Entry:"Short the first bearish bar after price rallies into the 20 EMA.", Stop:"Above the pullback high.", Target:"Prior swing low, then 2R or trail above the 9 EMA.", Avoid:"Flat, tangled EMAs. No trend means no trade."},
+   anchors:[[0,0],[6,-50],[12,-30],[20,-110],[26,-78],[36,-160],[44,-138],[59,-205]], vol:8, seed:41,
+   build(b,vw,e1,e2){ let i=-1; for(let k=22;k<32;k++){ if(b[k].h>=e2[k]-3 && b[k].c<b[k].o){ i=k; break; } } if(i<0)i=27; const e=b[i].c, s=Math.max(...b.slice(i-3,i+1).map(x=>x.h))+4; return {dir:-1,i,entry:e,stop:s,target:e-2*(s-e),show:{ema:1}}; }},
+  {id:"pdh", name:"Failed breakout at prior-day high", type:"Reversion", time:"9:30–11:30", cond:"Price tests a key level and can't hold", rt:"2R", diff:3,
+   summary:"Stops from short sellers sit above yesterday's high. When price pokes through, triggers those stops, then falls back inside, the breakout buyers are trapped and become fuel for a drop.",
+   rules:{Setup:"Price trades above the prior day high (PDH) but momentum is weak.", Entry:"Short the first 5-min close back below the PDH.", Stop:"A few points above the failed-breakout high.", Target:"VWAP first, then 2R.", Avoid:"Strong gap-and-go days where price accepts above the level for several bars."},
+   anchors:[[0,0],[6,40],[12,55],[16,82],[18,72],[21,48],[30,18],[45,-22],[59,-10]], vol:8, seed:53, level:{y:24560,label:"Prior-day high"},
+   build(b){ const L=24560; let brk=b.findIndex(x=>x.h>L); let i=b.findIndex((x,k)=>k>brk && x.c<L); if(i<0)i=19; const hiX=Math.max(...b.slice(brk,i+1).map(x=>x.h)); const e=b[i].c, s=hiX+4; return {dir:-1,i,entry:e,stop:s,target:e-2*(s-e),show:{vwap:1}}; }},
+  {id:"gap", name:"Gap fill", type:"Reversion", time:"9:30–10:30", cond:"Moderate gap (0.3–1%) with no major news", rt:"1.5–2R", diff:2,
+   summary:"When NQ opens well away from yesterday's 4:00 pm close without a strong catalyst, price often drifts back to 'fill the gap' in the first hour.",
+   rules:{Setup:"Open is 60–200 points from the prior close. Check the news: a real catalyst means skip it.", Entry:"Short the break of the first 15-minute low (gap up) or buy the break of the high (gap down).", Stop:"Other side of the first 15-minute range.", Target:"Yesterday's closing price.", Avoid:"Gaps on earnings, CPI or FOMC news. Those gaps often keep running."},
+   anchors:[[0,0],[3,15],[8,-22],[15,-52],[22,-86],[30,-62],[59,-42]], vol:7, seed:67, level:{y:24415,label:"Prior close (gap fill)"},
+   build(b){ const h=Math.max(...b.slice(0,3).map(x=>x.h)), l=Math.min(...b.slice(0,3).map(x=>x.l)); let i=b.findIndex((x,k)=>k>=3 && x.c<l); if(i<0)i=6; const e=b[i].c, s=h; return {dir:-1,i,entry:e,stop:s,target:24415,targetLabel:"Gap fill",zones:[{i0:0,i1:3,hi:h,lo:l,label:"First 15 min"}],show:{vwap:1}}; }}
+];
+let curStrat = STRATS[0].id;
+function renderStrategy(){
+  const S = STRATS.find(s => s.id === curStrat);
+  const bars = genBars({anchors:S.anchors, n:60, vol:S.vol, seed:S.seed});
+  const vw = vwap(bars), e1 = ema(bars,9), e2 = ema(bars,20);
+  const P = S.build(bars, vw, e1, e2);
+  // resolve outcome
+  let exitI = -1, exitP = null, why = "";
+  for (let k = P.i+1; k < bars.length; k++){
+    const b = bars[k];
+    if (P.dir > 0){ if (b.l <= P.stop){ exitI=k; exitP=P.stop; why="Stopped"; break; } if (b.h >= P.target){ exitI=k; exitP=P.target; why="Target hit"; break; } }
+    else { if (b.h >= P.stop){ exitI=k; exitP=P.stop; why="Stopped"; break; } if (b.l <= P.target){ exitI=k; exitP=P.target; why="Target hit"; break; } }
+  }
+  if (exitI < 0){ exitI = bars.length-1; exitP = bars[exitI].c; why = "Closed at end"; }
+  const levels = [
+    {y:P.entry, color:"var(--ink)", label:"Entry "+P.entry.toFixed(2), i0:P.i, i1:exitI, dash:"4 3", w:1},
+    {y:P.stop, color:"var(--down)", label:"Stop "+P.stop.toFixed(2), i0:P.i, i1:exitI, w:1.5},
+    {y:P.target, color:"var(--up)", label:(P.targetLabel||"Target")+" "+P.target.toFixed(2), i0:P.i, i1:exitI, w:1.5}
+  ];
+  if (S.level) levels.unshift({y:S.level.y, color:"var(--muted)", label:S.level.label, dash:"6 4", labelLeft:true});
+  drawChart($("#s-chart"), bars, {vwap:P.show.vwap?vw:null, ema1:P.show.ema?e1:null, ema2:P.show.ema?e2:null, zones:P.zones, levels,
+    markers:[{i:P.i, price:P.dir>0?bars[P.i].l:bars[P.i].h, dir:P.dir, label:P.dir>0?"BUY":"SELL"},{i:exitI, price:exitP, exit:1, label:why==="Target hit"?"EXIT +":"EXIT"}]});
+  $("#s-chart").setAttribute("aria-label", S.name + " example chart");
+  $("#s-title").textContent = S.name;
+  $("#s-tags").innerHTML = `<span class="pill ${S.type==="Trend"?"up":"acc"}">${S.type}</span><span class="pill">${S.time} ET</span>`;
+  const lg = [];
+  if (P.show.vwap) lg.push(`<span><i style="background:var(--accent)"></i>VWAP</span>`);
+  if (P.show.ema) lg.push(`<span><i style="background:var(--ema1)"></i>9 EMA</span><span><i style="background:var(--ema2)"></i>20 EMA</span>`);
+  lg.push(`<span><i style="background:var(--up)"></i>Target</span><span><i style="background:var(--down)"></i>Stop</span>`);
+  $("#s-legend").innerHTML = lg.join("");
+  $("#s-summary").textContent = S.summary;
+  $("#s-rules").innerHTML = Object.entries(S.rules).map(([k,v]) => `<div class="rule"><b>${k}</b><span>${v}</span></div>`).join("");
+  const risk = Math.abs(P.entry - P.stop), pts = (exitP - P.entry) * P.dir;
+  $("#s-result").innerHTML = `<dt>Example result</dt><dd class="${cls(pts)}">${why} · ${num(pts)} pts · ${num(pts/risk)}R</dd><dt>Risk</dt><dd>${num(risk)} pts = ${money(risk*2)} per MNQ</dd><dt>On 1 MNQ</dt><dd class="${cls(pts)}">${money(pts*2,1)}</dd><dt>On 1 NQ</dt><dd class="${cls(pts)}">${money(pts*20,1)}</dd>`;
+}
+function initStrategies(){
+  $("#strat-chips").innerHTML = STRATS.map(s => `<button class="chip" data-s="${s.id}" aria-pressed="${s.id===curStrat}">${s.name}</button>`).join("");
+  $("#strat-chips").addEventListener("click", e => { const b = e.target.closest("[data-s]"); if (!b) return; curStrat = b.dataset.s; $$("#strat-chips .chip").forEach(c => c.setAttribute("aria-pressed", c === b)); renderStrategy(); });
+  $("#strat-table").innerHTML = STRATS.map(s => `<tr><td><b>${s.name}</b></td><td><span class="pill ${s.type==="Trend"?"up":"acc"}">${s.type}</span></td><td class="mono">${s.time}</td><td>${s.cond}</td><td class="mono">${s.rt}</td><td class="mono" aria-label="difficulty ${s.diff} of 3">${"●".repeat(s.diff)}<span style="color:var(--line)">${"●".repeat(3-s.diff)}</span></td></tr>`).join("");
+  renderStrategy();
+}
+
+/* ---------------- Replay drill ---------------- */
+const RP = {bars:[], k:12, pos:null, trades:[], timer:null, regime:""};
+function newSession(){
+  const seed = (Date.now() ^ Math.floor(Math.random()*1e9)) >>> 0; const r = rng(seed);
+  const regimes = [["Trend up",1],["Trend down",-1],["Range",0],["Reversal",2]];
+  const [name, kind] = regimes[Math.floor(r()*regimes.length)];
+  const anchors = [[0,0]]; let p = 0;
+  const legs = 5 + Math.floor(r()*3);
+  for (let j = 1; j <= legs; j++){
+    const i = Math.round(j * 77/legs);
+    let drift = (r()-0.5) * 90;
+    if (kind === 1) drift += 45; if (kind === -1) drift -= 45;
+    if (kind === 0) drift = -p*0.8 + (r()-0.5)*70;
+    if (kind === 2) drift += (j <= legs/2 ? 60 : -80) * (r() < .5 ? 1 : -1) * (j === 1 ? 1 : 1);
+    p += drift; anchors.push([i, p]);
+  }
+  const base = 24000 + Math.round(r()*1200/25)*25;
+  RP.bars = genBars({anchors, n:78, vol:10 + r()*6, seed, base});
+  RP.k = 6; RP.pos = null; RP.trades = []; RP.regime = name; stopPlay();
+  $("#rp-regime").textContent = "Session hidden"; $("#rp-send").disabled = true;
+  $("#rp-msg").textContent = "The first 30 minutes are shown. Mark the opening range, decide your plan, then step forward.";
+  renderReplay();
+}
+function rpPV(){ return INSTR[$("#rp-sym").value].pv; }
+function rpFee(){ const f = store.get("fee", 1.24); return $("#rp-sym").value === "NQ" ? Math.max(f, f*3.5) : f; }
+function rpOpen(dir){
+  if (RP.k >= RP.bars.length) return;
+  if (RP.pos){ if (RP.pos.dir !== dir) rpClose(RP.bars[RP.k-1].c, "Manual"); return; }
+  const px = RP.bars[RP.k-1].c, qty = Math.max(1, Math.floor(val("rp-qty") || 1)), st = val("rp-stop") || 25, tg = val("rp-tgt") || 50;
+  RP.pos = {dir, qty, entry:px, stop:px - dir*st, target:px + dir*tg, i:RP.k-1, sym:$("#rp-sym").value, pv:rpPV(), fee:rpFee()};
+  $("#rp-msg").textContent = `${dir>0?"Bought":"Sold"} ${qty} ${RP.pos.sym} at ${px.toFixed(2)}. Bracket: stop ${RP.pos.stop.toFixed(2)}, target ${RP.pos.target.toFixed(2)}.`;
+  renderReplay();
+}
+function rpClose(px, reason){
+  const p = RP.pos; if (!p) return;
+  const pts = (px - p.entry) * p.dir; const pnl = pts * p.pv * p.qty - p.fee * p.qty;
+  RP.trades.push({...p, exit:px, reason, pts, pnl, exitI:RP.k-1, time:barTime(p.i)});
+  RP.pos = null; $("#rp-send").disabled = false;
+  $("#rp-msg").textContent = `${reason}: ${num(pts)} pts, ${money(pnl,1)} after fees.`;
+  renderReplay();
+}
+function rpNext(){
+  if (RP.k >= RP.bars.length){ stopPlay(); return; }
+  const b = RP.bars[RP.k]; RP.k++;
+  const p = RP.pos;
+  if (p){
+    if (p.dir > 0){ if (b.l <= p.stop) rpClose(Math.min(b.o, p.stop), "Stop"); else if (b.h >= p.target) rpClose(Math.max(b.o, p.target), "Target"); }
+    else { if (b.h >= p.stop) rpClose(Math.max(b.o, p.stop), "Stop"); else if (b.l <= p.target) rpClose(Math.min(b.o, p.target), "Target"); }
+  }
+  if (RP.k >= RP.bars.length){
+    if (RP.pos) rpClose(RP.bars[RP.k-1].c, "End of day");
+    stopPlay(); $("#rp-regime").textContent = "Session: " + RP.regime;
+    const tot = RP.trades.reduce((a,t) => a + t.pnl, 0);
+    $("#rp-msg").textContent = `Session over. It was a ${RP.regime.toLowerCase()} day. ${RP.trades.length} trade(s), net ${money(tot,1)}. Did your setups match the day type?`;
+  }
+  renderReplay();
+}
+function stopPlay(){ clearInterval(RP.timer); RP.timer = null; $("#rp-play").textContent = "Play"; }
+function renderReplay(){
+  const shown = RP.bars.slice(0, RP.k);
+  const vw = vwap(shown), e1 = ema(shown, 9);
+  const orB = RP.bars.slice(0,6); const orH = Math.max(...orB.map(b=>b.h)), orL = Math.min(...orB.map(b=>b.l));
+  const levels = [], markers = [];
+  if (RP.pos){
+    levels.push({y:RP.pos.entry, color:"var(--ink)", label:"Entry", i0:RP.pos.i, dash:"4 3", w:1});
+    levels.push({y:RP.pos.stop, color:"var(--down)", label:"Stop "+RP.pos.stop.toFixed(2), i0:RP.pos.i, w:1.5});
+    levels.push({y:RP.pos.target, color:"var(--up)", label:"Target "+RP.pos.target.toFixed(2), i0:RP.pos.i, w:1.5});
+    markers.push({i:RP.pos.i, price:RP.pos.dir>0?RP.bars[RP.pos.i].l:RP.bars[RP.pos.i].h, dir:RP.pos.dir});
+  }
+  RP.trades.forEach(t => { markers.push({i:t.i, price:t.dir>0?RP.bars[t.i].l:RP.bars[t.i].h, dir:t.dir}); markers.push({i:t.exitI, price:t.exit, exit:1}); });
+  drawChart($("#rp-chart"), shown, {slots:78, vwap:vw, ema1:e1, zones:[{i0:0,i1:6,hi:orH,lo:orL,label:"OR"}], levels, markers, lastTag:true});
+  const done = RP.k >= RP.bars.length;
+  $("#rp-time").textContent = barTime(Math.min(RP.k, 78)) + " ET";
+  const last = shown[shown.length-1].c;
+  if (RP.pos){ const open = (last - RP.pos.entry)*RP.pos.dir; $("#rp-pos").className = "pill " + (open >= 0 ? "up" : "down"); $("#rp-pos").textContent = `${RP.pos.dir>0?"Long":"Short"} ${RP.pos.qty} · ${num(open)} pts`; }
+  else { $("#rp-pos").className = "pill"; $("#rp-pos").textContent = "Flat"; }
+  const openPnl = RP.pos ? (last - RP.pos.entry)*RP.pos.dir*RP.pos.pv*RP.pos.qty : 0;
+  const tot = RP.trades.reduce((a,t) => a + t.pnl, 0) + openPnl;
+  $("#rp-pnl").textContent = money(tot, 1); $("#rp-pnl").className = "num " + cls(tot);
+  ["rp-buy","rp-sell","rp-next","rp-play"].forEach(id => $("#"+id).disabled = done);
+  $("#rp-flat").disabled = !RP.pos;
+  $("#rp-trades").innerHTML = RP.trades.length ? RP.trades.map((t,j) => `<tr><td>${j+1}</td><td class="${t.dir>0?"up-t":"down-t"}">${t.dir>0?"Long":"Short"}</td><td class="n">${t.qty} ${t.sym}</td><td class="n">${t.entry.toFixed(2)}</td><td class="n">${t.exit.toFixed(2)}</td><td>${t.reason}</td><td class="n ${cls(t.pts)}">${num(t.pts)}</td><td class="n ${cls(t.pnl)}">${money(t.pnl,1)}</td></tr>`).join("") : `<tr><td colspan="8" class="muted">No trades yet this session.</td></tr>`;
+}
+function initReplay(){
+  $("#rp-buy").onclick = () => rpOpen(1);
+  $("#rp-sell").onclick = () => rpOpen(-1);
+  $("#rp-flat").onclick = () => RP.pos && rpClose(RP.bars[RP.k-1].c, "Manual");
+  $("#rp-next").onclick = rpNext;
+  $("#rp-new").onclick = newSession;
+  $("#rp-play").onclick = () => { if (RP.timer) return stopPlay(); RP.timer = setInterval(rpNext, 650); $("#rp-play").textContent = "Pause"; };
+  $("#rp-send").onclick = async () => {
+    const d = todayNY();
+    for (const t of RP.trades){
+      await saveTrade({date:d, time:t.time, sym:t.sym, side:t.dir>0?"Long":"Short", qty:t.qty, entry:t.entry, exit:t.exit, stop:t.stop, strategy:"Replay drill", grade:"B", notes:`Replay (${RP.regime}) · ${t.reason}`});
+    }
+    $("#rp-send").disabled = true;
+    $("#rp-msg").textContent = `Added ${RP.trades.length} trade(s) to the journal under the setup "Replay drill".`;
+  };
+  newSession();
+}
+
+/* ---------------- Risk tools ---------------- */
+function symOptions(sel, def = "MNQ"){ sel.innerHTML = Object.keys(INSTR).map(k => `<option value="${k}" ${k===def?"selected":""}>${k} (${money(INSTR[k].pv).replace(".00","")}/pt)</option>`).join(""); }
+function renderSizer(){
+  const acct = val("ps-acct")||0, rp = val("ps-risk")||0, st = val("ps-stop")||0, I = INSTR[$("#ps-sym").value];
+  const budget = acct*rp/100, per = st*I.pv, n = per > 0 ? Math.floor(budget/per) : 0;
+  $("#ps-out").textContent = n; $("#ps-out").className = "big-out " + (n === 0 ? "down-t" : "");
+  $("#ps-kv").innerHTML = `<dt>Risk budget</dt><dd>${money(budget)}</dd><dt>Risk per contract</dt><dd>${money(per)} (${Math.round(st/I.tick)} ticks)</dd><dt>Actual risk</dt><dd>${money(n*per)} = ${num(acct? n*per/acct*100:0)}%</dd>`;
+  const note = $("#ps-note");
+  if (n === 0) note.innerHTML = `<span class="down-t">Your stop is too wide for this account at ${rp}% risk.</span> Tighten the stop, use a micro contract, or skip the trade.`;
+  else if ($("#ps-sym").value === "NQ" || $("#ps-sym").value === "ES") note.innerHTML = `<span class="muted">Same risk in micros: ${n*10} ${$("#ps-sym").value === "NQ" ? "MNQ" : "MES"}, which lets you scale out in smaller pieces.</span>`;
+  else note.innerHTML = `<span class="muted">A 5-loss streak at this size costs ${money(5*n*per)} (${num(acct?5*n*per/acct*100:0)}% of the account).</span>`;
+}
+function renderPlanner(){
+  const dir = +$("#tp-dir").value, e = val("tp-entry"), s = val("tp-stop"), t = val("tp-tgt"), q = Math.max(1, val("tp-qty")||1), I = INSTR[$("#tp-sym").value];
+  const risk = (e - s)*dir, rew = (t - e)*dir; const svg = $("#tp-viz"); svg.innerHTML = "";
+  const ok = risk > 0 && rew > 0;
+  const stats = $("#tp-stats");
+  if (!ok){ const tx = el("text",{x:10, y:48, "font-size":13, fill:"var(--down)"}, svg); tx.textContent = dir>0 ? "For a long: stop must be below entry and target above it." : "For a short: stop must be above entry and target below it."; stats.innerHTML = ""; return; }
+  const rr = rew/risk, be = 1/(1+rr)*100, tot = risk + rew, W = 500;
+  const wr = risk/tot*W;
+  el("rect",{x:10, y:22, width:wr, height:30, fill:"var(--down-soft)", stroke:"var(--down)"}, svg);
+  el("rect",{x:10+wr, y:22, width:W-wr, height:30, fill:"var(--up-soft)", stroke:"var(--up)"}, svg);
+  el("line",{x1:10+wr, x2:10+wr, y1:14, y2:60, stroke:"var(--ink)", "stroke-width":2}, svg);
+  const lab = (x, y, s, c, a="middle") => { const t2 = el("text",{x, y, "text-anchor":a, "font-size":11.5, "font-weight":600, "font-family":"var(--mono)", fill:c}, svg); t2.textContent = s; };
+  lab(10, 76, "STOP "+s.toFixed(2), "var(--down)", "start"); lab(10+wr, 76, "ENTRY "+e.toFixed(2), "var(--ink)", wr < 90 ? "start" : wr > W-90 ? "end" : "middle"); lab(10+W, 76, "TARGET "+t.toFixed(2), "var(--up)", "end");
+  lab(10 + wr/2, 42, "−1R", "var(--down)"); lab(10 + wr + (W-wr)/2, 42, "+"+rr.toFixed(2)+"R", "var(--up)");
+  stats.innerHTML = [
+    ["Reward : risk", rr.toFixed(2)+" : 1"],
+    ["Break-even win rate", be.toFixed(1)+"%"],
+    ["$ at risk", money(risk*I.pv*q)],
+    ["$ at target", money(rew*I.pv*q)],
+    ["Risk in ticks", Math.round(risk/I.tick)]
+  ].map(([k,v]) => `<div class="stat"><small>${k}</small><b>${v}</b></div>`).join("");
+}
+function runMC(){
+  const p = (val("mc-wr")||0)/100, rw = val("mc-rw")||0, rk = (val("mc-risk")||0)/100, n = Math.min(1000, Math.max(10, Math.floor(val("mc-n")||200))), cost = val("mc-cost")||0;
+  const PATHS = 40, paths = [], r = rng(Date.now() >>> 0);
+  let ruin = 0, dd20 = 0;
+  for (let j = 0; j < PATHS; j++){
+    let eq = 100, peak = 100, mdd = 0; const a = [eq];
+    for (let i = 0; i < n; i++){ const R = (r() < p ? rw : -1) - cost; eq *= (1 + rk*R); peak = Math.max(peak, eq); mdd = Math.max(mdd, 1 - eq/peak); a.push(eq); }
+    if (eq < 50) ruin++; if (mdd >= 0.2) dd20++;
+    paths.push({a, eq, mdd});
+  }
+  const finals = paths.map(x => x.eq).sort((a,b) => a-b); const med = finals[Math.floor(PATHS/2)];
+  const exp = p*rw - (1-p) - cost;
+  // draw
+  const svg = $("#mc-chart"); svg.innerHTML = "";
+  const W = 900, H = 300, L = 8, R = 56, T = 12, B = 26;
+  let lo = Math.min(...paths.flatMap(x => x.a)), hi = Math.max(...paths.flatMap(x => x.a));
+  lo = Math.min(lo, 90); hi = Math.max(hi, 110);
+  const X = i => L + i/n*(W-L-R), Y = v => T + (hi - v)/(hi - lo)*(H - T - B);
+  const step = niceStep((hi-lo)/5);
+  for (let v = Math.ceil(lo/step)*step; v <= hi; v += step){ el("line",{x1:L, x2:W-R, y1:Y(v), y2:Y(v), stroke:"var(--grid)"}, svg); const t = el("text",{x:W-R+6, y:Y(v)+4, "font-size":10.5, "font-family":"var(--mono)", fill:"var(--muted)"}, svg); t.textContent = Math.round(v-100)+"%"; }
+  el("line",{x1:L, x2:W-R, y1:Y(100), y2:Y(100), stroke:"var(--faint)", "stroke-dasharray":"4 3"}, svg);
+  for (let i = 0; i <= n; i += niceStep(n/6)){ const t = el("text",{x:X(i), y:H-8, "text-anchor":"middle", "font-size":10.5, "font-family":"var(--mono)", fill:"var(--muted)"}, svg); t.textContent = i; }
+  const medPath = paths.slice().sort((a,b) => a.eq - b.eq)[Math.floor(PATHS/2)];
+  paths.forEach(x => { if (x === medPath) return; const d = x.a.map((v,i) => `${i?"L":"M"}${X(i).toFixed(1)} ${Y(v).toFixed(1)}`).join(""); el("path",{d, fill:"none", stroke: x.eq >= 100 ? "var(--up)" : "var(--down)", "stroke-width":1, "stroke-opacity":.35}, svg); });
+  const d = medPath.a.map((v,i) => `${i?"L":"M"}${X(i).toFixed(1)} ${Y(v).toFixed(1)}`).join("");
+  el("path",{d, fill:"none", stroke:"var(--ink)", "stroke-width":2.5}, svg);
+  el("circle",{cx:X(n), cy:Y(medPath.eq), r:4, fill:"var(--ink)"}, svg);
+  const up = paths.filter(x => x.eq > 100).length;
+  $("#mc-stats").innerHTML = [
+    ["Expectancy / trade", `<span class="${cls(exp)}">${exp>=0?"+":""}${exp.toFixed(2)}R</span>`],
+    ["Break-even win rate", (100*(1+cost)/(1+rw)).toFixed(1)+"%"],
+    ["Median outcome", `<span class="${cls(med-100)}">${med>=100?"+":""}${(med-100).toFixed(1)}%</span>`],
+    ["Paths profitable", `${up} / ${PATHS}`],
+    ["Paths with ≥20% drawdown", `${dd20} / ${PATHS}`],
+    ["Paths losing half", `<span class="${ruin?"down-t":""}">${ruin} / ${PATHS}</span>`]
+  ].map(([k,v]) => `<div class="stat"><small>${k}</small><b>${v}</b></div>`).join("");
+}
+
+/* ---------------- Journal ---------------- */
+const STRAT_NAMES = [...STRATS.map(s => s.name), "Replay drill", "Other / unplanned"];
+const J = {trades:[], db:null, mode:"local"};
+const EXAMPLES = (() => {
+  const d0 = new Date(); const day = k => { const d = new Date(d0.getTime() - k*864e5); return d.toISOString().slice(0,10); };
+  const rows = [
+    [9,"09:42","MNQ","Long",2,24480,24521,24462,"Opening range breakout","A","Clean break with volume."],
+    [9,"10:55","MNQ","Short",1,24530,24541,24538,"Other / unplanned","C","Chased. No setup."],
+    [8,"09:51","MNQ","Long",2,24390,24371,24371,"Opening range breakout","A","Failed breakout, stop hit. Fine."],
+    [7,"10:20","MNQ","Long",2,24455,24492,24440,"VWAP pullback","A",""],
+    [6,"09:35","MNQ","Short",2,24610,24578,24628,"Gap fill","B","Took profit early."],
+    [5,"12:10","MNQ","Long",1,24520,24506,24508,"VWAP mean reversion","B","Lunch chop."],
+    [4,"09:48","MNQ","Short",2,24660,24615,24680,"Failed breakout at prior-day high","A","Textbook."],
+    [3,"10:05","MNQ","Long",2,24580,24566,24566,"VWAP pullback","A",""],
+    [2,"14:15","MNQ","Short",2,24490,24452,24509,"9/20 EMA trend pullback","A",""],
+    [1,"09:40","MNQ","Long",3,24420,24398,24405,"Opening range breakout","C","Oversized after two wins."],
+    [1,"10:30","MNQ","Long",2,24410,24446,24392,"VWAP pullback","A",""]
+  ];
+  return rows.map((r,i) => ({id:"ex"+i, example:true, date:day(r[0]), time:r[1], sym:r[2], side:r[3], qty:r[4], entry:r[5], exit:r[6], stop:r[7], strategy:r[8], grade:r[9], notes:r[10], createdAt:i}));
+})();
+function tradeCalc(t){
+  const I = INSTR[t.sym] || INSTR.MNQ; const dir = t.side === "Long" ? 1 : -1;
+  const pts = (t.exit - t.entry)*dir; const fee = feeFor(t.sym);
+  const net = pts*I.pv*t.qty - fee*t.qty;
+  const risk = t.stop != null && t.stop !== "" && !isNaN(t.stop) ? Math.abs(t.entry - t.stop) : null;
+  return {pts, net, R: risk ? pts/risk : null};
+}
+function feeFor(sym){ const f = store.get("fee", 1.24); return (sym === "NQ" || sym === "ES") ? f*3.5 : f; }
+function activeTrades(){ return J.trades.length ? J.trades : EXAMPLES; }
+function sortTrades(a){ return a.slice().sort((x,y) => (x.date+x.time).localeCompare(y.date+y.time) || (x.createdAt||0)-(y.createdAt||0)); }
+async function saveTrade(t){
+  const rec = {...t, qty:+t.qty, entry:+t.entry, exit:+t.exit, stop: t.stop === "" || t.stop == null || isNaN(t.stop) ? null : +t.stop, createdAt:Date.now()};
+  if (J.db){
+    try { const ref = J.db.collection("trades").doc(); await ref.set(rec); return; }
+    catch(e){ if (e && e.code === "quota_exceeded"){ flash("The journal database is full (5,000 trades). Delete old trades to add more."); return; } console.warn(e); flash("Couldn't save to the shared database, so this trade was saved in this browser only."); J.mode = "local"; J.db = null; J.trades = store.get("trades", []); }
+  }
+  rec.id = "t" + Date.now().toString(36) + Math.random().toString(36).slice(2,6);
+  J.trades.push(rec); store.set("trades", J.trades); renderJournal();
+}
+async function deleteTrade(id){
+  if (J.db){ try{ await J.db.collection("trades").doc(id).delete(); return; } catch(e){ console.warn(e); } }
+  J.trades = J.trades.filter(t => t.id !== id); store.set("trades", J.trades); renderJournal();
+}
+function flash(msg){ $("#j-copy-msg").textContent = msg; }
+function renderStoreBadge(){
+  const b = $("#j-store");
+  if (J.mode === "db"){ b.className = "pill up"; b.textContent = "Saved to this page's database"; }
+  else { b.className = "pill"; b.textContent = "Saved in this browser only"; }
+  $("#j-example").hidden = J.trades.length > 0;
+}
+function renderJournal(){
+  renderStoreBadge();
+  const trades = sortTrades(activeTrades()); const calc = trades.map(t => ({t, ...tradeCalc(t)}));
+  const wins = calc.filter(c => c.net > 0), losses = calc.filter(c => c.net <= 0);
+  const net = calc.reduce((a,c) => a + c.net, 0);
+  const gw = wins.reduce((a,c) => a + c.net, 0), gl = -losses.reduce((a,c) => a + c.net, 0);
+  const Rs = calc.filter(c => c.R != null);
+  let peak = 0, eq = 0, mdd = 0; const curve = [0];
+  calc.forEach(c => { eq += c.net; peak = Math.max(peak, eq); mdd = Math.max(mdd, peak - eq); curve.push(eq); });
+  const aGrade = calc.filter(c => c.t.grade === "A"); const aNet = aGrade.reduce((a,c)=>a+c.net,0);
+  const cGrade = calc.filter(c => c.t.grade === "C"); const cNet = cGrade.reduce((a,c)=>a+c.net,0);
+  $("#j-stats").innerHTML = [
+    ["Net P&L", `<span class="${cls(net)}">${money(net,1)}</span>`],
+    ["Trades", calc.length],
+    ["Win rate", calc.length ? (wins.length/calc.length*100).toFixed(0)+"%" : "—"],
+    ["Profit factor", gl > 0 ? (gw/gl).toFixed(2) : (gw > 0 ? "∞" : "—")],
+    ["Avg win / loss", `${wins.length?money(gw/wins.length):"—"} / ${losses.length?money(gl/losses.length):"—"}`],
+    ["Avg R", Rs.length ? `<span class="${cls(Rs.reduce((a,c)=>a+c.R,0))}">${(Rs.reduce((a,c)=>a+c.R,0)/Rs.length).toFixed(2)}R</span>` : "—"],
+    ["Max drawdown", `<span class="${mdd?"down-t":""}">${money(-mdd)}</span>`],
+    ["A vs C grade net", `<span class="${cls(aNet)}">${money(aNet)}</span> · <span class="${cls(cNet)}">${money(cNet)}</span>`]
+  ].map(([k,v]) => `<div class="stat"><small>${k}</small><b style="font-size:18px">${v}</b></div>`).join("");
+  drawEquity(curve, trades);
+  // by strategy
+  const by = {};
+  calc.forEach(c => { const k = c.t.strategy || "—"; (by[k] ||= {n:0,w:0,net:0,R:0,rn:0}); by[k].n++; if (c.net>0) by[k].w++; by[k].net += c.net; if (c.R!=null){ by[k].R += c.R; by[k].rn++; } });
+  $("#j-bystrat").innerHTML = Object.entries(by).sort((a,b) => b[1].net - a[1].net).map(([k,v]) => `<tr><td>${esc(k)}</td><td class="n">${v.n}</td><td class="n">${(v.w/v.n*100).toFixed(0)}%</td><td class="n ${cls(v.net)}">${money(v.net)}</td><td class="n">${v.rn ? (v.R/v.rn).toFixed(2) : "—"}</td></tr>`).join("") || `<tr><td colspan="5" class="muted">No trades.</td></tr>`;
+  drawByTime(calc);
+  // rows
+  const rows = $("#j-rows");
+  rows.innerHTML = trades.slice().reverse().map(t => { const c = tradeCalc(t); return `<tr><td class="mono">${esc(t.date)}</td><td class="mono">${esc(t.time||"")}</td><td class="mono">${esc(t.sym)}</td><td class="${t.side==="Long"?"up-t":"down-t"}">${esc(t.side)}</td><td class="n">${t.qty}</td><td class="n">${(+t.entry).toFixed(2)}</td><td class="n">${(+t.exit).toFixed(2)}</td><td class="n ${cls(c.pts)}">${num(c.pts)}</td><td class="n">${c.R!=null?c.R.toFixed(2):"—"}</td><td class="n ${cls(c.net)}">${money(c.net,1)}</td><td>${esc(t.strategy)}</td><td><span class="pill ${t.grade==="A"?"up":t.grade==="C"?"down":"acc"}">${esc(t.grade)}</span></td><td class="small muted" style="white-space:normal;min-width:160px">${esc(t.notes)}</td><td>${t.example?"":`<button class="btn ghost" data-del="${esc(t.id)}" aria-label="Delete trade">Delete</button>`}</td></tr>`; }).join("");
+  $("#j-eq-note").textContent = J.trades.length ? `${trades.length} trades, fees included` : "Example data";
+  if ($("#p-plan").classList.contains("active")) renderPlan();
+}
+function drawEquity(curve, trades){
+  const svg = $("#j-equity"); svg.innerHTML = "";
+  const W = 560, H = 240, L = 8, R = 64, T = 12, B = 24; const n = curve.length - 1 || 1;
+  let lo = Math.min(0, ...curve), hi = Math.max(0, ...curve); if (hi - lo < 50){ hi += 25; lo -= 25; }
+  const X = i => L + i/n*(W-L-R), Y = v => T + (hi - v)/(hi - lo)*(H-T-B);
+  const step = niceStep((hi-lo)/4);
+  for (let v = Math.ceil(lo/step)*step; v <= hi; v += step){ el("line",{x1:L,x2:W-R,y1:Y(v),y2:Y(v),stroke:v===0?"var(--faint)":"var(--grid)"}, svg); const t = el("text",{x:W-R+6,y:Y(v)+4,"font-size":10.5,"font-family":"var(--mono)",fill:"var(--muted)"}, svg); t.textContent = money(v).replace(".00",""); }
+  const pts = curve.map((v,i) => `${X(i).toFixed(1)} ${Y(v).toFixed(1)}`);
+  const last = curve[curve.length-1]; const col = last >= 0 ? "var(--up)" : "var(--down)";
+  el("path",{d:`M${X(0)} ${Y(0)} L${pts.join(" L")} L${X(n)} ${Y(0)} Z`, fill:col, "fill-opacity":.12}, svg);
+  el("path",{d:"M"+pts.join(" L"), fill:"none", stroke:col, "stroke-width":2, "stroke-linejoin":"round"}, svg);
+  curve.slice(1).forEach((v,i) => el("circle",{cx:X(i+1), cy:Y(v), r:2.2, fill:col}, svg));
+  el("circle",{cx:X(n), cy:Y(last), r:4.5, fill:col, stroke:"var(--surface)", "stroke-width":2}, svg);
+  const t0 = el("text",{x:L, y:H-6, "font-size":10.5, "font-family":"var(--mono)", fill:"var(--muted)"}, svg); t0.textContent = trades[0] ? trades[0].date : "";
+  const t1 = el("text",{x:W-R, y:H-6, "text-anchor":"end", "font-size":10.5, "font-family":"var(--mono)", fill:"var(--muted)"}, svg); t1.textContent = trades.length ? trades[trades.length-1].date : "";
+}
+function drawByTime(calc){
+  const svg = $("#j-bytime"); svg.innerHTML = "";
+  const hrs = [9,10,11,12,13,14,15]; const agg = hrs.map(h => ({h, net:0, n:0}));
+  calc.forEach(c => { const h = parseInt((c.t.time||"").split(":")[0], 10); const a = agg.find(x => x.h === (h < 9 ? 9 : h > 15 ? 15 : h)); if (a && !isNaN(h)){ a.net += c.net; a.n++; } });
+  const W = 560, H = 140, T = 16, B = 24; const m = Math.max(1, ...agg.map(a => Math.abs(a.net)));
+  const bw = (W - 20)/hrs.length; const Y0 = T + (H-T-B)/2;
+  el("line",{x1:10, x2:W-10, y1:Y0, y2:Y0, stroke:"var(--faint)"}, svg);
+  agg.forEach((a,i) => {
+    const hgt = Math.abs(a.net)/m*((H-T-B)/2 - 4); const x = 10 + i*bw + bw*0.2;
+    if (a.n) el("rect",{x, y:a.net >= 0 ? Y0 - hgt : Y0, width:bw*0.6, height:Math.max(1,hgt), rx:2, fill:a.net >= 0 ? "var(--up)" : "var(--down)"}, svg);
+    const t = el("text",{x:x + bw*0.3, y:H-6, "text-anchor":"middle", "font-size":10.5, "font-family":"var(--mono)", fill:"var(--muted)"}, svg); t.textContent = (a.h > 12 ? a.h-12 : a.h) + (a.h >= 12 ? "p" : "a") + (i===hrs.length-1?"+":"");
+    if (a.n){ const v = el("text",{x:x + bw*0.3, y:a.net >= 0 ? Y0 - hgt - 4 : Y0 + hgt + 12, "text-anchor":"middle", "font-size":10, "font-family":"var(--mono)", fill:"var(--ink)"}, svg); v.textContent = money(a.net).replace(/\.\d\d$/,""); }
+  });
+}
+function initJournal(){
+  symOptions($("#jf-sym"));
+  $("#jf-strat").innerHTML = STRAT_NAMES.map(s => `<option>${s}</option>`).join("");
+  $("#jf-date").value = todayNY();
+  $("#j-fee").value = store.get("fee", 1.24);
+  $("#j-fee").addEventListener("input", () => { store.set("fee", val("j-fee") || 0); renderJournal(); });
+  const prev = () => {
+    const t = {sym:$("#jf-sym").value, side:$("#jf-side").value, qty:val("jf-qty")||0, entry:val("jf-entry"), exit:val("jf-exit"), stop:val("jf-stop")};
+    if (isNaN(t.entry) || isNaN(t.exit)){ $("#jf-preview").textContent = ""; return; }
+    const c = tradeCalc(t); $("#jf-preview").innerHTML = `Preview: <b class="${cls(c.net)}">${money(c.net,1)}</b> · ${num(c.pts)} pts${c.R!=null?` · ${c.R.toFixed(2)}R`:""}`;
+  };
+  $("#j-form").addEventListener("input", prev);
+  $("#j-form").addEventListener("submit", async e => {
+    e.preventDefault();
+    await saveTrade({date:$("#jf-date").value, time:$("#jf-time").value, sym:$("#jf-sym").value, side:$("#jf-side").value, qty:val("jf-qty"), entry:val("jf-entry"), exit:val("jf-exit"), stop:val("jf-stop"), strategy:$("#jf-strat").value, grade:$("#jf-grade").value, notes:$("#jf-notes").value.trim()});
+    ["jf-entry","jf-exit","jf-stop","jf-notes"].forEach(id => $("#"+id).value = ""); $("#jf-preview").textContent = "Saved.";
+  });
+  $("#j-rows").addEventListener("click", e => {
+    const b = e.target.closest("[data-del]"); if (!b) return;
+    if (b.dataset.armed){ deleteTrade(b.dataset.del); } else { b.dataset.armed = "1"; b.textContent = "Confirm"; b.style.color = "var(--down)"; setTimeout(() => { if (b.isConnected){ delete b.dataset.armed; b.textContent = "Delete"; b.style.color = ""; } }, 3000); }
+  });
+  $("#j-copy").addEventListener("click", async () => {
+    const hdr = "date,time,symbol,side,qty,entry,exit,stop,points,r,net,setup,grade,notes";
+    const lines = sortTrades(activeTrades()).map(t => { const c = tradeCalc(t); return [t.date,t.time,t.sym,t.side,t.qty,t.entry,t.exit,t.stop??"",c.pts.toFixed(2),c.R!=null?c.R.toFixed(2):"",c.net.toFixed(2),t.strategy,t.grade,`"${String(t.notes||"").replace(/"/g,'""')}"`].join(","); });
+    const csv = [hdr, ...lines].join("\n");
+    try{ await navigator.clipboard.writeText(csv); flash(`Copied ${lines.length} trades as CSV. Paste into Excel or Google Sheets.`); }
+    catch{ flash("Clipboard is blocked here. Select and copy the table instead."); }
+  });
+  J.trades = store.get("trades", []);
+  renderJournal();
+  // Upgrade to the artifact database when available
+  (async () => {
+    try{
+      if (!window.claude || typeof window.claude.use !== "function") return;
+      const db = await window.claude.use("db"); if (!db) return;
+      J.db = db;
+      db.collection("trades").onSnapshot(snap => {
+        J.mode = "db"; J.trades = snap.docs.map(d => ({id:d.id, ...d.data()})); renderJournal();
+      }, err => { console.warn(err); J.db = null; J.mode = "local"; J.trades = store.get("trades", []); renderJournal(); });
+    }catch(e){ console.warn(e); }
+  })();
+}
+
+/* ---------------- Game plan ---------------- */
+const CHECKS = [
+  "Checked the economic calendar (8:30, 10:00, 2:00 ET events)",
+  "Marked overnight high/low and prior day high/low/close",
+  "Know the front-month contract and it's not roll week confusion",
+  "Picked today's 1–2 setups; everything else is a no",
+  "Bracket orders (stop + target) set up on the platform",
+  "Daily max loss entered below and I will honor it",
+  "Slept, ate, no revenge from yesterday"
+];
+const LEVELS = ["Prior day high","Prior day low","Prior day close","Overnight high","Overnight low","Opening range high","Opening range low"];
+function renderPlan(){
+  const today = todayNY();
+  const tr = sortTrades(activeTrades()).filter(t => t.date === today && !t.example).map(t => ({t, ...tradeCalc(t)}));
+  const pnl = tr.reduce((a,c) => a + c.net, 0);
+  let streak = 0; for (let i = tr.length-1; i >= 0 && tr[i].net <= 0; i--) streak++;
+  const ml = val("pl-maxloss")||0, mt = val("pl-maxtrades")||0, ms = val("pl-maxstreak")||0, goal = val("pl-goal")||0;
+  const used = ml ? Math.max(0, -pnl)/ml : 0;
+  $("#pl-meter").style.width = Math.min(100, used*100) + "%";
+  $("#pl-meter").style.background = used >= 1 ? "var(--down)" : used >= .6 ? "var(--accent)" : "var(--up)";
+  $("#pl-kv").innerHTML = `<dt>Today's net (journal)</dt><dd class="${cls(pnl)}">${money(pnl,1)}</dd><dt>Trades taken</dt><dd>${tr.length} / ${mt}</dd><dt>Losses in a row</dt><dd>${streak} / ${ms}</dd><dt>Loss room left</dt><dd>${money(Math.max(0, ml + Math.min(0,pnl)))}</dd>`;
+  const g = $("#gate");
+  const n = nyNow(); const ph = currentPhase(n);
+  let state = "ok", head = "Clear to trade", why = `Session: ${ph.name}. Stick to your setups.`;
+  if (ml && pnl <= -ml){ state = "stop"; head = "Done for the day"; why = "Daily loss limit reached. Close the platform. Tomorrow is another session."; }
+  else if (ms && streak >= ms){ state = "stop"; head = "Stop: loss streak"; why = `${streak} losses in a row. Walk away for at least an hour, or end the day.`; }
+  else if (mt && tr.length >= mt){ state = "stop"; head = "Trade limit reached"; why = "You've taken your max trades for the day."; }
+  else if (goal && pnl >= goal){ state = "warn"; head = "Goal reached"; why = "Consider stopping or cutting size in half. Don't give it back."; }
+  else if ($$("#checklist input").some(c => !c.checked)){ state = "warn"; head = "Finish your checklist"; why = "Complete the pre-market checklist before your first trade."; }
+  g.className = "gate " + state;
+  g.innerHTML = `<span class="dot ${state==="ok"?"live":state==="stop"?"off":"warn"}"></span><div><strong>${head}</strong><div class="small" style="font-weight:500;color:var(--ink)">${why}</div></div>`;
+}
+function initPlan(){
+  const lim = store.get("limits", null);
+  if (lim) ["pl-maxloss","pl-maxtrades","pl-maxstreak","pl-goal"].forEach(id => { if (lim[id] != null) $("#"+id).value = lim[id]; });
+  ["pl-maxloss","pl-maxtrades","pl-maxstreak","pl-goal"].forEach(id => $("#"+id).addEventListener("input", () => { const o = {}; ["pl-maxloss","pl-maxtrades","pl-maxstreak","pl-goal"].forEach(k => o[k] = $("#"+k).value); store.set("limits", o); renderPlan(); }));
+  const key = "checks:" + todayNY(); const done = store.get(key, []);
+  $("#checklist").innerHTML = CHECKS.map((c,i) => `<label class="check"><input type="checkbox" id="ck-${i}" ${done.includes(i)?"checked":""}><span>${c}</span></label>`).join("");
+  const upd = () => { const d = $$("#checklist input").map((c,i) => c.checked ? i : -1).filter(i => i >= 0); store.set(key, d); $("#ck-count").textContent = `${d.length} / ${CHECKS.length}`; $("#ck-count").className = "pill " + (d.length === CHECKS.length ? "up" : ""); renderPlan(); };
+  $("#checklist").addEventListener("change", upd);
+  $("#ck-reset").onclick = () => { $$("#checklist input").forEach(c => c.checked = false); upd(); };
+  const lv = store.get("levels:" + todayNY(), {});
+  $("#levels").innerHTML = LEVELS.map((l,i) => `<label class="f">${l}<input id="lv-${i}" type="number" class="mono" step="0.25" value="${lv[i] ?? ""}" placeholder="—"></label>`).join("");
+  $("#levels").addEventListener("input", () => { const o = {}; LEVELS.forEach((_,i) => o[i] = $("#lv-"+i).value); store.set("levels:" + todayNY(), o); });
+  upd();
+}
+
+/* ---------------- Boot ---------------- */
+function init(){
+  tick(); setInterval(tick, 1000);
+  renderCalendar(); renderSpecs(); renderLadder();
+  $("#idx-level").addEventListener("input", renderSpecs);
+  initStrategies();
+  symOptions($("#ps-sym")); symOptions($("#tp-sym"));
+  ["ps-acct","ps-risk","ps-stop","ps-sym"].forEach(id => $("#"+id).addEventListener("input", renderSizer)); renderSizer();
+  ["tp-dir","tp-entry","tp-stop","tp-tgt","tp-sym","tp-qty"].forEach(id => $("#"+id).addEventListener("input", renderPlanner)); renderPlanner();
+  $("#mc-run").onclick = runMC; runMC();
+  initReplay();
+  initJournal();
+  initPlan();
+  const h = (location.hash || "").slice(1);
+  showTab(TABS.includes(h) ? h : store.get("tab", "learn"));
+}
+init();
+})();
+</script>
