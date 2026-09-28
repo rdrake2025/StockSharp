@@ -195,6 +195,21 @@ input:focus,select:focus,textarea:focus{outline:2px solid var(--cyan);outline-of
 .ladder .bid{text-align:right;color:var(--up)} .ladder .ask{color:var(--down)}
 .ladder .inside .px{background:var(--amber-dim);color:var(--amber)}
 .subnav{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px}
+.jumpbar{position:sticky;top:var(--hdr,58px);z-index:20;display:flex;gap:6px;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;margin:0 calc(-1 * clamp(16px,3vw,32px)) 16px;padding:8px clamp(16px,3vw,32px);background:rgba(7,11,20,.88);backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
+.jumpbar::-webkit-scrollbar{display:none}
+.jumpbar .chip{white-space:nowrap;font-size:12.5px;padding:5px 11px;flex:none}
+.jumpbar .chip[aria-current="true"]{border-color:var(--amber);color:var(--ink);background:rgba(255,181,71,.12)}
+.jumpbar .jb-l{font:700 10px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--faint);align-self:center;flex:none;margin-right:2px}
+.pnext{display:flex;justify-content:space-between;gap:12px;margin-top:28px;flex-wrap:wrap}
+.pnext button{flex:1 1 220px;text-align:left;border:1px solid var(--line);background:var(--surface);border-radius:12px;padding:12px 16px;cursor:pointer;color:var(--text)}
+.pnext button:hover{border-color:var(--muted)}
+.pnext button small{display:block;font:700 10px/1.4 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--faint)}
+.pnext button b{color:var(--ink);font-size:15px}
+.pnext button.nx{text-align:right}
+#totop{position:fixed;right:18px;bottom:18px;z-index:35;width:42px;height:42px;border-radius:50%;border:1px solid var(--line-2);background:var(--surface-2);color:var(--ink);cursor:pointer;display:grid;place-items:center;box-shadow:0 8px 24px rgba(0,0,0,.5);opacity:0;pointer-events:none;transition:opacity .2s}
+#totop.on{opacity:1;pointer-events:auto}
+#totop svg{width:18px;height:18px}
+[data-sec]{scroll-margin-top:calc(var(--hdr,58px) + 56px)}
 .chip{border:1px solid var(--line-2);background:rgba(14,22,48,.8);padding:7px 12px;border-radius:999px;cursor:pointer;font-size:13.5px;font-weight:600;color:var(--text);text-decoration:none}
 .chip:hover{border-color:var(--muted);color:var(--ink)}
 .find{display:grid;gap:6px}
@@ -1016,7 +1031,7 @@ body.compact .ticker,body.compact #top-front,body.compact .search-btn span,body.
     <h2>How day trading NQ futures works</h2>
     <p class="lede">A day trader opens and closes every position within one session, so nothing is held overnight. The edge is small, so costs, position size and discipline decide whether you keep any of it.</p>
   </div>
-  <div class="subnav"><a class="chip" href="#l-start">Start here</a><a class="chip" href="#l-howto">Strategy in 6 steps</a><a class="chip" href="#l-terms">Key terms</a><a class="chip" href="#l-visual">Visual guides</a><a class="chip" href="#l-dd">Drawdown simulator</a><a class="chip" href="#l-fail">Why evals fail</a><a class="chip" href="#l-quiz">Quiz</a><a class="chip" href="#l-flow">Workflow</a><a class="chip" href="#l-contract">Contracts</a><a class="chip" href="#l-path">Your path</a></div>
+  <div class="subnav jumpbar"><a class="chip" href="#l-start">Start here</a><a class="chip" href="#l-howto">Strategy in 6 steps</a><a class="chip" href="#l-terms">Key terms</a><a class="chip" href="#l-visual">Visual guides</a><a class="chip" href="#l-dd">Drawdown simulator</a><a class="chip" href="#l-fail">Why evals fail</a><a class="chip" href="#l-quiz">Quiz</a><a class="chip" href="#l-flow">Workflow</a><a class="chip" href="#l-contract">Contracts</a><a class="chip" href="#l-path">Your path</a></div>
 
   <div class="card hot" id="l-start">
     <div class="eyebrow">Start here · the whole idea in 60 seconds</div>
@@ -1108,9 +1123,10 @@ body.compact .ticker,body.compact #top-front,body.compact .search-btn span,body.
   </div>
 
   <div class="card" style="margin-top:16px" id="l-quiz">
-    <div class="card-h"><div><div class="eyebrow">Check yourself</div><h3 style="margin-top:6px">Eval readiness quiz</h3></div><span class="pill" id="qz-score">0 / 8</span></div>
+    <div class="card-h"><div><div class="eyebrow">Check yourself · <span id="qz-no">quiz #1</span></div><h3 style="margin-top:6px">Eval readiness quiz</h3></div><div class="row"><span class="pill" id="qz-best" title="Your best score counts toward the plan">best —</span><span class="pill" id="qz-score">0 / 8</span></div></div>
+    <p class="small muted" style="margin-top:6px">Every quiz is freshly generated: new numbers, new scenarios, shuffled answers. You'll never get the same quiz twice. Your best score counts toward the plan.</p>
     <div id="qz"></div>
-    <button class="btn ghost" id="qz-reset">Reset quiz</button>
+    <div class="row" style="justify-content:space-between;margin-top:6px"><button class="btn primary" id="qz-reset">New quiz ↻</button><span class="small muted" id="qz-hist"></span></div>
   </div>
 
   <div class="steps" id="l-flow">
@@ -1443,6 +1459,53 @@ function hover(svg, getInfo){
 const TABS = ["home","plan","today","edge","journal","lab","fleet","prop","learn","replay","tools","me","coach"];
 const PAGES = {home:["Trade","Overview"], plan:["Trade","My plan"], today:["Trade","Cockpit"], edge:["Trade","Edge tools"], journal:["Trade","Journal"], lab:["Research","Backtest Lab"], fleet:["Research","Research fleet"], prop:["Research","Prop eval"], learn:["Practice","Learn"], replay:["Practice","Replay"], tools:["Practice","Risk tools"], me:["Trade","My profile"], coach:["Practice","Coach"]};
 let current = "today", ready = false;
+/* ---- navigation: section jump bars, scroll-spy, prev/next, back to top ---- */
+const SECS = {};
+function secLabel(el){
+  const h = el.querySelector("h2, h3"), eb = el.querySelector(".eyebrow");
+  let t = h ? h.textContent.trim() : ""; if ((!t || t.length > 34 || h.id || /^[\d$%−-]/.test(t)) && eb) t = eb.textContent.split("·")[0].trim();
+  t = t.replace(/\s+/g, " "); return t.length > 34 ? t.slice(0, 32) + "…" : t;
+}
+function buildNav(){
+  const order = $$("nav.tabs button").map(b => b.dataset.tab);
+  $$("section.panel").forEach(panel => {
+    const tab = panel.id.slice(2); let list = [];
+    const own = panel.querySelector(".subnav");
+    if (own){ list = $$("a.chip", own).map(a => { const el = document.getElementById(a.getAttribute("href").slice(1)); if (el) el.dataset.sec = "1"; return {el, label:a.textContent.trim(), a}; }).filter(x => x.el); own.classList.add("jumpbar"); }
+    else {
+      const cands = $$(".card, .hero, .steps, .stats", panel).filter(el => !el.parentElement.closest(".card") && (el.querySelector(":scope > .card-h h3, :scope > .card-h h2, :scope > .eyebrow, :scope > div > .eyebrow, :scope > h3, :scope > .card-h .eyebrow")));
+      const seenL = new Set(); let n = 0;
+      cands.forEach(el => { const label = secLabel(el); if (!label || seenL.has(label)) return; seenL.add(label); if (!el.id) el.id = `sec-${tab}-${n}`; n++; el.dataset.sec = "1"; list.push({el, label}); });
+      if (list.length >= 3){
+        const bar = document.createElement("div"); bar.className = "jumpbar"; bar.setAttribute("aria-label", "Sections on this page");
+        bar.innerHTML = list.map(x => `<a class="chip" href="#${x.el.id}">${esc(x.label)}</a>`).join("");
+        const first = panel.firstElementChild; panel.insertBefore(bar, first && !list.some(x => x.el === first || first.contains(x.el)) ? first.nextSibling : first);
+        list.forEach((x, i) => x.a = bar.querySelectorAll("a.chip")[i]);
+      } else list = list.map(x => ({...x, a:null}));
+    }
+    SECS[tab] = list;
+    const i = order.indexOf(tab); if (i < 0) return;
+    const pv = order[i - 1], nx = order[i + 1], nm = k => PAGES[k] ? PAGES[k][1] : k;
+    const f = document.createElement("div"); f.className = "pnext";
+    f.innerHTML = (pv ? `<button data-go="${pv}"><small>← Previous</small><b>${nm(pv)}</b></button>` : "<span></span>") + (nx ? `<button class="nx" data-go="${nx}"><small>Next →</small><b>${nm(nx)}</b></button>` : "");
+    panel.appendChild(f);
+  });
+  document.addEventListener("click", e => { const a = e.target.closest(".jumpbar a.chip"); if (!a) return; e.preventDefault(); const el = document.getElementById(a.getAttribute("href").slice(1)); if (el) el.scrollIntoView({behavior:"smooth", block:"start"}); });
+  const tt = document.createElement("button"); tt.id = "totop"; tt.setAttribute("aria-label", "Back to top"); tt.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>';
+  tt.onclick = () => window.scrollTo({top:0, behavior:"smooth"}); document.body.appendChild(tt);
+  const setH = () => { const h = $("header.top"); const top = parseFloat(getComputedStyle(h).top) || 0; document.documentElement.style.setProperty("--hdr", (h.offsetHeight + top) + "px"); };
+  setH(); addEventListener("resize", setH);
+  let tick = false; addEventListener("scroll", () => { if (tick) return; tick = true; requestAnimationFrame(() => { tick = false; spy(); }); }, {passive:true});
+}
+function spy(){
+  const tt = $("#totop"); if (tt) tt.classList.toggle("on", scrollY > 700);
+  const L = SECS[current]; if (!L || !L.length || !L[0].a) return;
+  const lim = (parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--hdr")) || 58) + 110; let on = L[0];
+  for (const x of L){ if (x.el.offsetParent !== null && x.el.getBoundingClientRect().top <= lim) on = x; }
+  if (innerHeight + scrollY >= document.body.scrollHeight - 4) on = L[L.length - 1];
+  L.forEach(x => x.a && x.a.setAttribute("aria-current", x === on));
+  if (on.a){ const bar = on.a.parentElement, r = on.a.offsetLeft - bar.clientWidth / 2 + on.a.offsetWidth / 2; if (Math.abs(bar.scrollLeft - r) > 40) bar.scrollTo({left:r, behavior:"smooth"}); }
+}
 function showTab(t){
   if (!TABS.includes(t)) t = "home"; current = t;
   $$("nav.tabs button").forEach(b => b.setAttribute("aria-selected", b.dataset.tab === t));
@@ -1459,6 +1522,7 @@ function showTab(t){
   if (t === "learn" && !showTab.learnDone){ showTab.learnDone = true; initLearn(); swInit(); }
   if (t === "fleet" && !showTab.fleetDone){ showTab.fleetDone = true; renderFleet(); }
   if (t === "prop" && !showTab.propDone){ showTab.propDone = true; renderProp(); }
+  requestAnimationFrame(spy);
 }
 $$("nav.tabs button").forEach(b => b.addEventListener("click", () => { showTab(b.dataset.tab); try{ history.replaceState(null,"","#"+b.dataset.tab); }catch{} }));
 document.addEventListener("click", e => {
@@ -2001,11 +2065,87 @@ const QUIZ = [
   ["Which strategy family lost money most often in 10 years of NQ tests?", ["Momentum / breakouts","Fading / mean reversion","Calendar effects","Benchmark"], 1, "Every strategy in the 'loses money' group bet on reversals."],
   ["Best time to be flat?", ["10:30 am","Right before scheduled news like CPI or FOMC","12:00 pm","Never"], 1, "Scheduled releases cause huge, fast moves and slippage."]
 ];
+/* ---- generated quiz ---- */
+const rint = (a, b) => a + Math.floor(Math.random() * (b - a + 1)), rpick = a => a[Math.floor(Math.random() * a.length)];
+const shuffle = a => { for (let i = a.length - 1; i > 0; i--){ const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+const $d = v => (v < 0 ? "−$" : "$") + Math.abs(Math.round(v)).toLocaleString("en-US");
+function mkQ(q, right, wrongs, why, fmt = String){
+  const R0 = fmt(right), seen = new Set([R0]), W = [];
+  for (const w of wrongs){ const f = fmt(w); if (!seen.has(f)){ seen.add(f); W.push(f); } if (W.length === 3) break; }
+  if (typeof right === "number") for (const m of [2, .5, 1.5, 3, .25, 4]){ if (W.length >= 3) break; const f = fmt(right * m); if (!seen.has(f)){ seen.add(f); W.push(f); } }
+  const opts = shuffle([R0, ...W]); return [q, opts, opts.indexOf(R0), why];
+}
+const QGEN = {
+  pnl(){ const pts = rint(6, 70), n = rint(1, 6), nq = Math.random() < .25, m = nq ? 20 : 2, sym = nq ? "NQ" : "MNQ";
+    return mkQ(`NQ moves ${pts} points in your favor. What do you make on ${n} ${sym}?`, pts * m * n, [pts * n, pts * m, pts * (nq ? 2 : 20) * n, pts * m * n * 2], `${pts} pts × $${m} per point × ${n} = ${$d(pts * m * n)}. MNQ is $2 per point, NQ is $20.`, $d); },
+  ticks(){ const t = rint(3, 48), nq = Math.random() < .3, v = nq ? 5 : .5;
+    return mkQ(`Your ${nq ? "NQ" : "MNQ"} trade moves ${t} ticks. How much is that per contract?`, t * v, [t * .25, t * (nq ? .5 : 5), t * 2, t * v * 4], `A tick is 0.25 points. On ${nq ? "NQ ($20/pt) that's $5" : "MNQ ($2/pt) that's $0.50"} per tick, so ${t} ticks = ${$d(t * v)}.`, v2 => "$" + v2.toFixed(2)); },
+  size(){ const stop = rpick([20, 23, 25, 30, 35, 40, 46, 50]), k = rint(1, 6), risk = stop * 2 * k;
+    return mkQ(`Your stop is ${stop} points and you'll risk ${$d(risk)} on the trade. How many MNQ?`, k, [k + 1, Math.max(1, k - 1) === k ? k + 2 : k - 1, k * 2, k + 3], `${stop} pts × $2 = ${$d(stop * 2)} per MNQ. ${$d(risk)} ÷ ${$d(stop * 2)} = ${k} MNQ.`, v => String(Math.round(v))); },
+  consistency(){ const best = rint(16, 26) * 100, total = best + rint(3, best / 100 - 1) * 100;
+    return mkQ(`LucidFlex 50K (target $3,000, 50% consistency rule). Your biggest day is ${$d(best)} and total profit is ${$d(total)}. What total profit do you need to pass?`, 2 * best, [total, 3000, best * 1.5, 2 * best + 500], `The biggest day must be no more than 50% of total profit: 2 × ${$d(best)} = ${$d(2 * best)}. Keep adding normal-size days until you get there.`, $d); },
+  expectancy(){ const w = rpick([33, 35, 39, 40, 42, 45, 50, 55]), W = rpick([30, 40, 50, 55, 60, 70]), L = rpick([20, 25, 27, 30, 35, 40]);
+    const e = (w * W - (100 - w) * L) / 100 * 2;
+    return mkQ(`A setup wins ${w}% of the time. Average win ${W} pts, average loss ${L} pts. Per trade on 1 MNQ, on average you…`, e, [-e, w / 100 * W * 2, (W - L) * 2, e * 2], `${w}% × ${W} − ${100 - w}% × ${L} = ${(e / 2).toFixed(1)} pts × $2 = ${$d(e)} per trade. Win rate alone never tells you if it's profitable.`, v => Math.abs(v) < .5 ? "about break-even" : (v > 0 ? "make " : "lose ") + $d(Math.abs(v))); },
+  trailing(){ if (Math.random() < .35){ const peak = 52200 + rint(0, 25) * 100;
+      return mkQ(`50K eval, $2,000 end-of-day trailing max loss. Your best closing balance was ${$d(peak)}. Where is your max-loss limit now?`, 50100, [peak - 2000, 48000, 50000, peak - 1000], `Once the balance closes above $52,100 the limit locks at start + $100 = $50,100 and stops trailing.`, $d); }
+    const peak = 50000 + rint(2, 20) * 100;
+    return mkQ(`50K eval, $2,000 end-of-day trailing max loss. Your best closing balance so far is ${$d(peak)}. Where is your max-loss limit?`, peak - 2000, [48000, peak - 1000, 50100, peak - 2500], `It trails your best closing balance by $2,000: ${$d(peak)} − $2,000 = ${$d(peak - 2000)}. It only moves up, at the close.`, $d); },
+  breakeven(){ const r = rpick([1, 1.5, 2, 2.5, 3, 4]), be = 100 / (1 + r);
+    return mkQ(`Your average win is ${r}× your average loss. What win rate do you need just to break even (before costs)?`, be, [50, 100 - be, be / 2, 100 / r], `Break-even win rate = 1 ÷ (1 + ${r}) = ${Math.round(be)}%. Anything above that makes money.`, v => Math.round(v) + "%"); },
+  streak(){ const m = rpick([1, 2, 3, 4, 5, 6, 8, 10]), r = m * 93, k = Math.floor(1999 / r);
+    return mkQ(`On a 50K with $2,000 of drawdown room, each loss at ${m} MNQ with a 46-pt stop costs about ${$d(r)}. How many losses in a row can you take without failing?`, k, [k + 1, k + 3, Math.max(1, k - 1) === k ? k + 2 : k - 1, 20], `$2,000 ÷ ${$d(r)} ≈ ${(2000 / r).toFixed(1)}, so ${k} full losses. The worst streak in the backtest was 18 losers in a row, so smaller size survives it.`, v => String(Math.round(v))); },
+  drawpct(){ const m = rpick([1, 2, 3, 4, 5, 6, 8, 10]), r = m * 93;
+    return mkQ(`${m} MNQ with a 46-point stop risks about ${$d(r)}. What share of a 50K eval's $2,000 drawdown is that?`, r / 20, [r / 500, r / 50, r / 10, r / 40], `${$d(r)} ÷ $2,000 = ${(r / 20).toFixed(1)}%. The eval's real account is the drawdown, not the $50,000.`, v => v.toFixed(1) + "%"); },
+  band(){ const o = rint(180, 240) * 100 + rint(0, 99) * .25 * 4, sg = rpick([.35, .45, .5, .6, .7]) / 100, ub = +(o * (1 + sg)).toFixed(2), lb = +(o * (1 - sg)).toFixed(2), kind = rpick(["long", "short", "none", "none2"]);
+    const c = kind === "long" ? ub + rint(1, 25) : kind === "short" ? lb - rint(1, 25) : kind === "none" ? ub - rint(1, 20) : lb + rint(1, 20), t = rpick(["10:00", "10:30", "11:00", "11:30"]);
+    const right = kind === "long" ? "Go long" : kind === "short" ? "Go short" : "No trade";
+    return mkQ(`${t} check, you're flat. Upper band ${ub.toFixed(2)}, lower band ${lb.toFixed(2)}. The 5-min candle closes at ${c.toFixed(2)}. What do you do?`, right, ["Go long", "Go short", "No trade", "Wait one more candle, then decide"], `Only the check close vs. the bands counts: ${c.toFixed(2)} is ${kind === "long" ? "above the upper band → long" : kind === "short" ? "below the lower band → short" : "inside the bands → no trade"}.`); },
+  handoff(){ const long = Math.random() < .5, b = rint(180, 240) * 100, v = b + (Math.random() < .5 ? 1 : -1) * rint(5, 40), lvl = long ? Math.max(b, v) : Math.min(b, v);
+    return mkQ(`It's 12:00 and your window ends. You're ${long ? "long" : "short"}. Band level ${b.toFixed(2)}, VWAP ${v.toFixed(2)}. Where does the fixed hand-off stop go?`, lvl.toFixed(2), [(long ? Math.min(b, v) : Math.max(b, v)).toFixed(2), "No stop, it's a strong trend", "Close the trade at 12:00 no matter what"], `${long ? "Long: the higher" : "Short: the lower"} of band and VWAP (${lvl.toFixed(2)}). That's the strategy's trail level; it rides unattended from there.`); },
+  payout(){ const pr0 = rint(8, 70) * 100, amt = Math.min(pr0 * .5, 2000);
+    return mkQ(`Funded LucidFlex 50K with ${$d(pr0)} of profit and 5 qualifying days. Max payout is 50% of profit, capped at $2,000, and you keep 90%. What lands in your bank?`, amt * .9, [pr0 * .9, amt, pr0 * .5 * .9 === amt * .9 ? pr0 * .45 + 200 : pr0 * .45, 2000], `min(50% × ${$d(pr0)}, $2,000) = ${$d(amt)}, × 90% = ${$d(amt * .9)}.`, $d); },
+  micro(){ const k = rint(1, 5), mode = Math.random() < .5;
+    return mode ? mkQ(`How many MNQ give you the same dollars per point as ${k} NQ?`, 10 * k, [k, 2 * k, 5 * k, 20 * k], `NQ is $20/pt, MNQ is $2/pt, so 1 NQ = 10 MNQ → ${10 * k} MNQ.`, v => String(Math.round(v)))
+      : mkQ(`What is ${k * 3} MNQ worth per point?`, k * 6, [k * 3, k * 60, k * 30, k * 12], `${k * 3} × $2 = $${k * 6} per point.`, v => "$" + Math.round(v)); },
+  dailystop(){ const ds = rpick([300, 400, 500, 600]), l1 = rint(8, 16) * 10, l2 = ds - l1 + rint(0, 4) * 10;
+    return mkQ(`Your daily stop is ${$d(ds)}. You lose ${$d(l1)} then ${$d(l2)}. A new signal appears. What do you do?`, "Stop trading for the day", ["Take it at half size", "Take it, it's a good setup", "Take it with a tighter stop"], `${$d(l1 + l2)} lost ≥ ${$d(ds)}: the day is over, whatever the setup looks like. That rule is what keeps one bad day from ending the eval.`); }
+};
+const QFIXED = [
+  ["On an EOD trailing drawdown eval, your balance dips to the max loss limit at 11 am, then recovers by the close. What happens?", ["You fail the account","Nothing, only the close counts","The limit moves down","You get a warning"], "The limit only moves at the close, but it's enforced all day. Touching it fails the account."],
+  ["Which strategy family lost money most often in 10 years of NQ tests?", ["Fading / mean reversion","Momentum / breakouts","Calendar effects","Buy-and-hold benchmark"], "Every strategy in the 'loses money' group bet on reversals."],
+  ["Best time to be flat?", ["Right before scheduled news like CPI or FOMC","10:30 am","12:00 pm","Never"], "Scheduled releases cause huge, fast moves and slippage."],
+  ["Your trade is at −40 pts and the stop is at −46. You feel it's about to turn. You…", ["Leave the stop where it is","Move the stop to −80 to give it room","Add another contract to lower your average","Remove the stop"], "Stops only ever move toward profit. Widening one turns a planned loss into a blown day."],
+  ["Why does the strategy use a stop of at least 46 points?", ["4 in 5 winning trades dip that far before working","It's a round number","Smaller stops cost more commission","The exchange requires it"], "Tighter stops get hit on trades that would have been winners. 46 pts is the 80th percentile of winners' dips."],
+  ["The noise-band signal happens at…", ["The close of the 5-min candle at :00 and :30","Any time price touches the band","The 9:30 open","The 4:00 pm close"], "Only the check closes count. Touches in between are noise."],
+  ["You passed the eval trading 6 MNQ. What should your size be in the funded account?", ["Smaller, about 2 MNQ","The same 6 MNQ","Bigger, you're funded now","As big as the scaling plan allows"], "A blown eval costs a reset fee; a blown funded account costs the payouts. Size down once funded."],
+  ["You had three losing days in a row, following every rule. The right move is…", ["Keep trading the same plan and size","Double size to win it back","Switch to a new strategy","Stop until you feel confident"], "A 39% win-rate strategy has long losing streaks by design. Rule-following through them is the job."],
+  ["What's the front-month contract?", ["The nearest expiry that most traders use","The cheapest contract","The one expiring next year","The micro contract"], "NQ rolls quarterly (Mar/Jun/Sep/Dec). Trade the front month; the app shows the roll date."],
+  ["Win rate is 39%. Is the strategy broken?", ["No, winners are about twice the size of losers","Yes, it loses more than it wins","Only in bear markets","It needs a tighter stop"], "Profit = win rate × avg win − loss rate × avg loss. 0.39 × 55 − 0.61 × 27 > 0."],
+  ["When is the strategy allowed to enter in your personal plan?", ["At the 10:00–11:30 checks","Any time before 12:00","At the 9:30 open","After lunch"], "Entries only at the four morning checks. After that you only manage or hand off."],
+  ["What does VWAP show?", ["The average price paid today, weighted by volume","Yesterday's close","The highest price today","A moving average of 20 bars"], "It's the day's volume-weighted average price. The strategy trails exits at band or VWAP."]
+];
+function newQuiz(){
+  const seen = new Set(store.get("quizSeen", [])), last = store.get("quizSet", null), lastFixed = new Set((last?.qs || []).map(q => q[0]));
+  let qs, sig, tries = 0;
+  do {
+    const gens = shuffle(Object.keys(QGEN)).slice(0, 6).map(k => QGEN[k]());
+    const fx = shuffle(QFIXED.filter(f => !lastFixed.has(f[0]))).slice(0, 2).map(([q, o, why]) => { const opts = shuffle(o.slice()); return [q, opts, opts.indexOf(o[0]), why]; });
+    qs = shuffle([...gens, ...fx]); sig = qs.map(q => q[0] + "|" + q[1].join("/")).join("#"); tries++;
+  } while (seen.has(sig) && tries < 50);
+  seen.add(sig); store.set("quizSeen", [...seen].slice(-400));
+  const n = (last?.n || 0) + 1; store.set("quizSet", {qs, a:{}, n}); return {qs, a:{}, n};
+}
+function quizState(){ return store.get("quizSet", null) || newQuiz(); }
+function quizBest(){ return +(store.get("quizBest", 0)) || 0; }
 function renderQuiz(){
-  const st = store.get("quiz", {}); let score = 0;
-  $("#qz").innerHTML = QUIZ.map(([q, opts, ans, why], i) => { const a = st[i]; if (a === ans) score++;
+  const Z = quizState(), st = Z.a; let score = 0;
+  $("#qz").innerHTML = Z.qs.map(([q, opts, ans, why], i) => { const a = st[i]; if (a === ans) score++;
     return `<div class="quiz-q"><b style="color:var(--ink)">${i+1}. ${q}</b><div class="opts">${opts.map((o,j) => `<button data-q="${i}" data-a="${j}" class="${a != null ? (j === ans ? "right" : j === a ? "wrong" : "") : ""}">${o}</button>`).join("")}</div>${a != null ? `<p class="why ${a === ans ? "up-t" : "down-t"}">${a === ans ? "✓ Correct." : "✕ Not quite."} <span style="color:var(--text)">${why}</span></p>` : ""}</div>`; }).join("");
-  $("#qz-score").textContent = `${score} / ${QUIZ.length}`; $("#qz-score").className = "pill " + (score === QUIZ.length ? "up" : score >= 5 ? "amb" : "");
+  const done = Object.keys(st).length, N = Z.qs.length;
+  $("#qz-score").textContent = `${score} / ${N}`; $("#qz-score").className = "pill " + (score === N ? "up" : score >= 5 ? "amb" : "");
+  $("#qz-no").textContent = `quiz #${Z.n}`; $("#qz-best").textContent = `best ${quizBest()} / 8`; $("#qz-best").className = "pill " + (quizBest() >= 7 ? "up" : "");
+  const H = store.get("quizHist", []); $("#qz-hist").textContent = done === N ? `Done: ${score}/${N}. Hit "New quiz" for a fresh set.` : H.length ? `Last ${Math.min(5, H.length)}: ${H.slice(-5).map(h => h.c + "/" + h.n).join(" · ")}` : `${done}/${N} answered`;
 }
 function initLearn(){
   renderGloss(); $("#gl-q").addEventListener("input", renderGloss);
@@ -2015,8 +2155,10 @@ function initLearn(){
   $("#dd-scn").onclick = e => { const b = e.target.closest("[data-s]"); if (!b) return; ddS = +b.dataset.s; $$("#dd-scn button").forEach(x => x.setAttribute("aria-pressed", x === b)); $("#dd-step").value = DD_SCN[ddS].n; renderDD(); };
   $("#dd-step").addEventListener("input", renderDD); renderDD();
   $("#cc-in").addEventListener("input", renderCC); renderCC();
-  $("#qz").addEventListener("click", e => { const b = e.target.closest("[data-q]"); if (!b) return; const st = store.get("quiz", {}); if (st[b.dataset.q] != null) return; st[b.dataset.q] = +b.dataset.a; store.set("quiz", st); renderQuiz(); });
-  $("#qz-reset").onclick = () => { store.set("quiz", {}); renderQuiz(); };
+  $("#qz").addEventListener("click", e => { const b = e.target.closest("[data-q]"); if (!b) return; const Z = quizState(); if (Z.a[b.dataset.q] != null) return; Z.a[b.dataset.q] = +b.dataset.a; store.set("quizSet", Z);
+    if (Object.keys(Z.a).length === Z.qs.length){ const c = Z.qs.filter((q, i) => Z.a[i] === q[2]).length; store.set("quizBest", Math.max(quizBest(), c)); const H = store.get("quizHist", []); H.push({c, n:Z.qs.length, at:Date.now()}); store.set("quizHist", H.slice(-50)); toast(`Quiz #${Z.n}: ${c}/${Z.qs.length}`); }
+    renderQuiz(); });
+  $("#qz-reset").onclick = () => { newQuiz(); renderQuiz(); $("#l-quiz").scrollIntoView({behavior:"smooth", block:"start"}); };
   renderQuiz();
 }
 
@@ -2855,7 +2997,7 @@ function initMe(){
   $("#pf").addEventListener("input", () => { $("#pf-saved").className = "pill amb"; $("#pf-saved").textContent = "Unsaved changes"; });
 }
 function progress(){
-  const quiz = store.get("quiz", {}), qs = QUIZ.filter((q,i) => quiz[i] === q[2]).length;
+  const Zq = store.get("quizSet", null), cur = Zq ? Zq.qs.filter((q, i) => Zq.a[i] === q[2]).length : 0, qs = Math.max(quizBest(), cur);
   const rp = (store.get("rpScore", null) || {}).done || 0;
   const real = J.trades.filter(t => !t.example), A = real.filter(t => t.grade === "A").length;
   const ev = evalCalc();
@@ -3342,9 +3484,10 @@ function cmdBuild(q){
    ["Log a trade", "Journal", () => { showTab("journal"); setTimeout(() => $("#jf-entry").focus(), 50); }], ["Turn sound alerts on/off", "Cockpit", () => { showTab("today"); $("#cp-sound").click(); }],
    ["Edit my profile", "My profile", () => { showTab("me"); setTimeout(() => $("#pf-name").focus(), 50); }], ["Open the launch checklist", "My plan", () => { showTab("plan"); setTimeout(() => $("#lc-card").scrollIntoView({behavior:"smooth"}), 60); }], ["Run the expectancy simulator", "Risk tools", () => { showTab("tools"); }], ["Open my coach notes", "Coach", () => showTab("coach")], ["Start a signal drill", "Replay", () => { showTab("replay"); window.scrollTo({top:0}); }], ["Strategy in 6 steps", "Learn", () => { showTab("learn"); setTimeout(() => $("#l-howto").scrollIntoView({behavior:"smooth"}), 80); }], ["What can a funded account pay?", "Prop eval", () => { showTab("prop"); setTimeout(() => $("#fd-card").scrollIntoView({behavior:"smooth"}), 80); }]]
     .forEach(([l, s2, run]) => out.push({grp:"Actions", label:l, sub:s2, run}));
+  Object.entries(SECS).forEach(([tab, L]) => L.forEach(x => out.push({grp:"Sections", label:x.label, sub:PAGES[tab] ? PAGES[tab][1] : tab, run:() => { showTab(tab); setTimeout(() => x.el.scrollIntoView({behavior:"smooth", block:"start"}), 60); }})));
   BT.strats.forEach(st => out.push({grp:"Strategies", label:st.name, sub:`${VNAME[st.verdict]} · PF ${st.all.pf.toFixed(2)}`, run:() => { selStrat = st.key; showTab("lab"); renderDetail(); setTimeout(() => $("#detail").scrollIntoView({behavior:"smooth"}), 60); }}));
   GLOSS.forEach(g => out.push({grp:"Key terms", label:g[0], sub:g[1], run:() => { showTab("learn"); setTimeout(() => { $("#gl-q").value = g[0]; glCat = "All"; renderGloss(); $("#l-terms").scrollIntoView({behavior:"smooth"}); }, 60); }}));
-  const f = q ? out.filter(x => (x.label + " " + x.sub + " " + x.grp).toLowerCase().includes(q)) : out.filter(x => x.grp === "Pages" || x.grp === "Actions");
+  const f = q ? out.filter(x => q.split(/\s+/).every(w => (x.label + " " + x.sub + " " + x.grp).toLowerCase().includes(w))) : out.filter(x => x.grp === "Pages" || x.grp === "Actions");
   return f.slice(0, 40);
 }
 function cmdRender(){
@@ -3380,7 +3523,7 @@ function init(){
     const tr = e.target.closest("tr[data-k]"); if (tr){ selStrat = tr.dataset.k; renderDetail(); if (innerWidth < 980) $("#detail").scrollIntoView({behavior:"smooth"}); } });
   $("#lb").addEventListener("keydown", e => { const tr = e.target.closest("tr[data-k]"); if (tr && (e.key === "Enter" || e.key === " ")){ e.preventDefault(); selStrat = tr.dataset.k; renderDetail(); } });
   $("#ex-win").onclick = () => { exKind = "win"; renderExample(); }; $("#ex-loss").onclick = () => { exKind = "loss"; renderExample(); };
-  initToday(); initReplay(); initTools(); initJournal(); initCockpit(); initMe(); initCmd(); renderSideAcct();
+  initToday(); initReplay(); initTools(); initJournal(); initCockpit(); initMe(); initCmd(); renderSideAcct(); buildNav();
   const h = (location.hash || "").slice(1);
   ready = true;
   showTab(h === "cockpit" ? "today" : TABS.includes(h) ? h : store.get("tab", "home"));
