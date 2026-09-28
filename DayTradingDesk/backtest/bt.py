@@ -70,7 +70,9 @@ def trade(d, i, side, entry, stop, target=None, end=EOD, stop_entry=False, trail
 def mae(d, side, i, j, entry, exit_px, why):
     """Maximum adverse excursion in points (<= 0), capped at the exit price when stopped out."""
     raw = (d["l"][i:j + 1].min() - entry) if side > 0 else (entry - d["h"][i:j + 1].max())
-    return float(min(0.0, max(raw, (exit_px - entry) * side)) - COST)
+    gross_exit = (exit_px - entry) * side
+    if gross_exit < 0: raw = max(raw, gross_exit)     # stopped out: can't be worse than the exit fill
+    return float(min(0.0, raw) - COST)
 
 def first_cross_up(arr, level, start):
     idx = np.nonzero(arr[start:] > level)[0]

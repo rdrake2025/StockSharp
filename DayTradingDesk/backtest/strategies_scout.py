@@ -134,7 +134,7 @@ def _ov_trade(d, side, a, b, lo, hi):
     pts = (b - a) * side - COST
     adverse = (lo - a) if side > 0 else (a - hi)
     return dict(date=str(d["date"]), side=side, i=0, j=0, entry=float(a), exit=float(b), stop0=None, risk=None,
-                pts=float(pts), R=None, ret=float(pts / a), why="overnight", mae=float(min(0.0, max(adverse, pts + COST)) - COST))
+                pts=float(pts), R=None, ret=float(pts / a), why="overnight", mae=float(min(0.0, adverse) - COST))
 
 def overnight_drift(conditional=False):
     """#3 Bondarenko & Muravyev (2023): long 23:30 -> 03:30 ET. Conditional (Boyarchenko et al.): only after

@@ -312,13 +312,14 @@ footer.foot{margin-top:48px;padding-top:18px;border-top:1px solid var(--line);co
     <nav class="tabs" role="tablist" aria-label="Sections">
       <button role="tab" data-tab="plan" id="t-plan"><kbd>1</kbd>My plan</button>
       <button role="tab" data-tab="today" id="t-today"><kbd>2</kbd>Cockpit</button>
-      <button role="tab" data-tab="lab" id="t-lab"><kbd>3</kbd>Backtest Lab</button>
-      <button role="tab" data-tab="fleet" id="t-fleet"><kbd>4</kbd>Research fleet</button>
-      <button role="tab" data-tab="prop" id="t-prop"><kbd>5</kbd>Prop eval</button>
-      <button role="tab" data-tab="learn" id="t-learn"><kbd>6</kbd>Learn</button>
-      <button role="tab" data-tab="replay" id="t-replay"><kbd>7</kbd>Replay</button>
-      <button role="tab" data-tab="tools" id="t-tools"><kbd>8</kbd>Risk tools</button>
-      <button role="tab" data-tab="journal" id="t-journal"><kbd>9</kbd>Journal</button>
+      <button role="tab" data-tab="edge" id="t-edge"><kbd>3</kbd>Edge tools</button>
+      <button role="tab" data-tab="lab" id="t-lab"><kbd>4</kbd>Backtest Lab</button>
+      <button role="tab" data-tab="fleet" id="t-fleet"><kbd>5</kbd>Research fleet</button>
+      <button role="tab" data-tab="prop" id="t-prop"><kbd>6</kbd>Prop eval</button>
+      <button role="tab" data-tab="learn" id="t-learn"><kbd>7</kbd>Learn</button>
+      <button role="tab" data-tab="replay" id="t-replay"><kbd>8</kbd>Replay</button>
+      <button role="tab" data-tab="tools" id="t-tools"><kbd>9</kbd>Risk tools</button>
+      <button role="tab" data-tab="journal" id="t-journal"><kbd>0</kbd>Journal</button>
     </nav>
   </div>
   <div class="ticker" aria-label="Backtest highlights"><div class="ticker-track" id="ticker"></div></div>
@@ -492,6 +493,72 @@ footer.foot{margin-top:48px;padding-top:18px;border-top:1px solid var(--line);co
   <div class="card cp-hide" style="margin-top:16px">
     <div class="card-h"><h3>Key levels</h3><span class="small muted">Saved for today in this browser</span></div>
     <div class="form" id="levels"></div>
+  </div>
+</section>
+
+<!-- ======================= EDGE TOOLS ======================= -->
+<section class="panel" id="p-edge" role="tabpanel" aria-labelledby="t-edge">
+  <div class="panel-head">
+    <div class="eyebrow">Edge tools · built from 10 years of NQ sessions</div>
+    <h2>Know what's <span class="grad">normal</span> before the market tells you</h2>
+    <p class="lede">Four tools and a calendar. Each one is tested for whether it actually predicts anything, and each says plainly when it doesn't.</p>
+  </div>
+
+  <div class="card" id="cal-card">
+    <div class="card-h"><div><div class="eyebrow">Event calendar · official schedules</div><h3 style="margin-top:6px">Market-moving releases coming up</h3></div><span class="pill" id="cal-today"></span></div>
+    <div class="table-wrap" style="margin-top:10px;max-height:260px"><table><thead><tr><th>Date</th><th>Event</th><th>Time (ET)</th><th>Your time</th><th class="n">In</th><th>Cockpit</th></tr></thead><tbody id="cal-body2"></tbody></table></div>
+    <p class="small muted" style="margin-top:8px">From the Federal Reserve's FOMC calendar and the Bureau of Labor Statistics release schedules (CPI, jobs report) for 2026. FOMC dates run through 2027. The cockpit fills today's news blackouts from this list automatically.</p>
+  </div>
+
+  <div class="split" style="margin-top:16px">
+    <div class="card hot">
+      <div class="card-h"><div><div class="eyebrow">Pre-market outlook · similar days</div><h3 style="margin-top:6px">What did days like today look like?</h3></div><span class="pill cy" id="ol-k"></span></div>
+      <p class="small">Finds the 60 past sessions whose opening conditions match today's most closely, then shows how they played out. Levels you entered in the cockpit's key levels are filled in automatically.</p>
+      <div class="form" style="margin-top:10px">
+        <label class="f">Today's open<input id="ol-open" type="number" class="mono" step="0.25"></label>
+        <label class="f">Prior close<input id="ol-pdc" type="number" class="mono" step="0.25"></label>
+        <label class="f">Overnight high<input id="ol-onh" type="number" class="mono" step="0.25"></label>
+        <label class="f">Overnight low<input id="ol-onl" type="number" class="mono" step="0.25"></label>
+        <label class="f">Prior-day high<input id="ol-pdh" type="number" class="mono" step="0.25"></label>
+        <label class="f">Prior-day low<input id="ol-pdl" type="number" class="mono" step="0.25"></label>
+        <label class="f">Recent volatility<select id="ol-vol"><option value="0.2">Calm</option><option value="0.5" selected>Normal</option><option value="0.75">Elevated</option><option value="0.92">High</option></select></label>
+        <label class="f">NQ vs 50-day average<select id="ol-tr"><option value="4">Well above</option><option value="1.5" selected>Above</option><option value="-1.5">Below</option><option value="-5">Well below</option></select></label>
+      </div>
+      <div class="stats" id="ol-out" style="margin-top:12px"></div>
+      <div class="chart-box" style="margin-top:10px"><svg class="chart" id="ol-chart" viewBox="0 0 560 150" role="img" aria-label="Range distribution of similar days"></svg></div>
+      <p class="small" id="ol-note" style="margin-top:8px"></p>
+      <details class="meth" style="margin-top:10px"><summary>How good is this forecast? (tested on 2,268 days, past data only)</summary><div class="small" id="ol-skill"></div></details>
+    </div>
+    <div class="grid" style="align-content:start">
+      <div class="card">
+        <div class="eyebrow">Intraday · 2023–25 sessions</div><h3 style="margin-top:6px">How much more can it move today?</h3>
+        <div class="form" style="margin-top:10px">
+          <label class="f">Time (ET)<select id="mm-t"></select></label>
+          <label class="f">High so far<input id="mm-h" type="number" class="mono" step="0.25"></label>
+          <label class="f">Low so far<input id="mm-l" type="number" class="mono" step="0.25"></label>
+        </div>
+        <div class="stats" id="mm-out" style="margin-top:12px"></div>
+        <p class="small" id="mm-note" style="margin-top:8px"></p>
+      </div>
+      <div class="card">
+        <div class="eyebrow">Trade manager · noise-band exits</div><h3 style="margin-top:6px">Where's my exit right now?</h3>
+        <div class="form" style="margin-top:10px">
+          <label class="f">Position<select id="tm-side"><option value="1">Long</option><option value="-1">Short</option></select></label>
+          <label class="f">VWAP now<input id="tm-vwap" type="number" class="mono" step="0.25"></label>
+          <label class="f">Next check (ET)<select id="tm-t"></select></label>
+        </div>
+        <div class="gate" id="tm-out" style="margin-top:10px"></div>
+        <p class="small muted" style="margin-top:6px">Uses the open and prior close from the cockpit's noise-band card, at that card's volatility scale.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:16px">
+    <div class="card-h"><div><div class="eyebrow">Stop placement · real trade excursions</div><h3 style="margin-top:6px">Will this stop kill my winners?</h3></div>
+      <div class="row"><select id="sp-s" style="width:auto" aria-label="Strategy"></select><label class="f" style="grid-template-columns:auto 100px;align-items:center">Stop (pts)<input id="sp-pts" type="number" class="mono" value="20" min="1" step="1"></label><label class="f" style="grid-template-columns:auto 110px;align-items:center">NQ price<input id="sp-px" type="number" class="mono" value="23500" step="50"></label></div></div>
+    <p class="small">Before a winning trade works, it usually moves against you first. This curve shows how far eventual <b class="up-t">winners</b> dipped, from every winning trade in the backtest, scaled to today's price. A stop inside that dip turns winners into losers.</p>
+    <div class="chart-box" style="margin-top:8px"><svg class="chart" id="sp-chart" viewBox="0 0 900 250" role="img" aria-label="Adverse excursion of winning trades"></svg></div>
+    <div class="gate" id="sp-out" style="margin-top:10px"></div>
   </div>
 </section>
 
@@ -1057,7 +1124,7 @@ function hover(svg, getInfo){
 }
 
 /* ================= Tabs & keyboard ================= */
-const TABS = ["plan","today","lab","fleet","prop","learn","replay","tools","journal"];
+const TABS = ["plan","today","edge","lab","fleet","prop","learn","replay","tools","journal"];
 let current = "today", ready = false;
 function showTab(t){
   if (!TABS.includes(t)) t = "plan"; current = t;
@@ -1067,6 +1134,7 @@ function showTab(t){
   if (t === "journal") renderJournal();
   if (t === "today"){ renderGate(); renderEval(); renderTicket(); }
   if (t === "plan") renderPlan();
+  if (t === "edge"){ if (!showTab.edgeDone){ showTab.edgeDone = true; initEdge(); } else renderEdge(); }
   if (t === "lab" && !showTab.labDone){ showTab.labDone = true; renderLab(); }
   if (t === "learn" && !showTab.learnDone){ showTab.learnDone = true; initLearn(); }
   if (t === "fleet" && !showTab.fleetDone){ showTab.fleetDone = true; renderFleet(); }
@@ -1081,7 +1149,7 @@ document.addEventListener("click", e => {
 });
 document.addEventListener("keydown", e => {
   if (e.target.closest("input,select,textarea") || e.metaKey || e.ctrlKey || e.altKey) return;
-  const n = parseInt(e.key, 10); if (n >= 1 && n <= TABS.length){ showTab(TABS[n-1]); return; }
+  const n = e.key === "0" ? 10 : parseInt(e.key, 10); if (n >= 1 && n <= TABS.length){ showTab(TABS[n-1]); return; }
   if (current !== "replay") return;
   const k = e.key.toLowerCase();
   if (k === "b") rpOpen(1); else if (k === "s") rpOpen(-1); else if (k === "f") rpFlat();
@@ -1626,6 +1694,103 @@ function initLearn(){
   renderQuiz();
 }
 
+/* ================= Edge tools ================= */
+const CAL = (() => {
+  const ev = [];
+  const fomc = ["2026-01-28","2026-03-18","2026-04-29","2026-06-17","2026-07-29","2026-09-16","2026-10-28","2026-12-09","2027-01-27","2027-03-17","2027-04-28","2027-06-09","2027-07-28","2027-09-15","2027-10-27","2027-12-08"];
+  const sep = new Set(["2026-03-18","2026-06-17","2026-09-16","2026-12-09","2027-03-17","2027-06-09","2027-09-15","2027-12-08"]);
+  fomc.forEach(d => { ev.push({d, t:840, name:"FOMC statement" + (sep.has(d) ? " + projections" : ""), k:"fomc"}); ev.push({d, t:870, name:"Fed press conference", k:"fomc"}); });
+  ["2026-01-13","2026-02-13","2026-03-11","2026-04-10","2026-05-12","2026-06-10","2026-07-14","2026-08-12","2026-09-11","2026-10-14","2026-11-10","2026-12-10"].forEach(d => ev.push({d, t:510, name:"CPI inflation", k:"cpi"}));
+  ["2026-01-09","2026-02-11","2026-03-06","2026-04-03","2026-05-08","2026-06-05","2026-07-02","2026-08-07","2026-09-04","2026-10-02","2026-11-06","2026-12-04"].forEach(d => ev.push({d, t:510, name:"Jobs report (NFP)", k:"nfp"}));
+  return ev.sort((a,b) => (a.d + a.t).localeCompare(b.d + b.t));
+})();
+function todaysNews(){ const t = todayNY(); return CAL.filter(e => e.d === t).map(e => etHM(e.t).padStart(5,"0")); }
+function renderCalendar2(){
+  const t = todayNY(), off = derived().off, up = CAL.filter(e => e.d >= t).slice(0, 12);
+  const dd = d => Math.round((new Date(d + "T12:00:00Z") - new Date(t + "T12:00:00Z"))/864e5);
+  $("#cal-today").className = "pill " + (todaysNews().length ? "down" : "up"); $("#cal-today").textContent = todaysNews().length ? `Today: ${CAL.filter(e => e.d === t).map(e => e.name).join(", ")}` : "No major release today";
+  $("#cal-body2").innerHTML = up.map(e => `<tr class="${e.d === t ? "sel" : ""}"><td class="mono">${new Date(e.d+"T12:00:00Z").toLocaleDateString("en-US",{weekday:"short",month:"short",day:"numeric",timeZone:"UTC"})}</td><td><span class="pill ${e.k==="fomc"?"amb":e.k==="cpi"?"down":"cy"}">${e.k.toUpperCase()}</span> ${e.name}</td><td class="mono">${etHM(e.t)}</td><td class="mono">${hm(e.t + off)}</td><td class="n">${dd(e.d) === 0 ? "today" : dd(e.d) + "d"}</td><td class="small">flat ${etHM(e.t - 5)}–${etHM(e.t + 5)}</td></tr>`).join("") || `<tr><td colspan="6" class="muted">No scheduled events in the calendar range.</td></tr>`;
+}
+const ED = BT.edge;
+const EDC = Object.fromEntries(ED.cols.map((c,i) => [c,i]));
+function volQuantile(q){ const v = ED.rows.map(r => r[EDC.vol]).sort((a,b) => a-b); return v[Math.floor(q*(v.length-1))]; }
+function readLv(i){ const lv = store.get("levels:" + todayNY(), {}); return lv[i] ? +lv[i] : null; }
+function renderOutlook(){
+  const g = id => parseFloat($("#"+id).value), op = g("ol-open"), pdc = g("ol-pdc"), onh = g("ol-onh"), onl = g("ol-onl"), pdh = g("ol-pdh"), pdl = g("ol-pdl");
+  if (![op,pdc,onh,onl,pdh,pdl].every(x => x > 0)){ $("#ol-out").innerHTML = ""; $("#ol-chart").innerHTML = ""; $("#ol-note").innerHTML = "Fill in the six prices (from your platform or the cockpit's key levels) to see today's outlook."; return; }
+  const f = [(op/pdc - 1)*100, (onh - onl)/pdc*100, (pdh - pdl)/pdc*100, volQuantile(+$("#ol-vol").value), +$("#ol-tr").value];
+  const X = ED.rows.map(r => [r[1], r[2], r[3], r[4], r[5]]), mu = [0,1,2,3,4].map(j => X.reduce((a,x) => a + x[j], 0)/X.length), sd = [0,1,2,3,4].map(j => Math.sqrt(X.reduce((a,x) => a + (x[j]-mu[j])**2, 0)/X.length) || 1);
+  const dist = X.map((x,i) => [Math.sqrt(x.reduce((a,v,j) => a + ((v - f[j])/sd[j])**2, 0)), i]).sort((a,b) => a[0] - b[0]).slice(0, ED.K).map(x => ED.rows[x[1]]);
+  const q = (arr, p) => { const a = arr.slice().sort((x,y) => x-y); return a[Math.floor(p*(a.length-1))]; };
+  const rg = dist.map(r => r[EDC.rng]), med = q(rg,.5), lo = q(rg,.2), hi = q(rg,.8), tr = dist.filter(r => r[EDC.trendday]).length/dist.length, upd = dist.filter(r => r[EDC.oc] > 0).length/dist.length, fh = dist.filter(r => r[EDC.firsthour]).length/dist.length;
+  const allMed = q(ED.rows.map(r => r[EDC.rng]), .5), base = ED.skill.base_trend;
+  $("#ol-k").textContent = `${ED.K} closest of ${ED.rows.length.toLocaleString()} days`;
+  $("#ol-out").innerHTML = [["Expected range", `${Math.round(med/100*op)} pts`, `likely ${Math.round(lo/100*op)}–${Math.round(hi/100*op)} · normal ${Math.round(allMed/100*op)}`], ["Trend-day odds", pct(tr), `normal ${pct(base)}`], ["Closed higher", pct(upd), "direction is close to a coin flip"], ["High or low in first hour", pct(fh), "of similar days"]]
+    .map(([k,v,e]) => `<div class="stat"><small>${k}</small><b style="font-size:19px">${v}</b><em>${e}</em></div>`).join("");
+  const svg = $("#ol-chart"); svg.innerHTML = ""; const {W, H} = vb(svg), mx = Math.max(...rg, allMed*2.2), bins = 18, bw = (W - 20)/bins, cnt = Array(bins).fill(0);
+  rg.forEach(v => cnt[Math.min(bins-1, Math.floor(v/mx*bins))]++); const m = Math.max(...cnt);
+  cnt.forEach((c,i) => el("rect",{x:10 + i*bw + 1, y:H - 24 - c/m*(H - 40), width:bw - 2, height:c/m*(H - 40), rx:2, fill:"url(#gCy)", stroke:"var(--cyan)", "stroke-width":.6}, svg));
+  const xm = v => 10 + v/mx*(W - 20);
+  el("rect",{x:xm(allMed)-1.5, y:10, width:3, height:H - 34, fill:"var(--muted)"}, svg); txt(svg, xm(allMed), 10, "normal day", {"text-anchor":"middle", "font-size":10});
+  el("rect",{x:xm(med)-2, y:18, width:4, height:H - 42, fill:"var(--amber)", filter:"url(#glow)"}, svg); txt(svg, xm(med), H - 8, `today ≈ ${Math.round(med/100*op)} pts`, {"text-anchor":"middle", fill:"var(--amber)", "font-weight":800});
+  const big = med > allMed*1.25, small = med < allMed*.8;
+  $("#ol-note").innerHTML = `${big ? "<b class='amb-t'>Bigger day than usual expected.</b> Signals travel further, but stops get hit faster. Size stays the same, so accept wider swings in P&amp;L." : small ? "<b>Quieter day expected.</b> Fewer signals clear the noise band. Don't force trades." : "A fairly normal day expected."} <span class="muted">Similar days: ${dist.slice(0,5).map(r => r[0]).join(", ")}…</span><br><b>What this can't tell you:</b> tested on 2,268 days, similar days did <b>not</b> predict whether the noise-band strategy wins that day. Take every valid signal, and use the outlook only to set expectations for range and stops.`;
+}
+function renderSkill(){
+  const S = ED.skill;
+  $("#ol-skill").innerHTML = `<ul class="clean"><li><b>Range: useful.</b> Predicted vs. actual day range correlate at <b>${S.corr_range}</b>, and the typical error is ${Math.round((1 - S.err_knn/S.err_naive)*100)}% smaller than just using the last 60 days' average.</li>
+    <li><b>Trend-day odds: weak.</b> ${S.trend_buckets.map(b => `${b.label} forecast → predicted ${pct(b.pred)}, actual ${pct(b.actual)}`).join(" · ")}.</li>
+    <li><b>Strategy P&amp;L: no skill.</b> ${S.noise_buckets.map(b => `${b.label}: actual ${(b.actual*100).toFixed(1)} bp`).join(" · ")}. The strategy earned about the same whatever the forecast said, so don't skip signals because of the outlook.</li></ul>`;
+}
+function renderMore(){
+  const k = +$("#mm-t").value, M = ED.more[k], h = parseFloat($("#mm-h").value), l = parseFloat($("#mm-l").value), px = parseFloat($("#nb-px").value) || 23500;
+  const e = M.ext.map(x => Math.round(x/100*px));
+  $("#mm-out").innerHTML = [["High already in", pct(M.p_hi), "chance today's high is set"], ["Low already in", pct(M.p_lo), "chance today's low is set"], ["More range to come", `${e[0]} pts`, `typical · 1 in 5 days ${e[1]}+ · 1 in 20 ${e[2]}+`]]
+    .map(([a,v,x]) => `<div class="stat"><small>${a}</small><b style="font-size:19px">${v}</b><em>${x}</em></div>`).join("");
+  $("#mm-note").innerHTML = h > 0 && l > 0 && h > l ? `Range so far ${Math.round(h - l)} pts. Typical finish: <b>${Math.round(h - l + e[0])} pts</b> (up to ${Math.round(h - l + e[1])} on 1 in 5 days). ${M.p_both > .5 ? "Both extremes are probably in, so late breakouts are less likely." : "At least one extreme is likely still to come."}` : "Add today's high and low so far to project the full day's range.";
+}
+function renderManager(){
+  const side = +$("#tm-side").value, k = +$("#tm-t").value, op = val("nb-open"), pdc = val("nb-pdc"), vm = parseFloat($("#nb-vol").value) || 1, vw = parseFloat($("#tm-vwap").value), px = val("nb-px"), g = $("#tm-out");
+  if (!(op > 0 && pdc > 0)){ g.className = "gate warn"; g.innerHTML = "Enter today's open and prior close in the cockpit's noise-band card."; return; }
+  const sg = BT.sigma[k]/100*vm, up = Math.max(op, pdc)*(1+sg), lo = Math.min(op, pdc)*(1-sg);
+  const band = side > 0 ? up : lo, exit = isFinite(vw) ? (side > 0 ? Math.max(up, vw) : Math.min(lo, vw)) : band, t = etHM(600 + k*30);
+  const safe = px > 0 ? (px - exit) * side : null;
+  g.className = "gate " + (safe == null ? "warn" : safe > 0 ? "ok" : "stop");
+  g.innerHTML = `<span class="dot ${safe == null ? "warn" : safe > 0 ? "live" : "off"}"></span><div><strong>Exit level at ${t}: ${exit.toFixed(2)}</strong><div class="small">${side > 0 ? "Exit the long if the" : "Exit the short if the"} ${t} close is ${side > 0 ? "below" : "above"} ${exit.toFixed(2)} (the ${isFinite(vw) && exit === vw ? "VWAP" : "band"}${isFinite(vw) ? `, band ${band.toFixed(2)}, VWAP ${vw.toFixed(2)}` : ""}). ${safe == null ? "" : safe > 0 ? `Price is ${safe.toFixed(1)} pts on the right side. Hold.` : `Price is ${(-safe).toFixed(1)} pts through it. If the check closes here, exit.`}</div></div>`;
+}
+function renderStops(){
+  const k = $("#sp-s").value, M = ED.mae[k], stop = val("sp-pts"), px = val("sp-px") || 23500, svg = $("#sp-chart"); svg.innerHTML = "";
+  const w = M.win.map(x => x/100*px), l = M.loss.map(x => x/100*px);
+  const {W, H} = vb(svg), L = 50, Rr = 20, T = 14, B = 30, mx = Math.max(w[47], stop*1.3, 20), X = v => L + Math.min(v, mx)/mx*(W - L - Rr), Y = p => T + (1 - p)*(H - T - B);
+  [0,.25,.5,.75,1].forEach(p => { el("line",{x1:L, x2:W-Rr, y1:Y(p), y2:Y(p), stroke:"var(--grid)"}, svg); txt(svg, L-6, Y(p)+4, Math.round(p*100) + "%", {"text-anchor":"end"}); });
+  for (let v = 0; v <= mx; v += niceStep(mx/6)) txt(svg, X(v), H-10, v + " pts", {"text-anchor":"middle"});
+  const pth = w.map((v,i) => `${i?"L":"M"}${X(v).toFixed(1)} ${Y(1 - i/50).toFixed(1)}`).join("");
+  el("path",{d:pth + ` L${X(mx)} ${Y(0)} L${X(0)} ${Y(0)} Z`, fill:"url(#gUp)"}, svg); const pl = el("path",{d:pth, fill:"none", stroke:"var(--up)", "stroke-width":2.4, filter:"url(#glow)"}, svg); animateDraw(pl);
+  const killed = (() => { let i = w.findIndex(v => v >= stop); return i < 0 ? 0 : 1 - i/50; })();
+  el("rect",{x:X(stop)-2, y:T, width:4, height:H - T - B, rx:2, fill:"var(--down)", filter:"url(#glow)"}, svg);
+  txt(svg, X(stop) + 8, T + 14, `your stop ${stop} pts`, {fill:"var(--down)", "font-weight":800});
+  el("circle",{cx:X(stop), cy:Y(killed), r:6, fill:"var(--down)", stroke:"var(--bg)", "stroke-width":2}, svg);
+  txt(svg, W - Rr, T + 14, "share of winning trades that dipped at least this far", {fill:"var(--muted)", "font-size":10.5, "text-anchor":"end"});
+  const p50 = Math.round(w[25]), p80 = Math.round(w[40]), p95 = Math.round(w[47]), g = $("#sp-out");
+  g.className = "gate " + (killed > .3 ? "stop" : killed > .12 ? "warn" : "ok");
+  g.innerHTML = `<span class="dot ${killed > .3 ? "off" : killed > .12 ? "warn" : "live"}"></span><div><strong>A ${stop}-point stop would have cut ${pct(killed)} of winners short</strong><div class="small">Winning ${SBY[k].name.toLowerCase()} trades dipped a median ${p50} pts before working; 1 in 5 dipped ${p80}+ and 1 in 20 ${p95}+ (at ${px.toLocaleString()}). ${k === "noise" ? "This strategy exits on the trailing band/VWAP, not a tight fixed stop. If you add a hard stop for eval safety, keep it beyond " + p80 + " pts and size down to fit it." : "Put the stop beyond the normal dip and size down so it still fits your per-trade risk."}</div></div>`;
+}
+function initEdge(){
+  renderCalendar2();
+  const lv = i => readLv(i); const setv = (id, v) => { if (v && !$("#"+id).value) $("#"+id).value = v; };
+  setv("ol-open", val("nb-open")); setv("ol-pdc", lv(2) || val("nb-pdc")); setv("ol-pdh", lv(0)); setv("ol-pdl", lv(1)); setv("ol-onh", lv(3)); setv("ol-onl", lv(4));
+  ["ol-open","ol-pdc","ol-onh","ol-onl","ol-pdh","ol-pdl","ol-vol","ol-tr"].forEach(id => $("#"+id).addEventListener("input", renderOutlook));
+  const opts = ED.more.map((m,i) => `<option value="${i}">${etHM(m.t)}</option>`).join(""); $("#mm-t").innerHTML = opts; $("#tm-t").innerHTML = opts;
+  const n = nyNow(); let cur = 0; ED.more.forEach((m,i) => { if (n.mins >= m.t) cur = i; }); $("#mm-t").value = cur; $("#tm-t").value = Math.min(ED.more.length - 1, n.mins >= 600 ? cur + 1 : 0);
+  ["mm-t","mm-h","mm-l"].forEach(id => $("#"+id).addEventListener("input", renderMore));
+  ["tm-side","tm-vwap","tm-t"].forEach(id => $("#"+id).addEventListener("input", renderManager));
+  $("#sp-s").innerHTML = Object.keys(ED.mae).map(k => `<option value="${k}">${SBY[k].name}</option>`).join("");
+  $("#sp-px").value = Math.round((val("nb-px") || 23500)/50)*50;
+  ["sp-s","sp-pts","sp-px"].forEach(id => $("#"+id).addEventListener("input", renderStops));
+  renderSkill(); renderEdge();
+}
+function renderEdge(){ renderCalendar2(); renderOutlook(); renderMore(); renderManager(); renderStops(); }
+
 /* ================= Research fleet ================= */
 function renderFleet(){
   const S = BT.strats, cnt = v => S.filter(s => s.verdict === v).length, RG = BT.regime, n50 = BT.lucid.results.noise.find(r => r.size === "50K" && r.micros === 2), lk = BT.lucid.luck["50K|2"];
@@ -2098,13 +2263,18 @@ function profile(){ const p = Object.assign({}, PROFILE_DEFAULT, KV.get("profile
   if (!p.ws) p.ws = etHM(600 + off).padStart(5,"0"); if (!p.we) p.we = etHM(690 + off).padStart(5,"0"); return p; }
 function derived(p = profile()){
   const S = BT.lucid.sizes[p.size], mll = S.mll;
-  const contracts = p.pace === "fast" ? (p.size === "25K" ? 2 : 4) : p.pace === "balanced" ? (p.size === "25K" ? 1 : 2) : (p.size === "25K" ? 1 : p.exp === "live" ? 2 : 1);
-  const dailyStop = Math.round(mll * (p.pace === "fast" ? .25 : .2) / 10) * 10, perTrade = Math.round(dailyStop / 3 / 5) * 5;
+  let contracts = p.pace === "fast" ? (p.size === "25K" ? 2 : 4) : p.pace === "balanced" ? (p.size === "25K" ? 1 : 2) : (p.size === "25K" ? 1 : p.exp === "live" ? 2 : 1);
+  const dailyStop = Math.round(mll * (p.pace === "fast" ? .25 : .2) / 10) * 10;
+  const px = parseFloat(document.querySelector("#nb-px")?.value) || 23500, safeStop = Math.round(BT.edge.mae.noise.win[40]/100*px);
+  const fee = (+(store.get("fee", 1.24)) || 0), capTrade = dailyStop / 2;
+  const paceC = contracts, fitC = Math.max(1, Math.floor(capTrade / (safeStop * 2 + fee)));
+  contracts = Math.min(paceC, fitC);
+  const perTrade = Math.min(capTrade, Math.max(Math.round(dailyStop / 3 / 5) * 5, Math.ceil((contracts * (safeStop * 2 + fee)) / 5) * 5));
   const row = (BT.lucid.results.noise || []).find(r => r.size === p.size && r.micros === contracts) || {};
   const off = tzOffsetMin(p.tz), wsE = toMin(p.ws) - off, weE = toMin(p.we) - off;
   const busy = (p.busy || "").split(",").map(x => x.trim().split("-").map(toMin)).filter(x => x.length === 2 && x[0] != null && x[1] != null).map(([a,b]) => [a - off, b - off]);
   const checks = []; for (let m = 600; m <= 930; m += 30){ const inW = m >= wsE && m <= weE, isBusy = busy.some(([a,b]) => m >= a && m < b); checks.push({et:m, local:m + off, ok: inW && !isBusy, busy:isBusy}); }
-  return {S, contracts, dailyStop, perTrade, maxTrades: p.exp === "new" ? 3 : 4, streak:2, row, off, wsE, weE, busy, checks, fee:S.fee};
+  return {S, contracts, safeStop, paceC, dailyStop, perTrade, maxTrades: p.exp === "new" ? 3 : 4, streak:2, row, off, wsE, weE, busy, checks, fee:S.fee};
 }
 function applyProfile(){
   const p = profile(), d = derived(p);
@@ -2167,7 +2337,7 @@ function renderPlan(){
   $("#pl-rules").innerHTML = [
     `Trade only <b>noise-band momentum</b> signals at the :00/:30 checks. Everything else is a no.`,
     `Size: <b>${d.contracts} MNQ</b>. Never more, not even after a great day.`,
-    `Every trade has a bracket. Risk per trade ≤ <b>${money0(d.perTrade)}</b> (≈ ${Math.floor(d.perTrade/(d.contracts*2))} points).`,
+    `Every trade has a bracket with a stop <b>at least ${d.safeStop} points</b> away (beyond the dip 4 in 5 winners make). Risk per trade ≤ <b>${money0(d.perTrade)}</b>.${d.paceC > d.contracts ? ` That's why your size is ${d.contracts} MNQ, not ${d.paceC}.` : ""}`,
     `Daily stop <b>${money0(-d.dailyStop)}</b>, or <b>${d.streak} losses in a row</b>, and you're done. Close the platform.`,
     `After any losing trade, a <b>10-minute cool-off</b> before the next one. The cockpit enforces it.`,
     `Flat <b>5 minutes before</b> scheduled news (8:30, 10:00, 2:00 FOMC ET) and flat by <b>${hm(955 + off)}</b> your time.`,
@@ -2272,7 +2442,8 @@ function ticketChecks(){
   const inWin = n.mins >= d.wsE && n.mins <= d.weE;
   const out = [
     [dirOK, dirOK ? `Stop is on the right side (${ttSide > 0 ? "below" : "above"} entry)` : "Enter an entry and a stop on the correct side"],
-    [dirOK && Math.abs(e - st) >= 10, `Stop is outside normal noise (≥ 10 pts; yours ${dirOK ? Math.abs(e - st).toFixed(2) : "—"})`],
+    (() => { const W = BT.edge.mae.noise.win, px = isFinite(e) && e > 0 ? e : 23500, p50 = Math.round(W[25]/100*px), p80 = Math.round(W[40]/100*px), dist = dirOK ? Math.abs(e - st) : 0;
+      return [dirOK && dist >= p80 ? true : dirOK && dist >= p50 ? "warn" : false, `Stop beyond the normal dip of winning trades (typical ${p50} pts, 1 in 5 ${p80}+; yours ${dirOK ? dist.toFixed(0) : "—"})`]; })(),
     [q <= d.contracts, `Size within your plan (${q} ≤ ${d.contracts} MNQ)`],
     [isFinite(risk) && risk <= d.perTrade * 1.001, `Risk ≤ ${money0(d.perTrade)} per trade (this one ${isFinite(risk) ? money(risk) : "—"})`],
     [isFinite(risk) && risk <= roomDay, `Fits today's loss room (${money0(roomDay)} left)`],
@@ -2351,7 +2522,7 @@ function initCockpit(){
   $("#cp-sound").setAttribute("aria-pressed", store.get("sound", false));
   $("#cp-sound").onclick = () => { const v = !store.get("sound", false); store.set("sound", v); $("#cp-sound").setAttribute("aria-pressed", v); if (v){ beep(880); toast("Sound on: a beep 1 minute before each check and news blackout, and a double beep at the time."); } };
   $("#cp-wake").onclick = async () => { try{ if (wakeLock){ await wakeLock.release(); wakeLock = null; $("#cp-wake").setAttribute("aria-pressed", false); return; } wakeLock = await navigator.wakeLock.request("screen"); $("#cp-wake").setAttribute("aria-pressed", true); wakeLock.addEventListener("release", () => { wakeLock = null; $("#cp-wake").setAttribute("aria-pressed", false); }); } catch { toast("This browser won't keep the screen on. Change your screen timeout instead."); } };
-  $("#cp-news").value = store.get("news:" + todayNY(), "08:30, 10:00");
+  $("#cp-news").value = store.get("news:" + todayNY(), [...new Set([...todaysNews(), "10:00"])].sort().join(", "));
   $("#cp-news").addEventListener("input", () => { store.set("news:" + todayNY(), $("#cp-news").value); renderGate(); renderTicket(); });
   $("#tilt").onclick = e => { const b = e.target.closest("[data-m]"); if (!b) return; const m = b.dataset.m; KV.set("mood", {m, at:Date.now(), date:todayNY()});
     if (m === "tilt") startCooldown(15, "you said you're frustrated. Walk away for 15 minutes"); else { renderGate(); toast(m === "calm" ? "Good. Trade your plan." : "Anxious: halve your size or skip the next signal."); } };

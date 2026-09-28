@@ -104,6 +104,7 @@ out["series_dates"] = dates
 out["regime"] = json.load(open(os.path.join(D, "regime.json")))
 from strategies_scout import LEDGER
 out["scout"] = LEDGER
+out["edge"] = json.load(open(os.path.join(D, "edge.json")))
 s = json.dumps(clean(out), separators=(",", ":"))
 open(os.path.join(os.path.dirname(__file__), "..", "bt-data.json"), "w").write(s)
 print("bytes", len(s)); print(json.dumps(out["daystats"]), out["sigma"][:4])

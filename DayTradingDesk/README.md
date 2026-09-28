@@ -9,6 +9,7 @@ Nasdaq-100 futures (NQ / MNQ). Open `index.html` in any browser.
 | Cockpit | Side-by-side live trading panel: next-event countdown with sound, GO/STOP gate, trade ticket that blocks trades failing risk checks, LucidFlex eval tracker (max-loss distance), cool-offs after losses, tilt check. Also: Live New York session clock, front-month contract, trade/no-trade gate from your daily limits, noise-band signal calculator, checklist, key levels |
 | Research fleet | Eight research agents modeled on the AnswerRank pipeline (Scout, Auditor, Skeptic, Regime analyst, Portfolio builder, Risk officer, Reporter, Bookkeeper), regime heatmap, portfolios, correlations, Scout research ledger |
 | Prop eval | Lucid Trading LucidFlex rules, pass-rate simulator by size and contracts, luck baseline, how to get the eval |
+| Edge tools | Official FOMC / CPI / jobs-report calendar (auto news blackouts), similar-day pre-market outlook with walk-forward skill test, intraday range projection, noise-band exit manager, stop-placement analyzer from real trade excursions |
 | Backtest Lab | 41 strategies + benchmark tested on 2,630 real NQ sessions (2015 to Jul 2025): leaderboard, equity curves, yearly results, real example trades |
 | Learn | Beginner course: 40-term glossary, candlestick / ticks-to-dollars / bracket / expectancy visuals, interactive trailing-drawdown simulator, consistency-rule checker, why evals fail, 8-question quiz; plus workflow, order book, futures vs. QQQ, contract specs and roll calendar, costs, learning path |
 | Replay | Trade 160 real NQ sessions bar by bar with a bracket (keys: B, S, F, →, Space, N) |
@@ -48,6 +49,7 @@ NQ_DATA=/path/to/data python3 robust.py       # parameter and cost sensitivity
 NQ_DATA=/path/to/data python3 proof.py        # significance, bootstrap, randomization, walk-forward
 NQ_DATA=/path/to/data python3 lucid.py        # LucidFlex evaluation simulator
 NQ_DATA=/path/to/data python3 lucid_luck.py   # random-direction baseline for the simulator
+NQ_DATA=/path/to/data python3 edge.py         # outlook features, range tables, adverse-excursion quantiles
 NQ_DATA=/path/to/data python3 export.py       # writes ../bt-data.json
 cd .. && python3 build.py                 # src/app.html + bt-data.json -> index.html
 ```
