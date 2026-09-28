@@ -219,6 +219,23 @@ ol.stepsl{margin:0;padding-left:0;list-style:none;counter-reset:q;display:grid;g
 ol.stepsl li{counter-increment:q;display:grid;grid-template-columns:34px 1fr;gap:12px;font-size:14px}
 ol.stepsl li::before{content:counter(q);width:30px;height:30px;border-radius:9px;display:grid;place-items:center;font:800 14px/1 var(--mono);background:linear-gradient(135deg,var(--amber),var(--amber-2));color:#1A1203}
 ol.stepsl b{color:var(--ink)}
+.pipe{display:grid;gap:8px}
+.stage{display:grid;grid-template-columns:18px 150px 1fr auto;gap:14px;align-items:center;padding:12px 14px;background:rgba(14,22,48,.8);border:1px solid var(--line);border-radius:12px;cursor:pointer;transition:border-color .2s, transform .15s;text-align:left;color:inherit;font:inherit;width:100%}
+.stage:hover{border-color:var(--cyan);transform:translateX(2px)}
+.stage .sd{width:10px;height:10px;border-radius:50%;background:var(--cyan);box-shadow:0 0 12px var(--cyan)}
+.stage.human{border-color:rgba(255,181,71,.45);background:var(--amber-dim)}
+.stage.human .sd{background:var(--amber);border-radius:3px;box-shadow:0 0 12px var(--amber)}
+.stage .nm{font:800 13px/1.2 var(--mono);color:var(--ink);letter-spacing:.04em}
+.stage .nm small{display:block;font:500 11.5px/1.3 var(--body);color:var(--muted);letter-spacing:0;margin-top:3px}
+.stage .ds{font-size:13.5px;color:var(--text);line-height:1.45}
+.stage .ds b{color:var(--ink)}
+.stage .go{font:700 11px/1 var(--mono);color:var(--cyan);white-space:nowrap}
+@media (max-width:760px){.stage{grid-template-columns:18px 1fr}.stage .ds,.stage .go{grid-column:2}}
+.brief{counter-reset:b;display:grid;gap:10px;margin:0;padding:0;list-style:none}
+.brief li{counter-increment:b;display:grid;grid-template-columns:34px 1fr;gap:12px;font-size:14.5px;line-height:1.5}
+.brief li::before{content:counter(b,decimal-leading-zero);font:800 13px/30px var(--mono);color:var(--amber)}
+.brief b{color:var(--ink)}
+.heat td.hc{text-align:center;font-family:var(--mono);font-weight:700;font-size:13px}
 footer.foot{margin-top:48px;padding-top:18px;border-top:1px solid var(--line);color:var(--faint);font-size:12.5px;max-width:95ch}
 @media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}.draw{stroke-dashoffset:0}}
 @media (max-width:640px){.clockmini{display:none}nav.tabs{margin-left:0;width:100%}nav.tabs button kbd{display:none}.big-out{font-size:36px}.rule{grid-template-columns:1fr;gap:2px}}
@@ -242,11 +259,12 @@ footer.foot{margin-top:48px;padding-top:18px;border-top:1px solid var(--line);co
     <nav class="tabs" role="tablist" aria-label="Sections">
       <button role="tab" data-tab="today" id="t-today"><kbd>1</kbd>Today</button>
       <button role="tab" data-tab="lab" id="t-lab"><kbd>2</kbd>Backtest Lab</button>
-      <button role="tab" data-tab="prop" id="t-prop"><kbd>3</kbd>Prop eval</button>
-      <button role="tab" data-tab="learn" id="t-learn"><kbd>4</kbd>Learn</button>
-      <button role="tab" data-tab="replay" id="t-replay"><kbd>5</kbd>Replay</button>
-      <button role="tab" data-tab="tools" id="t-tools"><kbd>6</kbd>Risk tools</button>
-      <button role="tab" data-tab="journal" id="t-journal"><kbd>7</kbd>Journal</button>
+      <button role="tab" data-tab="fleet" id="t-fleet"><kbd>3</kbd>Research fleet</button>
+      <button role="tab" data-tab="prop" id="t-prop"><kbd>4</kbd>Prop eval</button>
+      <button role="tab" data-tab="learn" id="t-learn"><kbd>5</kbd>Learn</button>
+      <button role="tab" data-tab="replay" id="t-replay"><kbd>6</kbd>Replay</button>
+      <button role="tab" data-tab="tools" id="t-tools"><kbd>7</kbd>Risk tools</button>
+      <button role="tab" data-tab="journal" id="t-journal"><kbd>8</kbd>Journal</button>
     </nav>
   </div>
   <div class="ticker" aria-label="Backtest highlights"><div class="ticker-track" id="ticker"></div></div>
@@ -402,6 +420,37 @@ footer.foot{margin-top:48px;padding-top:18px;border-top:1px solid var(--line);co
       <summary>How the backtest was run</summary>
       <div class="small" id="meth"></div>
     </details>
+  </div>
+</section>
+
+<!-- ======================= FLEET ======================= -->
+<section class="panel" id="p-fleet" role="tabpanel" aria-labelledby="t-fleet">
+  <div class="panel-head">
+    <div class="eyebrow">Research fleet · modeled on the AnswerRank agents</div>
+    <h2>Eight agents do the research. <span class="grad">You make two decisions.</span></h2>
+    <p class="lede">The same design as AnswerRank's pipeline: each agent has one job and passes its output to the next, and a person stays at the two points where a mistake costs money. Click an agent to see its work.</p>
+  </div>
+  <div class="split">
+    <div class="pipe" id="fleet-pipe"></div>
+    <div class="card hot" style="align-self:start"><div class="eyebrow">Reporter · research brief</div><h3 style="margin-top:6px">What the fleet found</h3><ol class="brief" id="fleet-brief" style="margin-top:12px"></ol></div>
+  </div>
+
+  <div class="card" style="margin-top:16px" id="fleet-regime">
+    <div class="card-h"><div><div class="eyebrow">Regime analyst</div><h3 style="margin-top:6px">When each strategy earns its money</h3></div>
+      <div class="seg" role="group" aria-label="Condition" id="rg-dim"><button data-d="trend" aria-pressed="true">Trend</button><button data-d="vol" aria-pressed="false">Volatility</button><button data-d="gap" aria-pressed="false">Gap size</button><button data-d="weekday" aria-pressed="false">Weekday</button></div></div>
+    <p class="small muted">Average NQ points per trade after costs. Every condition is known before the open, so there's no look-ahead. Hover a cell for trade count and profit factor.</p>
+    <div class="table-wrap heat" style="margin-top:10px"><table><thead id="rg-head"></thead><tbody id="rg-body"></tbody></table></div>
+    <div class="grid g2" style="margin-top:14px">
+      <div><h3>Is the downtrend effect real? Both halves of the data</h3><p class="small muted">Average points per trade in uptrends vs. downtrends, tested separately on 2015–21 and 2022–25.</p><div class="chart-box"><svg class="chart" id="rg-split" viewBox="0 0 560 230" role="img" aria-label="Uptrend vs downtrend by period"></svg></div></div>
+      <div id="fleet-port"><h3>Portfolio builder</h3><p class="small muted">Combinations fixed in advance by evidence tier, not by searching for the best-looking mix. 1 NQ-equivalent per strategy.</p>
+        <div class="chart-box"><svg class="chart" id="pf-eq" viewBox="0 0 560 200" role="img" aria-label="Portfolio equity curves"></svg></div>
+        <div class="table-wrap" style="margin-top:8px"><table><thead><tr><th>Portfolio</th><th class="n">Sharpe</th><th class="n">Total pts</th><th class="n">Max DD</th><th class="n">Up years</th></tr></thead><tbody id="pf-body"></tbody></table></div></div>
+    </div>
+  </div>
+
+  <div class="grid g2" style="margin-top:16px">
+    <div class="card"><div class="eyebrow">Portfolio builder</div><h3 style="margin-top:6px">Do they lose on the same days?</h3><p class="small muted">Correlation of daily P&amp;L. Low numbers mean the strategies make and lose money at different times, which is what makes combining them smoother.</p><div style="overflow-x:auto"><svg class="chart" id="corr" viewBox="0 0 520 400" role="img" aria-label="Correlation matrix"></svg></div></div>
+    <div class="card" id="fleet-scout"><div class="eyebrow">Scout · research ledger</div><h3 style="margin-top:6px">Ideas from published research, tested here</h3><div class="table-wrap" style="margin-top:10px;max-height:420px"><table><thead><tr><th>Idea &amp; source</th><th>Result here</th></tr></thead><tbody id="scout-body"></tbody></table></div></div>
   </div>
 </section>
 
@@ -758,7 +807,7 @@ function hover(svg, getInfo){
 }
 
 /* ================= Tabs & keyboard ================= */
-const TABS = ["today","lab","prop","learn","replay","tools","journal"];
+const TABS = ["today","lab","fleet","prop","learn","replay","tools","journal"];
 let current = "today", ready = false;
 function showTab(t){
   if (!TABS.includes(t)) t = "today"; current = t;
@@ -768,6 +817,7 @@ function showTab(t){
   if (t === "journal") renderJournal();
   if (t === "today") renderGate();
   if (t === "lab" && !showTab.labDone){ showTab.labDone = true; renderLab(); }
+  if (t === "fleet" && !showTab.fleetDone){ showTab.fleetDone = true; renderFleet(); }
   if (t === "prop" && !showTab.propDone){ showTab.propDone = true; renderProp(); }
 }
 $$("nav.tabs button").forEach(b => b.addEventListener("click", () => { showTab(b.dataset.tab); try{ history.replaceState(null,"","#"+b.dataset.tab); }catch{} }));
@@ -1137,6 +1187,88 @@ function renderWF(){
   const up = wf.filter(w => w.pts > 0).length, tot = wf.reduce((a,w) => a + w.pts, 0), sel = BT.proof.wf_select, stot = sel.reduce((a,w) => a + w.pts, 0);
   $("#wf-pill").textContent = `${up}/${wf.length} years up · ${num(tot,0,1)} pts`;
   $("#wf-sel").innerHTML = sel.map(w => `<tr><td class="mono">${w.year}</td><td class="small" style="white-space:normal">${w.picks.join(" · ")}</td><td class="n ${cls(w.pts)}"><b>${num(w.pts,0,1)}</b></td></tr>`).join("") + `<tr><td><b>Total</b></td><td class="small muted">${sel.filter(w => w.pts > 0).length}/${sel.length} years profitable</td><td class="n ${cls(stot)}"><b>${num(stot,0,1)}</b></td></tr>`;
+}
+
+/* ================= Research fleet ================= */
+function renderFleet(){
+  const S = BT.strats, cnt = v => S.filter(s => s.verdict === v).length, RG = BT.regime, n50 = BT.lucid.results.noise.find(r => r.size === "50K" && r.micros === 2), lk = BT.lucid.luck["50K|2"];
+  const ts = RG.trend_split.noise, upA = ts["2022–25|Uptrend"].avg, dnA = ts["2022–25|Downtrend"].avg;
+  const pp = RG.portfolios["Proven + promising"], scout = BT.scout || [];
+  const jn = J.trades.length;
+  const stages = [
+    ["Scout", "Reads the research", scout.length ? `Found <b>${scout.length} strategies</b> with published evidence and turned each into exact rules.` : "Collects strategy ideas from papers and practitioner research.", "#fleet-scout", "fleet"],
+    ["Auditor", "Backtests with fixed rules", `Ran <b>${S.length - 1} strategies</b> on <b>${BT.meta.sessions.toLocaleString()}</b> real NQ sessions, 1-minute fills, costs included.`, "lab", "lab"],
+    ["Skeptic", "Tries to prove it's luck", `<b class="up-t">${cnt("proven")} proven</b>, <b>${cnt("promising")} promising</b>, <b class="down-t">${cnt("none")} lose money</b>. Seven tests each, corrected for ${BT.proof.n_trials} variants.`, "lab", "lab"],
+    ["Regime analyst", "Finds when it works", `Momentum earns <b>${(dnA/Math.max(.1,upA)).toFixed(1)}×</b> more per trade below the 50-day average (2022–25), and the effect shows in both halves of the data.`, "#fleet-regime", "fleet"],
+    ["Portfolio builder", "Combines what's left", `Proven + promising: <b>${pp.up_years}/${pp.years} years up</b>, Sharpe ${pp.sharpe}.`, "#fleet-port", "fleet"],
+    ["Risk officer", "Sizes it and runs the prop sim", `LucidFlex 50K at 2 MNQ: <b class="up-t">${pct(n50.pass_rate)}</b> pass vs <b class="down-t">${pct(lk.pass_rate)}</b> for luck.`, "prop", "prop"],
+    ["YOU", "Approve the playbook", "Pick <b>one</b> strategy and a size. Nothing trades without this.", "today", "today", 1],
+    ["Reporter", "Writes the morning brief", "The Today tab: session clock, noise-band signal, the go/no-go gate.", "today", "today"],
+    ["YOU", "Place the trades", "Execute with brackets. The agents can't feel a losing streak. You can, so the gate enforces your limits.", "replay", "replay", 1],
+    ["Bookkeeper", "Checks you against the test", jn ? `${jn} journal trade${jn>1?"s":""} compared with the backtest by setup. A big gap means execution, not strategy.` : "Compares your journal with the backtest once you log trades.", "journal", "journal"]
+  ];
+  $("#fleet-pipe").innerHTML = stages.map(([nm, job, ds, target, tab, human]) => `<button class="stage ${human?"human":""}" data-target="${target}" data-tab="${tab}"><span class="sd"></span><span class="nm">${nm}<small>${job}</small></span><span class="ds">${ds}</span><span class="go">${tab === "fleet" ? "↓" : "open →"}</span></button>`).join("");
+  $("#fleet-pipe").onclick = e => { const b = e.target.closest(".stage"); if (!b) return; const t = b.dataset.target;
+    if (t.startsWith("#")){ $(t).scrollIntoView({behavior:"smooth", block:"start"}); } else { showTab(b.dataset.tab); window.scrollTo({top:0}); } };
+  const nz = SBY.noise, dr = RG.trend_split.drive;
+  const brief = [
+    `<b>One strategy is proven:</b> noise-band momentum (PF ${nz.all.pf.toFixed(2)}, Sharpe ${nz.all.sharpe.toFixed(2)}, adj. p ${nz.proof.p_adj.toFixed(3)}). Everything else is either promising or unproven.`,
+    `<b>Fading NQ loses.</b> All ${cnt("none")} strategies that lost money bet on reversal: VWAP reversion, failed breakouts, RSI(2), EMA pullbacks.`,
+    `<b>Downtrends pay momentum.</b> Noise-band averaged ${num(dnA,1)} pts per trade below the 50-day average vs ${num(upA,1)} above it in 2022–25 (2015–21: ${num(ts["2015–21|Downtrend"].avg,1)} vs ${num(ts["2015–21|Uptrend"].avg,1)}). Keep trading in uptrends (still positive), but expect less.`,
+    `<b>Combining helps consistency:</b> noise + opening drive + lunch breakout made money in ${pp.up_years} of ${pp.years} years. Lunch breakout's P&amp;L is nearly uncorrelated with the others.`,
+    `<b>For a Lucid eval,</b> the edge shows as a 4–5× higher pass rate than random trading at the same size. Smaller size passes more often but takes months.`
+  ];
+  if (scout.length){ const good = scout.filter(x => x.key && SBY[x.key] && ["proven","promising"].includes(SBY[x.key].verdict)).length; brief.push(`<b>Scout's ${scout.length} published ideas:</b> ${good} earned promising or better here, and ${scout.filter(x => x.key && SBY[x.key] && SBY[x.key].verdict === "none").length} lost money on NQ.`); }
+  $("#fleet-brief").innerHTML = brief.map(x => `<li><span>${x}</span></li>`).join("");
+  $("#rg-dim").onclick = e => { const b = e.target.closest("[data-d]"); if (!b) return; $$("#rg-dim button").forEach(x => x.setAttribute("aria-pressed", x === b)); renderRegime(b.dataset.d); };
+  renderRegime("trend"); drawSplit(); drawPortfolios(); drawCorr(); renderScout();
+}
+function heatColor(v, m){ const a = Math.min(1, Math.abs(v)/m); return v >= 0 ? `rgba(43,227,160,${.08 + a*.5})` : `rgba(255,90,122,${.08 + a*.5})`; }
+function renderRegime(dim){
+  const RG = BT.regime, cols = RG.dims[dim], keys = Object.keys(RG.regimes).filter(k => SBY[k]).sort((a,b) => SBY[b].all.sharpe - SBY[a].all.sharpe);
+  const short = c => c.replace(" (above 50-day avg)", "").replace(" (below 50-day avg)", "");
+  $("#rg-head").innerHTML = `<tr><th>Strategy</th>${cols.map(c => `<th class="n" style="text-align:center">${short(c)}</th>`).join("")}</tr>`;
+  const m = Math.max(1, ...keys.flatMap(k => cols.map(c => Math.abs(RG.regimes[k][dim][c].avg))));
+  $("#rg-body").innerHTML = keys.map(k => `<tr><td><b style="color:var(--ink)">${SBY[k].name}</b> <span class="verdict ${SBY[k].verdict}" style="font-size:9px">${VNAME[SBY[k].verdict]}</span></td>${cols.map(c => { const x = RG.regimes[k][dim][c];
+    return `<td class="hc" style="background:${x.n ? heatColor(x.avg, m) : "transparent"}" title="${x.n} trades · PF ${x.pf ?? "—"}">${x.n ? num(x.avg,1,1) : "—"}</td>`; }).join("")}</tr>`).join("");
+}
+function drawSplit(){
+  const svg = $("#rg-split"); svg.innerHTML = ""; const {W, H} = vb(svg), TS = BT.regime.trend_split, keys = ["noise","drive","lunch","late_mom","gap_go","orb5_z"].filter(k => TS[k]);
+  const cats = [["2015–21|Uptrend","'15–21 up","rgba(76,214,255,.45)"],["2015–21|Downtrend","'15–21 down","var(--cyan)"],["2022–25|Uptrend","'22–25 up","rgba(255,181,71,.45)"],["2022–25|Downtrend","'22–25 down","var(--amber)"]];
+  const L = 110, T = 8, B = 30, rowH = (H - T - B)/keys.length, m = Math.max(1, ...keys.flatMap(k => cats.map(c => Math.abs(TS[k][c[0]].avg))));
+  const X0 = L + 20, X = v => X0 + v/m*(W - X0 - 30);
+  el("line",{x1:X0, x2:X0, y1:T, y2:H-B, stroke:"var(--line-2)"}, svg);
+  keys.forEach((k,i) => { const y = T + i*rowH; txt(svg, 0, y + rowH/2 + 4, SBY[k].name.length > 17 ? SBY[k].name.slice(0,16)+"…" : SBY[k].name, {fill:"var(--text)", "font-size":11, "font-family":"var(--body)"});
+    cats.forEach((c,j) => { const v = TS[k][c[0]].avg, bh = (rowH - 6)/4, yy = y + 3 + j*bh; el("rect",{x: v >= 0 ? X0 : X(v), y:yy, width:Math.max(1, Math.abs(X(v) - X0)), height:bh - 1.5, rx:2, fill:c[2]}, svg); }); });
+  cats.forEach((c,j) => { const x = L + j*110; el("rect",{x, y:H-16, width:10, height:10, rx:2, fill:c[2]}, svg); txt(svg, x + 14, H-7, c[1], {"font-size":10.5}); });
+  hover(svg, (fx) => null);
+}
+function drawPortfolios(){
+  const svg = $("#pf-eq"); svg.innerHTML = ""; const {W, H} = vb(svg), P = BT.regime.portfolios, names = Object.keys(P), cols = ["var(--up)","var(--amber)","var(--violet)"];
+  const L = 6, R = 64, T = 10, B = 22; const all = names.flatMap(n => P[n].eq.map(e => e[1])), lo = Math.min(0, ...all), hi = Math.max(...all);
+  const t0 = +new Date(P[names[0]].eq[0][0]), t1 = +new Date(P[names[0]].eq.at(-1)[0]);
+  const X = d => L + (+new Date(d) - t0)/(t1 - t0)*(W - L - R), Y = v => T + (hi - v)/(hi - lo)*(H - T - B);
+  const step = niceStep((hi-lo)/4); for (let v = Math.ceil(lo/step)*step; v <= hi; v += step){ el("line",{x1:L, x2:W-R, y1:Y(v), y2:Y(v), stroke:"var(--grid)"}, svg); txt(svg, W-R+6, Y(v)+4, Math.round(v).toLocaleString()); }
+  [2016,2018,2020,2022,2024].forEach(y => txt(svg, X(`${y}-01-01`), H-6, y, {"text-anchor":"middle", "font-size":10}));
+  names.forEach((n,i) => { const p = el("path",{d:P[n].eq.map((e,j) => `${j?"L":"M"}${X(e[0]).toFixed(1)} ${Y(e[1]).toFixed(1)}`).join(""), fill:"none", stroke:cols[i], "stroke-width":2}, svg); animateDraw(p); });
+  $("#pf-body").innerHTML = names.map((n,i) => `<tr><td><i style="display:inline-block;width:12px;height:3px;background:${cols[i]};vertical-align:middle;margin-right:8px"></i>${n}<div class="small muted" style="white-space:normal;max-width:260px">${P[n].keys.map(k => SBY[k].name).join(" + ")}</div></td><td class="n"><b>${P[n].sharpe}</b></td><td class="n up-t">${num(P[n].total,0,1)}</td><td class="n down-t">${num(P[n].maxdd,0)}</td><td class="n">${P[n].up_years}/${P[n].years}</td></tr>`).join("");
+  hover(svg, fx => { const t = t0 + (fx - L)/(W - L - R)*(t1 - t0); const e0 = P[names[0]].eq; let i = e0.findIndex(e => +new Date(e[0]) >= t); if (i < 0) i = e0.length - 1;
+    return {x:X(e0[i][0]), y:null, html:`${e0[i][0]}<br>` + names.map((n,k) => `<span style="color:${cols[k]}">■</span> ${num(P[n].eq[Math.min(i, P[n].eq.length-1)][1],0,1)}`).join("<br>")}; });
+}
+function drawCorr(){
+  const svg = $("#corr"); svg.innerHTML = ""; const C = BT.regime.corr, n = C.keys.length, L = 150, T = 10, cs = (520 - L - 10)/n;
+  C.keys.forEach((k,i) => { const nm = SBY[k].name; txt(svg, L - 8, T + i*cs + cs/2 + 4, nm.length > 20 ? nm.slice(0,19)+"…" : nm, {"text-anchor":"end", "font-size":10.5, fill:"var(--text)", "font-family":"var(--body)"});
+    C.keys.forEach((k2,j) => { const v = C.m[i][j]; el("rect",{x:L + j*cs + 1, y:T + i*cs + 1, width:cs - 2, height:cs - 2, rx:4, fill: i === j ? "var(--surface-2)" : `rgba(76,214,255,${Math.max(.05, v)*.9})`}, svg);
+      txt(svg, L + j*cs + cs/2, T + i*cs + cs/2 + 4, i === j ? "—" : v.toFixed(2), {"text-anchor":"middle", "font-size":10.5, fill: v > .45 ? "#04121A" : "var(--ink)", "font-weight":700}); }); });
+  C.keys.forEach((k,j) => txt(svg, L + j*cs + cs/2, T + n*cs + 14, String(j+1), {"text-anchor":"middle", "font-size":10}));
+  C.keys.forEach((k,i) => txt(svg, 4, T + i*cs + cs/2 + 4, String(i+1), {"font-size":10, fill:"var(--faint)"}));
+}
+function renderScout(){
+  const sc = BT.scout || [];
+  $("#scout-body").innerHTML = sc.length ? sc.map(x => { const s = x.key && SBY[x.key];
+    return `<tr><td style="white-space:normal;min-width:220px"><b style="color:var(--ink)">${esc(x.name)}</b><div class="small muted">${x.url ? `<a href="${esc(x.url)}" target="_blank" rel="noopener">${esc(x.source)}</a>` : esc(x.source)}</div><div class="small" style="margin-top:4px">${esc(x.claim || "")}</div></td>
+      <td style="white-space:normal;min-width:150px">${s ? `<span class="verdict ${s.verdict}">${VNAME[s.verdict]}</span><div class="small mono" style="margin-top:6px">PF ${s.all.pf.toFixed(2)} · Sharpe ${s.all.sharpe.toFixed(2)}<br>${s.all.n.toLocaleString()} trades</div>` : `<span class="pill">${esc(x.status || "Not testable with this data")}</span>`}</td></tr>`; }).join("")
+    : `<tr><td colspan="2" class="muted">The Scout's research ledger appears here after its next run.</td></tr>`;
 }
 
 /* ================= Prop eval (Lucid) ================= */
