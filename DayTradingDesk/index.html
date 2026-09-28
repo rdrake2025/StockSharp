@@ -194,6 +194,7 @@ input:focus,select:focus,textarea:focus{outline:2px solid var(--cyan);outline-of
 .ladder .px{text-align:center;background:rgba(19,29,59,.8);font-weight:700;color:var(--ink)}
 .ladder .bid{text-align:right;color:var(--up)} .ladder .ask{color:var(--down)}
 .ladder .inside .px{background:var(--amber-dim);color:var(--amber)}
+[hidden]{display:none !important}
 .subnav{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px}
 .jumpbar{position:sticky;top:var(--hdr,58px);z-index:20;display:flex;gap:6px;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;margin:0 calc(-1 * clamp(16px,3vw,32px)) 16px;padding:8px clamp(16px,3vw,32px);background:rgba(7,11,20,.88);backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
 .jumpbar::-webkit-scrollbar{display:none}
@@ -628,6 +629,10 @@ body.compact .ticker,body.compact #top-front,body.compact .search-btn span,body.
         <label class="f">Price paid ($)<input id="pf-paid" type="number" class="mono" min="0" step="1"></label>
         <label class="f">Evals bought so far<input id="pf-evals" type="number" class="mono" min="0" step="1"></label>
       </div></div>
+    <div class="card" id="bk-card"><div class="eyebrow">Backup &amp; restore</div>
+      <p class="small" style="margin-top:8px">Everything you've entered (profile, journal, eval tracker, quiz, drill and replay scores) lives in this browser. Download a backup file now and then; load it on a new device or after clearing your browser.</p>
+      <div class="row" style="margin-top:10px"><button class="btn primary" id="bk-save">Download backup</button><label class="btn" style="cursor:pointer">Restore from file<input type="file" id="bk-load" accept=".json,application/json" hidden></label></div>
+      <p class="small muted" id="bk-note" style="margin-top:8px"></p></div>
     <div class="card"><div class="eyebrow">Accountability</div>
       <div class="form" style="margin-top:10px">
         <label class="f">Someone I tell when I break a rule<input id="pf-contact" type="text" placeholder="name only"></label>
@@ -1127,6 +1132,7 @@ body.compact .ticker,body.compact #top-front,body.compact .search-btn span,body.
     <p class="small muted" style="margin-top:6px">Every quiz is freshly generated: new numbers, new scenarios, shuffled answers. You'll never get the same quiz twice. Your best score counts toward the plan.</p>
     <div id="qz"></div>
     <div class="row" style="justify-content:space-between;margin-top:6px"><button class="btn primary" id="qz-reset">New quiz ↻</button><span class="small muted" id="qz-hist"></span></div>
+    <details id="qz-miss" style="margin-top:12px" hidden><summary class="small" style="cursor:pointer;font-weight:700">Review your misses</summary><div id="qz-miss-l" style="margin-top:8px"></div></details>
   </div>
 
   <div class="steps" id="l-flow">
@@ -1221,9 +1227,9 @@ body.compact .ticker,body.compact #top-front,body.compact .search-btn span,body.
   <div class="card hot" id="dr-card" style="margin-bottom:16px">
     <div class="card-h"><div><div class="eyebrow">Signal drill · the fastest way to learn the strategy</div><h3 style="margin-top:6px" id="dr-q">At this check, you're flat. What do you do?</h3></div><div class="row"><span class="pill" id="dr-prog"></span><span class="score" id="dr-score"></span></div></div>
     <div class="chart-box"><svg class="chart" id="dr-chart" viewBox="0 0 1080 330" role="img" aria-label="Drill chart"></svg></div>
-    <div class="row" style="margin-top:10px"><button class="btn buy" data-dr="1">Go long</button><button class="btn sell" data-dr="-1">Go short</button><button class="btn" data-dr="0">No trade</button><span style="flex:1"></span><button class="btn primary" id="dr-next" disabled>Next question ▸</button></div>
+    <div class="row" style="margin-top:10px"><button class="btn buy" data-dr="1">Go long</button><button class="btn sell" data-dr="-1">Go short</button><button class="btn" data-dr="0">No trade</button><button class="btn primary" data-dr="2" hidden>Hold</button><button class="btn sell" data-dr="3" hidden>Exit now</button><span style="flex:1"></span><div class="seg" id="dr-mode" role="group" aria-label="Drill type"><button data-m="mix" aria-pressed="true">Mixed</button><button data-m="entry" aria-pressed="false">Entries</button><button data-m="manage" aria-pressed="false">Managing</button></div><button class="btn primary" id="dr-next" disabled>Next question ▸</button></div>
     <div class="gate" id="dr-fb" style="margin-top:10px" hidden></div>
-    <p class="small muted" style="margin-top:8px">Real NQ sessions. Cyan lines are the noise bands; the last candle is the one that just closed at the check. <b>Rule:</b> close above the upper band → long; below the lower band → short; inside → no trade. 20 questions per set, target 90%+.</p>
+    <p class="small muted" style="margin-top:8px">Real NQ sessions. Cyan lines are the noise bands; the last candle is the one that just closed at the check. <b>Entry rule:</b> close above the upper band → long; below the lower band → short; inside → no trade. <b>Managing rule:</b> long → exit if the check closes below the higher of band and VWAP (short: above the lower); otherwise hold. 20 questions per set, target 90%+.</p>
   </div>
   <div class="card">
     <div class="card-h">
@@ -2145,6 +2151,8 @@ function renderQuiz(){
   const done = Object.keys(st).length, N = Z.qs.length;
   $("#qz-score").textContent = `${score} / ${N}`; $("#qz-score").className = "pill " + (score === N ? "up" : score >= 5 ? "amb" : "");
   $("#qz-no").textContent = `quiz #${Z.n}`; $("#qz-best").textContent = `best ${quizBest()} / 8`; $("#qz-best").className = "pill " + (quizBest() >= 7 ? "up" : "");
+  const MS = store.get("quizMiss", []); $("#qz-miss").hidden = !MS.length; $("#qz-miss summary").textContent = `Review your misses (${MS.length})`;
+  $("#qz-miss-l").innerHTML = MS.slice().reverse().map(m => `<div class="quiz-q"><b style="color:var(--ink)">${m.q}</b><p class="why"><span class="up-t">Answer: ${m.r}</span> · <span class="muted">you picked ${m.y}</span><br>${m.w}</p></div>`).join("");
   const H = store.get("quizHist", []); $("#qz-hist").textContent = done === N ? `Done: ${score}/${N}. Hit "New quiz" for a fresh set.` : H.length ? `Last ${Math.min(5, H.length)}: ${H.slice(-5).map(h => h.c + "/" + h.n).join(" · ")}` : `${done}/${N} answered`;
 }
 function initLearn(){
@@ -2156,6 +2164,7 @@ function initLearn(){
   $("#dd-step").addEventListener("input", renderDD); renderDD();
   $("#cc-in").addEventListener("input", renderCC); renderCC();
   $("#qz").addEventListener("click", e => { const b = e.target.closest("[data-q]"); if (!b) return; const Z = quizState(); if (Z.a[b.dataset.q] != null) return; Z.a[b.dataset.q] = +b.dataset.a; store.set("quizSet", Z);
+    { const qq = Z.qs[+b.dataset.q]; if (+b.dataset.a !== qq[2]){ const MS = store.get("quizMiss", []); MS.push({q:qq[0], r:qq[1][qq[2]], y:qq[1][+b.dataset.a], w:qq[3]}); store.set("quizMiss", MS.slice(-25)); } }
     if (Object.keys(Z.a).length === Z.qs.length){ const c = Z.qs.filter((q, i) => Z.a[i] === q[2]).length; store.set("quizBest", Math.max(quizBest(), c)); const H = store.get("quizHist", []); H.push({c, n:Z.qs.length, at:Date.now()}); store.set("quizHist", H.slice(-50)); toast(`Quiz #${Z.n}: ${c}/${Z.qs.length}`); }
     renderQuiz(); });
   $("#qz-reset").onclick = () => { newQuiz(); renderQuiz(); $("#l-quiz").scrollIntoView({behavior:"smooth", block:"start"}); };
@@ -2657,31 +2666,48 @@ function gradeReplay(){
     <ul class="clean small" style="margin-top:10px">${notes.map(x => `<li>${x}</li>`).join("")}</ul><p class="small muted" style="margin-top:6px">Graded on signals at the checks inside your window (entries through ${etHM(Math.round((lastIdx - 1) * 5 + 570))} ET). SYS markers show the full-day system's trades. The score is matched trades ÷ (system trades + your extra trades). Entries within 10 minutes of the signal count as matched.</p>`;
 }
 /* ---- Signal drill ---- */
-const DR = {set:[], i:0, right:0, answered:false};
+const DR = {set:[], i:0, right:0, answered:false, mode:"mix"};
 function drBuild(){
-  const d = derived(), lastK = Math.max(0, Math.min(3, Math.floor((Math.min(d.weE, 720) - 30 - 600) / 30))), pool = [];
-  BT.replay.forEach((r, ri) => { if (r.nog || !r.ub) return; const D = decodeDay(r); for (let k = 0; k <= lastK; k++){ const bi = 5 + 6*k, c = D.c[bi]; pool.push({ri, k, ans: c > D.ub[k] ? 1 : c < D.lb[k] ? -1 : 0}); } });
-  const sig = pool.filter(x => x.ans !== 0), no = pool.filter(x => x.ans === 0), pick = (a, n) => { const out = []; for (let j = 0; j < n && a.length; j++) out.push(a.splice(Math.floor(Math.random()*a.length), 1)[0]); return out; };
-  DR.set = [...pick(sig, 11), ...pick(no, 9)].sort(() => Math.random() - .5); DR.i = 0; DR.right = 0; drShow();
+  const d = derived(), lastK = Math.max(0, Math.min(3, Math.floor((Math.min(d.weE, 720) - 30 - 600) / 30))), manK = Math.max(1, Math.min(4, Math.floor((Math.min(d.weE, 720) - 600) / 30))), pool = [], man = [];
+  BT.replay.forEach((r, ri) => { if (r.nog || !r.ub) return; const D = decodeDay(r);
+    for (let k = 0; k <= lastK; k++){ const bi = 5 + 6*k, c = D.c[bi]; const ans = c > D.ub[k] ? 1 : c < D.lb[k] ? -1 : 0; pool.push({t:"entry", ri, k, ans});
+      if (ans){ const e = D.o[bi + 1], stop = e - ans * d.safeStop;   // simulate managing from this entry
+        for (let k2 = k + 1; k2 <= manK; k2++){ const b2 = 5 + 6*k2; let hit = false; for (let i = bi + 1; i <= b2; i++) if (ans > 0 ? D.l[i] <= stop : D.h[i] >= stop) hit = true; if (hit) break;
+          const lvl = ans > 0 ? Math.max(D.ub[k2], D.vw[b2]) : Math.min(D.lb[k2], D.vw[b2]), ex = (D.c[b2] - lvl) * ans < 0;
+          man.push({t:"manage", ri, k:k2, k0:k, side:ans, entry:e, lvl, ans: ex ? 3 : 2}); if (ex) break; } } } });
+  const take = (a, n) => { const out = []; for (let j = 0; j < n && a.length; j++) out.push(a.splice(Math.floor(Math.random()*a.length), 1)[0]); return out; };
+  const sig = pool.filter(x => x.ans !== 0), no = pool.filter(x => x.ans === 0), hold = man.filter(x => x.ans === 2), exit = man.filter(x => x.ans === 3);
+  const m = DR.mode || "mix", nE = m === "entry" ? 20 : m === "manage" ? 0 : 12, nM = 20 - nE;
+  DR.set = shuffle([...take(sig, Math.round(nE * .55)), ...take(no, nE - Math.round(nE * .55)), ...take(hold, Math.ceil(nM / 2)), ...take(exit, Math.floor(nM / 2))]); DR.i = 0; DR.right = 0; drShow();
 }
 function drShow(){
-  const q = DR.set[DR.i]; if (!q) return; DR.answered = false; const D = decodeDay(BT.replay[q.ri]), n = 6 + 6*q.k;
-  const levels = []; for (let k = 0; k <= q.k; k++){ const i0 = 6*k + (k ? 0 : 0), i1 = Math.min(77, 6 + 6*k - 1); levels.push({y:D.ub[k], color:"var(--cyan)", i0: k ? 6*k : 0, i1, dash:"3 3", w:1.4, fit:k === q.k, hideOff:true, label: k === q.k ? "upper " + D.ub[k].toFixed(2) : ""}, {y:D.lb[k], color:"var(--cyan)", i0: k ? 6*k : 0, i1, dash:"3 3", w:1.4, fit:k === q.k, hideOff:true, label: k === q.k ? "lower " + D.lb[k].toFixed(2) : ""}); }
-  candles($("#dr-chart"), D, n, {vwap:true, levels, lastTag:true, slots:36});
-  $("#dr-q").innerHTML = `It's the <b>${etHM(600 + 30*q.k)}</b> check and you're flat. What do you do?`;
+  const q = DR.set[DR.i]; if (!q) return; DR.answered = false; const D = decodeDay(BT.replay[q.ri]), n = 6 + 6*q.k, man = q.t === "manage";
+  const levels = [], markers = [];
+  for (let k = 0; k <= q.k; k++){ const i0 = k ? 6*k : 0, i1 = Math.min(77, 6 + 6*k - 1), last = k === q.k;
+    levels.push({y:D.ub[k], color:"var(--cyan)", i0, i1, dash:"3 3", w:1.4, fit:last, hideOff:true, label: last ? "upper " + D.ub[k].toFixed(2) : ""}, {y:D.lb[k], color:"var(--cyan)", i0, i1, dash:"3 3", w:1.4, fit:last, hideOff:true, label: last ? "lower " + D.lb[k].toFixed(2) : ""}); }
+  if (man){ const ei = 6 + 6*q.k0; markers.push({i:ei, price:q.entry, dir:q.side, label:q.side > 0 ? "LONG" : "SHORT"}); levels.push({y:q.entry, color:"var(--ink)", i0:ei, dash:"4 3", w:1, fit:false, hideOff:true, label:"entry"}); }
+  candles($("#dr-chart"), D, n, {vwap:true, levels, markers, lastTag:true, slots:36});
+  $("#dr-q").innerHTML = man ? `It's the <b>${etHM(600 + 30*q.k)}</b> check. You're <b class="${q.side > 0 ? "up-t" : "down-t"}">${q.side > 0 ? "long" : "short"}</b> from ${etHM(600 + 30*q.k0)} at ${q.entry.toFixed(2)}. Hold or exit?` : `It's the <b>${etHM(600 + 30*q.k)}</b> check and you're flat. What do you do?`;
+  $$("#dr-card [data-dr]").forEach(b => { const v = +b.dataset.dr; b.hidden = man ? v < 2 : v >= 2; b.disabled = false; });
   $("#dr-prog").textContent = `Question ${DR.i + 1} / ${DR.set.length}`; $("#dr-score").innerHTML = `<span class="amb-t">${DR.right}/${DR.i}</span>`;
-  $("#dr-fb").hidden = true; $("#dr-next").disabled = true; $$("#dr-card [data-dr]").forEach(b => b.disabled = false);
+  $("#dr-fb").hidden = true; $("#dr-next").disabled = true;
 }
 function drAnswer(a){
-  if (DR.answered) return; DR.answered = true; const q = DR.set[DR.i], D = decodeDay(BT.replay[q.ri]), c = D.c[5 + 6*q.k], ok = a === q.ans; if (ok) DR.right++;
-  const why = q.ans === 1 ? `closed at ${c.toFixed(2)}, <b>above</b> the upper band ${D.ub[q.k].toFixed(2)} → long` : q.ans === -1 ? `closed at ${c.toFixed(2)}, <b>below</b> the lower band ${D.lb[q.k].toFixed(2)} → short` : `closed at ${c.toFixed(2)}, <b>inside</b> the bands (${D.lb[q.k].toFixed(2)}–${D.ub[q.k].toFixed(2)}) → no trade`;
-  const fb = $("#dr-fb"); fb.hidden = false; fb.className = "gate " + (ok ? "ok" : "stop"); fb.innerHTML = `<span class="dot ${ok ? "live" : "off"}"></span><div><strong>${ok ? "Correct" : "Not this time"}</strong><div class="small">The check candle ${why}. Ignore how the chart "looks". Only the close vs. the band counts.</div></div>`;
+  if (DR.answered) return; DR.answered = true; const q = DR.set[DR.i], D = decodeDay(BT.replay[q.ri]), bi = 5 + 6*q.k, c = D.c[bi], ok = a === q.ans; if (ok) DR.right++;
+  let why;
+  if (q.t === "manage"){ const vw = D.vw[bi], bd = q.side > 0 ? D.ub[q.k] : D.lb[q.k];
+    why = `Trail level = the ${q.side > 0 ? "higher" : "lower"} of band ${bd.toFixed(2)} and VWAP ${vw.toFixed(2)} → <b>${q.lvl.toFixed(2)}</b>. The check closed at ${c.toFixed(2)}, ${q.ans === 3 ? `<b>${q.side > 0 ? "below" : "above"}</b> it → exit.` : `still on the right side → <b>hold</b>. Exiting early is how most of this strategy's profit gets thrown away.`}`; }
+  else why = q.ans === 1 ? `The check candle closed at ${c.toFixed(2)}, <b>above</b> the upper band ${D.ub[q.k].toFixed(2)} → long.` : q.ans === -1 ? `The check candle closed at ${c.toFixed(2)}, <b>below</b> the lower band ${D.lb[q.k].toFixed(2)} → short.` : `The check candle closed at ${c.toFixed(2)}, <b>inside</b> the bands (${D.lb[q.k].toFixed(2)}–${D.ub[q.k].toFixed(2)}) → no trade.`;
+  const fb = $("#dr-fb"); fb.hidden = false; fb.className = "gate " + (ok ? "ok" : "stop"); fb.innerHTML = `<span class="dot ${ok ? "live" : "off"}"></span><div><strong>${ok ? "Correct" : "Not this time"}</strong><div class="small">${why} Only the check close counts, not how the chart "looks".</div></div>`;
   $$("#dr-card [data-dr]").forEach(b => b.disabled = true); $("#dr-next").disabled = false; $("#dr-score").innerHTML = `<span class="amb-t">${DR.right}/${DR.i + 1}</span>`;
-  if (DR.i === DR.set.length - 1){ const hist = KV.get("drill", []) || []; hist.push({c:DR.right, n:DR.set.length, at:Date.now()}); KV.set("drill", hist.slice(-50)); $("#dr-next").textContent = "Start a new set ▸";
+  if (DR.i === DR.set.length - 1){ const hist = KV.get("drill", []) || []; hist.push({c:DR.right, n:DR.set.length, at:Date.now(), m:DR.mode || "mix"}); KV.set("drill", hist.slice(-50)); $("#dr-next").textContent = "Start a new set ▸";
     toast(`Set done: ${DR.right}/${DR.set.length} (${Math.round(DR.right/DR.set.length*100)}%)`); }
 }
 function initDrill(){
-  $("#dr-card").addEventListener("click", e => { const b = e.target.closest("[data-dr]"); if (b) drAnswer(+b.dataset.dr); });
+  $("#dr-card").addEventListener("click", e => { const b = e.target.closest("[data-dr]"); if (b) drAnswer(+b.dataset.dr);
+    const m = e.target.closest("[data-m]"); if (m){ DR.mode = m.dataset.m; $$("#dr-mode button").forEach(x => x.setAttribute("aria-pressed", x === m)); $("#dr-next").textContent = "Next question ▸"; drBuild(); } });
+  document.addEventListener("keydown", e => { if (current !== "replay" || e.target.closest("input,select,textarea") || e.ctrlKey || e.metaKey || e.altKey) return; const card = $("#dr-card"), r = card.getBoundingClientRect(); if (r.bottom < 0 || r.top > innerHeight) return;
+    if (e.key === "Enter" && !$("#dr-next").disabled){ e.preventDefault(); $("#dr-next").click(); } });
   $("#dr-next").onclick = () => { if (DR.i >= DR.set.length - 1){ $("#dr-next").textContent = "Next question ▸"; drBuild(); } else { DR.i++; drShow(); } };
   drBuild();
 }
@@ -2995,6 +3021,20 @@ function initMe(){
   fillProfileForm();
   $("#pf-save").onclick = () => { KV.set("profile", readProfileForm()); store.set("limits", null); applyProfile(); fillProfileForm(); renderSideAcct(); toast("Profile saved. Your plan, checklist and cockpit are updated."); };
   $("#pf").addEventListener("input", () => { $("#pf-saved").className = "pill amb"; $("#pf-saved").textContent = "Unsaved changes"; });
+}
+function backupData(){ const o = {}; for (let i = 0; i < localStorage.length; i++){ const k = localStorage.key(i); if (k && k.startsWith("nqdesk:")) o[k] = localStorage.getItem(k); } return o; }
+function initBackup(){
+  const last = store.get("backupAt", null); $("#bk-note").textContent = last ? `Last backup: ${new Date(last).toLocaleDateString()}` : "No backup yet.";
+  $("#bk-save").onclick = () => { try{ const blob = new Blob([JSON.stringify({app:"nqdesk", v:1, at:new Date().toISOString(), data:backupData()}, null, 1)], {type:"application/json"}), a = document.createElement("a");
+      a.href = URL.createObjectURL(blob); a.download = `nq-desk-backup-${todayNY()}.json`; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+      store.set("backupAt", Date.now()); $("#bk-note").textContent = "Backup downloaded."; }catch(e){ toast("Download blocked here. Try the app in a normal browser tab."); } };
+  $("#bk-load").onchange = async e => { const f = e.target.files[0]; if (!f) return;
+    try{ const j = JSON.parse(await f.text()); if (j.app !== "nqdesk" || !j.data) throw 0; const n = Object.keys(j.data).length;
+      if (!confirm(`Restore ${n} saved items from ${String(j.at).slice(0,10)}? This replaces what's in this browser.`)) return;
+      Object.entries(j.data).forEach(([k, v]) => { if (k.startsWith("nqdesk:")) localStorage.setItem(k, v); });
+      Object.keys(j.data).filter(k => k.startsWith("nqdesk:kv:")).forEach(k => { try{ KV.set(k.slice(10), JSON.parse(j.data[k])); }catch{} });
+      toast("Restored. Reloading…"); setTimeout(() => location.reload(), 700); }
+    catch{ toast("That file isn't an NQ Desk backup."); } e.target.value = ""; };
 }
 function progress(){
   const Zq = store.get("quizSet", null), cur = Zq ? Zq.qs.filter((q, i) => Zq.a[i] === q[2]).length : 0, qs = Math.max(quizBest(), cur);
@@ -3523,7 +3563,7 @@ function init(){
     const tr = e.target.closest("tr[data-k]"); if (tr){ selStrat = tr.dataset.k; renderDetail(); if (innerWidth < 980) $("#detail").scrollIntoView({behavior:"smooth"}); } });
   $("#lb").addEventListener("keydown", e => { const tr = e.target.closest("tr[data-k]"); if (tr && (e.key === "Enter" || e.key === " ")){ e.preventDefault(); selStrat = tr.dataset.k; renderDetail(); } });
   $("#ex-win").onclick = () => { exKind = "win"; renderExample(); }; $("#ex-loss").onclick = () => { exKind = "loss"; renderExample(); };
-  initToday(); initReplay(); initTools(); initJournal(); initCockpit(); initMe(); initCmd(); renderSideAcct(); buildNav();
+  initToday(); initReplay(); initTools(); initJournal(); initCockpit(); initMe(); initCmd(); renderSideAcct(); initBackup(); buildNav();
   const h = (location.hash || "").slice(1);
   ready = true;
   showTab(h === "cockpit" ? "today" : TABS.includes(h) ? h : store.get("tab", "home"));
