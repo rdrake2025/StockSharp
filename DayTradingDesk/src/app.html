@@ -292,6 +292,94 @@ body.compact .clock{font-size:28px}
 footer.foot{margin-top:48px;padding-top:18px;border-top:1px solid var(--line);color:var(--faint);font-size:12.5px;max-width:95ch}
 @media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}.draw{stroke-dashoffset:0}}
 @media (max-width:640px){.clockmini{display:none}nav.tabs{margin-left:0;width:100%}nav.tabs button kbd{display:none}.big-out{font-size:36px}.rule{grid-template-columns:1fr;gap:2px}}
+
+/* ===================== Pro shell & refined visual system ===================== */
+:root{--bg:#070B14;--surface:#0D1322;--surface-2:#121A2E;--raise:#172039;--line:#1A2440;--line-2:#253257;--grid:#111A30;--side:#0A0F1C;--r:12px}
+body{background:var(--bg);background-image:radial-gradient(1200px 600px at 70% -20%, rgba(76,214,255,.06), transparent 60%),radial-gradient(900px 500px at 10% -10%, rgba(255,170,60,.06), transparent 60%);font-size:14.5px}
+.app{display:grid;grid-template-columns:236px minmax(0,1fr);min-height:100vh}
+.side{position:sticky;top:0;height:100vh;display:flex;flex-direction:column;gap:6px;padding:18px 12px;background:var(--side);border-right:1px solid var(--line);overflow-y:auto}
+.side .brand{display:flex;align-items:center;gap:10px;padding:4px 8px 16px;text-decoration:none}
+.side .logo{width:32px;height:32px;border-radius:9px;box-shadow:0 0 0 1px rgba(255,255,255,.08),0 6px 18px -6px rgba(255,160,60,.6)}
+.bname b{display:block;font:800 16px/1.1 var(--display);font-stretch:112%;color:var(--ink)}
+.bname small{display:block;font:600 10.5px/1.3 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--amber)}
+.side nav.tabs{display:flex;flex-direction:column;gap:2px;margin:0;overflow:visible}
+.nav-label{font:700 10px/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--faint);padding:14px 10px 6px}
+.side nav.tabs button{display:grid;grid-template-columns:20px 1fr auto;gap:10px;align-items:center;width:100%;padding:8px 10px;border-radius:8px;border:1px solid transparent;color:var(--muted);font-weight:600;font-size:13.5px;text-align:left;background:none;box-shadow:none;position:relative}
+.side nav.tabs button:hover{background:var(--surface-2);color:var(--ink)}
+.side nav.tabs button[aria-selected="true"]{background:linear-gradient(90deg,rgba(255,181,71,.14),rgba(255,181,71,.03));color:var(--ink);border-color:rgba(255,181,71,.22);box-shadow:none}
+.side nav.tabs button[aria-selected="true"]::before{content:"";position:absolute;left:-12px;top:8px;bottom:8px;width:3px;border-radius:0 3px 3px 0;background:var(--amber);box-shadow:0 0 12px var(--amber)}
+.side nav.tabs button[aria-selected="true"] .ni{color:var(--amber)}
+.side nav.tabs .ni{width:18px;height:18px}
+.side nav.tabs kbd{font:600 10px/1 var(--mono);color:var(--faint);border:1px solid var(--line-2);border-radius:4px;padding:2px 5px;background:none}
+.side nav.tabs button[aria-selected="true"] kbd{color:var(--amber);border-color:rgba(255,181,71,.35)}
+.side-foot{margin-top:auto;padding:12px;border:1px solid var(--line);border-radius:10px;background:var(--surface);font-size:12.5px}
+.side-foot .who{display:flex;align-items:center;gap:8px;font-weight:700;color:var(--ink)}
+.side-foot .av{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;background:linear-gradient(135deg,var(--violet),var(--cyan));color:#06101F;font:800 12px/1 var(--display)}
+.side-foot .mini{height:5px;border-radius:3px;background:var(--surface-2);margin-top:8px;overflow:hidden}
+.side-foot .mini i{display:block;height:100%;background:linear-gradient(90deg,var(--amber),var(--up))}
+.main{min-width:0}
+header.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:30;background:rgba(7,11,20,.85);backdrop-filter:blur(14px) saturate(140%);border-bottom:1px solid var(--line)}
+.top-inner{max-width:1320px;margin:0 auto;padding:12px clamp(16px,3vw,32px);display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.crumb{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted)}
+.crumb b{color:var(--ink);font:750 15px/1 var(--display);font-stretch:108%}
+.crumb .sep{color:var(--faint)}
+.top-right{margin-left:auto;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.chip-stat{display:inline-flex;align-items:center;gap:7px;padding:6px 10px;border:1px solid var(--line);border-radius:8px;background:var(--surface);font-size:12.5px;font-weight:600;color:var(--text);white-space:nowrap}
+.chip-stat.mono{font-family:var(--mono);font-size:12px}
+.search-btn{display:inline-flex;align-items:center;gap:8px;padding:6px 8px 6px 10px;border:1px solid var(--line-2);border-radius:8px;background:var(--surface-2);color:var(--muted);cursor:pointer;font-size:12.5px;font-weight:600}
+.search-btn svg{width:15px;height:15px}
+.search-btn:hover{color:var(--ink);border-color:var(--muted)}
+.search-btn kbd,.cmd kbd{font:600 10px/1 var(--mono);border:1px solid var(--line-2);border-radius:4px;padding:3px 5px;color:var(--faint)}
+.ticker{background:transparent;border-bottom:0;border-top:1px solid var(--line);opacity:.85}
+.ticker-track{font-size:11.5px;padding:6px 0;animation-duration:110s}
+.wrap{max-width:1320px}
+section.panel{padding-top:22px}
+h2{font-size:clamp(22px,2.4vw,30px);font-stretch:112%}
+.hero h1{font-size:clamp(28px,4vw,44px)}
+.lede{font-size:15px;color:var(--muted)}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);box-shadow:0 1px 0 rgba(255,255,255,.02) inset,0 8px 24px -16px rgba(0,0,0,.6)}
+.card.hot{background:linear-gradient(180deg,rgba(23,32,57,.9),var(--surface)) padding-box,linear-gradient(135deg,rgba(255,181,71,.55),rgba(255,181,71,.08) 35%,rgba(76,214,255,.35)) border-box;border:1px solid transparent;box-shadow:0 12px 36px -18px rgba(255,160,60,.35)}
+.stats{border-radius:10px}
+.stat{background:var(--surface)}
+.stat small{letter-spacing:.1em}
+.table-wrap{background:var(--surface);border-radius:10px}
+th{background:var(--surface-2)}
+.glow-up{text-shadow:0 0 12px rgba(43,227,160,.3)} .glow-down{text-shadow:0 0 12px rgba(255,90,122,.3)}
+.btn{border-radius:8px;font-size:13.5px;padding:9px 14px}
+.chip{font-size:13px;padding:6px 11px}
+.eyebrow{font-size:10.5px;letter-spacing:.14em}
+.gate{border-radius:10px}
+.step{background:var(--surface)}
+/* command palette */
+.cmd{position:fixed;inset:0;z-index:60;background:rgba(3,6,12,.6);backdrop-filter:blur(4px);display:grid;place-items:start center;padding:12vh 16px 16px}
+.cmd[hidden]{display:none!important}
+.cmd-box{width:min(640px,100%);background:var(--surface);border:1px solid var(--line-2);border-radius:14px;box-shadow:0 30px 80px -20px rgba(0,0,0,.8);overflow:hidden}
+.cmd-in{display:flex;align-items:center;gap:10px;padding:14px 16px;border-bottom:1px solid var(--line)}
+.cmd-in svg{width:18px;height:18px;color:var(--muted);flex:none}
+.cmd-in input{flex:1;background:none;border:0;padding:4px 0;font-size:16px;color:var(--ink)}
+.cmd-in input:focus{outline:none}
+.cmd-list{max-height:52vh;overflow-y:auto;padding:6px}
+.cmd-grp{font:700 10px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--faint);padding:10px 10px 6px}
+.cmd-it{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;padding:9px 10px;border-radius:8px;cursor:pointer;color:var(--text);font-size:14px}
+.cmd-it small{color:var(--muted);font-size:12px}
+.cmd-it[aria-selected="true"]{background:var(--raise);color:var(--ink)}
+.cmd-foot{display:flex;gap:16px;padding:10px 16px;border-top:1px solid var(--line);font-size:12px;color:var(--muted)}
+.cmd-foot kbd{margin-right:3px}
+/* responsive shell */
+@media (max-width:900px){
+  .app{grid-template-columns:1fr}
+  .side{position:sticky;top:0;z-index:40;height:auto;flex-direction:row;align-items:center;padding:8px 12px;border-right:0;border-bottom:1px solid var(--line);overflow-x:auto;overflow-y:hidden}
+  .side .brand{padding:0 6px 0 0}
+  .bname,.nav-label,.side-foot,.side nav.tabs kbd{display:none}
+  .side nav.tabs{flex-direction:row;gap:4px}
+  .side nav.tabs button{grid-template-columns:18px auto;width:auto;white-space:nowrap;padding:7px 10px}
+  .side nav.tabs button[aria-selected="true"]::before{display:none}
+  header.top{top:52px}
+  .cp-hide-sm,.search-btn span,.search-btn kbd{display:none}
+}
+body.compact .side{display:none}
+body.compact .app{grid-template-columns:1fr}
+body.compact .ticker,body.compact #top-front,body.compact .search-btn span,body.compact .search-btn kbd{display:none}
 </style>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><defs>
@@ -302,29 +390,42 @@ footer.foot{margin-top:48px;padding-top:18px;border-top:1px solid var(--line);co
   <linearGradient id="bandHot" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#2BE3A0"/><stop offset="1" stop-color="#4CD6FF"/></linearGradient>
   <filter id="glow" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
 </defs></svg>
+<div class="app">
+<aside class="side" aria-label="Main navigation">
+  <a class="brand" href="#today" data-go="today" aria-label="NQ Desk home">
+    <span class="logo"><svg viewBox="0 0 18 18" fill="none" stroke="#1A1203" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 13l4-4 3 3 7-8"/><path d="M12 4h4v4"/></svg></span>
+    <span class="bname"><b>NQ Desk</b><small>Pro · personal</small></span>
+  </a>
+  <nav class="tabs" role="tablist" aria-label="Sections">
+    <div class="nav-label">Trade</div>
+    <button role="tab" data-tab="plan" id="t-plan"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v16H4z"/><path d="M8 9h8M8 13h8M8 17h5"/></svg><span>My plan</span><kbd>1</kbd></button>
+    <button role="tab" data-tab="today" id="t-today"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"/><path d="M12 12l4-3"/><path d="M12 4v2M4 12h2M18 12h2"/></svg><span>Cockpit</span><kbd>2</kbd></button>
+    <button role="tab" data-tab="edge" id="t-edge"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l5-5 4 4 8-9"/><path d="M15 7h5v5"/></svg><span>Edge tools</span><kbd>3</kbd></button>
+    <button role="tab" data-tab="journal" id="t-journal"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h11a2 2 0 012 2v16H8a2 2 0 01-2-2z"/><path d="M6 19a2 2 0 012-2h11"/><path d="M10 8h6"/></svg><span>Journal</span><kbd>4</kbd></button>
+    <div class="nav-label">Research</div>
+    <button role="tab" data-tab="lab" id="t-lab"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3v6L4 19a1 1 0 001 2h14a1 1 0 001-2L15 9V3"/><path d="M8 3h8"/><path d="M7 15h10"/></svg><span>Backtest Lab</span><kbd>5</kbd></button>
+    <button role="tab" data-tab="fleet" id="t-fleet"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="7" r="2.5"/><circle cx="18" cy="7" r="2.5"/><circle cx="12" cy="17" r="2.5"/><path d="M8 8.5l2.8 6.3M16 8.5l-2.8 6.3M8.5 7h7"/></svg><span>Research fleet</span><kbd>6</kbd></button>
+    <button role="tab" data-tab="prop" id="t-prop"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 4v5c0 4.5-3 8-7 9-4-1-7-4.5-7-9V7z"/><path d="M9 12l2 2 4-4"/></svg><span>Prop eval</span><kbd>7</kbd></button>
+    <div class="nav-label">Practice</div>
+    <button role="tab" data-tab="learn" id="t-learn"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8l9-4 9 4-9 4z"/><path d="M7 10v5c0 1.5 2.5 3 5 3s5-1.5 5-3v-5"/></svg><span>Learn</span><kbd>8</kbd></button>
+    <button role="tab" data-tab="replay" id="t-replay"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12a8 8 0 108-8"/><path d="M4 4v5h5"/><path d="M11 9l4 3-4 3z"/></svg><span>Replay</span><kbd>9</kbd></button>
+    <button role="tab" data-tab="tools" id="t-tools"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20l6-6"/><path d="M14 4a6 6 0 00-4 10l6 6 4-4-6-6a6 6 0 00-0-6z"/></svg><span>Risk tools</span><kbd>0</kbd></button>
+  </nav>
+  <div class="side-foot" id="side-acct"></div>
+</aside>
+<div class="main">
 <header class="top">
   <div class="top-inner">
-    <a class="brand" href="#today" data-go="today" aria-label="NQ Desk home">
-      <span class="logo"><svg viewBox="0 0 18 18" fill="none" stroke="#1A1203" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 13l4-4 3 3 7-8"/><path d="M12 4h4v4"/></svg></span>
-      <b>NQ DESK</b>
-    </a>
-    <span class="clockmini"><span class="dot" id="mini-dot"></span><span id="mini-clk">--:-- ET</span></span>
-    <nav class="tabs" role="tablist" aria-label="Sections">
-      <button role="tab" data-tab="plan" id="t-plan"><kbd>1</kbd>My plan</button>
-      <button role="tab" data-tab="today" id="t-today"><kbd>2</kbd>Cockpit</button>
-      <button role="tab" data-tab="edge" id="t-edge"><kbd>3</kbd>Edge tools</button>
-      <button role="tab" data-tab="lab" id="t-lab"><kbd>4</kbd>Backtest Lab</button>
-      <button role="tab" data-tab="fleet" id="t-fleet"><kbd>5</kbd>Research fleet</button>
-      <button role="tab" data-tab="prop" id="t-prop"><kbd>6</kbd>Prop eval</button>
-      <button role="tab" data-tab="learn" id="t-learn"><kbd>7</kbd>Learn</button>
-      <button role="tab" data-tab="replay" id="t-replay"><kbd>8</kbd>Replay</button>
-      <button role="tab" data-tab="tools" id="t-tools"><kbd>9</kbd>Risk tools</button>
-      <button role="tab" data-tab="journal" id="t-journal"><kbd>0</kbd>Journal</button>
-    </nav>
+    <div class="crumb"><span id="pg-group">Trade</span><span class="sep">/</span><b id="pg-title">Cockpit</b></div>
+    <div class="top-right">
+      <span class="chip-stat" id="top-phase"><span class="dot" id="mini-dot"></span><span id="mini-phase">—</span></span>
+      <span class="chip-stat mono" id="mini-clk">--:-- ET</span>
+      <span class="chip-stat mono cp-hide-sm" id="top-front"></span>
+      <button class="search-btn" id="cmd-open" aria-label="Search and jump"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg><span>Search</span><kbd>Ctrl K</kbd></button>
+    </div>
   </div>
   <div class="ticker" aria-label="Backtest highlights"><div class="ticker-track" id="ticker"></div></div>
 </header>
-
 <div class="wrap">
 
 <!-- ======================= MY PLAN ======================= -->
@@ -1066,7 +1167,16 @@ footer.foot{margin-top:48px;padding-top:18px;border-top:1px solid var(--line);co
 
 <footer class="foot">Educational tool, not investment advice. Backtests use historical 1-minute NQ futures data from a public community dataset (Hugging Face: mdelcristo/NQ-F_1min_OHLCV_Parquet), not verified against CME records. Past performance does not predict future results. Futures trading involves substantial risk of loss. Verify contract specs, margins and taxes with CME Group, your broker and a tax professional.</footer>
 </div>
+</div>
+</div>
 <div class="toast" id="toast" hidden></div>
+<div class="cmd" id="cmd" hidden role="dialog" aria-modal="true" aria-label="Search">
+  <div class="cmd-box">
+    <div class="cmd-in"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg><input id="cmd-q" type="text" placeholder="Jump to a page, strategy, term or action…" autocomplete="off"><kbd>Esc</kbd></div>
+    <div class="cmd-list" id="cmd-list" role="listbox"></div>
+    <div class="cmd-foot"><span><kbd>↑</kbd><kbd>↓</kbd> move</span><span><kbd>Enter</kbd> open</span><span><kbd>Ctrl K</kbd> toggle</span></div>
+  </div>
+</div>
 
 <script type="application/json" id="btdata">/*BTDATA*/</script>
 <script>
@@ -1124,13 +1234,14 @@ function hover(svg, getInfo){
 }
 
 /* ================= Tabs & keyboard ================= */
-const TABS = ["plan","today","edge","lab","fleet","prop","learn","replay","tools","journal"];
+const TABS = ["plan","today","edge","journal","lab","fleet","prop","learn","replay","tools"];
+const PAGES = {plan:["Trade","My plan"], today:["Trade","Cockpit"], edge:["Trade","Edge tools"], journal:["Trade","Journal"], lab:["Research","Backtest Lab"], fleet:["Research","Research fleet"], prop:["Research","Prop eval"], learn:["Practice","Learn"], replay:["Practice","Replay"], tools:["Practice","Risk tools"]};
 let current = "today", ready = false;
 function showTab(t){
   if (!TABS.includes(t)) t = "plan"; current = t;
   $$("nav.tabs button").forEach(b => b.setAttribute("aria-selected", b.dataset.tab === t));
   $$("section.panel").forEach(p => p.classList.toggle("active", p.id === "p-"+t));
-  store.set("tab", t);
+  store.set("tab", t); $("#pg-group").textContent = PAGES[t][0]; $("#pg-title").textContent = PAGES[t][1]; document.title = PAGES[t][1] + " · NQ Desk"; window.scrollTo({top:0});
   if (t === "journal") renderJournal();
   if (t === "today"){ renderGate(); renderEval(); renderTicket(); }
   if (t === "plan") renderPlan();
@@ -1200,7 +1311,8 @@ function tick(){
   $("#clk").textContent = `${hh}:${mm}:${String(n.s).padStart(2,"0")} ET`;
   $("#mini-clk").textContent = `${hh}:${mm} ET`;
   const p = currentPhase(n);
-  if (p.name !== tick.last){ $("#phase-name").textContent = p.name; $("#phase-tip").textContent = p.tip; $("#phase-dot").className = $("#mini-dot").className = "dot " + p.k; tick.last = p.name; }
+  if (p.name !== tick.last){ $("#phase-name").textContent = p.name; $("#phase-tip").textContent = p.tip; $("#phase-dot").className = $("#mini-dot").className = "dot " + p.k; $("#mini-phase").textContent = p.name; tick.last = p.name; }
+  if (ready && n.s % 10 === 0) renderSideAcct();
   if (n.s === 0 || !tick.drawn){ drawTape(); tick.drawn = true; if (ready && current === "today") { renderNoise(); } }
   if (ready && current === "today"){ renderNext(); renderGate(); if (store.get("ticket", null)) renderTicket(); else if (n.s % 15 === 0) renderTicket(); }
 }
@@ -1218,6 +1330,7 @@ function contracts(){
 }
 function renderContracts(){
   const {list, front, today} = contracts();
+  $("#top-front").textContent = `NQ${front.code} · rolls ${pretty(front.roll).replace(/, \d{4}$/,"")}`;
   $("#front-month").innerHTML = `Front month<br><b class="mono amb-t" style="font-size:15px">NQ${front.code} · MNQ${front.code}</b><br>rolls ~${pretty(front.roll)}`;
   $("#cal-body").innerHTML = list.map(c => {
     let st = `<span class="pill">Upcoming</span>`;
@@ -2581,6 +2694,51 @@ function renderTicker(){
   $("#ticker").innerHTML = items.join("") + items.join("");
 }
 
+/* ================= Sidebar account card ================= */
+function renderSideAcct(){
+  const box = $("#side-acct"); if (!box) return;
+  const hasP = !!KV.get("profile", null), p = profile(), c = evalCalc(parseFloat($("#ev-now")?.value)), prog = Math.max(0, Math.min(1, c.prof / c.S.target));
+  const nm = p.name || "Your account", st = c.state === "passed" ? `<span class="up-t">Passed</span>` : c.state === "failed" ? `<span class="down-t">Failed</span>` : c.days ? `Day ${c.days}` : "Not started";
+  box.innerHTML = `<div class="who"><span class="av">${esc((p.name || "Y").charAt(0).toUpperCase())}</span><span>${esc(nm)}</span></div>
+    <div class="muted" style="margin-top:8px">LucidFlex ${c.size} · ${st}</div>
+    ${c.days ? `<div class="mini"><i style="width:${Math.round(prog*100)}%"></i></div><div class="muted" style="margin-top:6px">${money0(c.prof,1)} of ${money0(c.S.target)} · room ${money0(c.now - c.mll)}</div>` : `<a href="#plan" data-go="${hasP ? "today" : "plan"}" style="display:inline-block;margin-top:8px;font-weight:600">${hasP ? "Log your eval in the cockpit →" : "Set up your profile →"}</a>`}`;
+}
+
+/* ================= Command palette ================= */
+let cmdItems = [], cmdSel = 0;
+function cmdBuild(q){
+  q = (q || "").trim().toLowerCase(); const out = [];
+  Object.entries(PAGES).forEach(([k,[g,t]]) => out.push({grp:"Pages", label:t, sub:g, run:() => showTab(k)}));
+  [["Toggle side-by-side mode", "Cockpit", () => { showTab("today"); $("#cp-compact").click(); }], ["Start a new replay session", "Practice", () => { showTab("replay"); newSession(); }],
+   ["Log a trade", "Journal", () => { showTab("journal"); setTimeout(() => $("#jf-entry").focus(), 50); }], ["Turn sound alerts on/off", "Cockpit", () => { showTab("today"); $("#cp-sound").click(); }],
+   ["Edit my profile", "My plan", () => { showTab("plan"); setTimeout(() => $("#pf-name").focus(), 50); }], ["Run the expectancy simulator", "Risk tools", () => { showTab("tools"); }]]
+    .forEach(([l, s2, run]) => out.push({grp:"Actions", label:l, sub:s2, run}));
+  BT.strats.forEach(st => out.push({grp:"Strategies", label:st.name, sub:`${VNAME[st.verdict]} · PF ${st.all.pf.toFixed(2)}`, run:() => { selStrat = st.key; showTab("lab"); renderDetail(); setTimeout(() => $("#detail").scrollIntoView({behavior:"smooth"}), 60); }}));
+  GLOSS.forEach(g => out.push({grp:"Key terms", label:g[0], sub:g[1], run:() => { showTab("learn"); setTimeout(() => { $("#gl-q").value = g[0]; glCat = "All"; renderGloss(); $("#l-terms").scrollIntoView({behavior:"smooth"}); }, 60); }}));
+  const f = q ? out.filter(x => (x.label + " " + x.sub + " " + x.grp).toLowerCase().includes(q)) : out.filter(x => x.grp === "Pages" || x.grp === "Actions");
+  return f.slice(0, 40);
+}
+function cmdRender(){
+  cmdItems = cmdBuild($("#cmd-q").value); cmdSel = Math.min(cmdSel, Math.max(0, cmdItems.length - 1)); let last = "", h = "";
+  cmdItems.forEach((x,i) => { if (x.grp !== last){ h += `<div class="cmd-grp">${x.grp}</div>`; last = x.grp; } h += `<div class="cmd-it" role="option" data-i="${i}" aria-selected="${i === cmdSel}"><span>${esc(x.label)}</span><small>${esc(x.sub)}</small></div>`; });
+  $("#cmd-list").innerHTML = h || `<div class="cmd-grp">No matches</div>`;
+  const selEl = $("#cmd-list [aria-selected='true']"); if (selEl) selEl.scrollIntoView({block:"nearest"});
+}
+function cmdOpen(){ $("#cmd").hidden = false; $("#cmd-q").value = ""; cmdSel = 0; cmdRender(); $("#cmd-q").focus(); }
+function cmdClose(){ $("#cmd").hidden = true; }
+function cmdRun(i){ const x = cmdItems[i]; if (!x) return; cmdClose(); x.run(); }
+function initCmd(){
+  $("#cmd-open").onclick = cmdOpen;
+  $("#cmd").addEventListener("click", e => { if (e.target.id === "cmd") cmdClose(); const it = e.target.closest(".cmd-it"); if (it) cmdRun(+it.dataset.i); });
+  $("#cmd-q").addEventListener("input", () => { cmdSel = 0; cmdRender(); });
+  $("#cmd-q").addEventListener("keydown", e => {
+    if (e.key === "ArrowDown"){ e.preventDefault(); cmdSel = Math.min(cmdItems.length - 1, cmdSel + 1); cmdRender(); }
+    else if (e.key === "ArrowUp"){ e.preventDefault(); cmdSel = Math.max(0, cmdSel - 1); cmdRender(); }
+    else if (e.key === "Enter"){ e.preventDefault(); cmdRun(cmdSel); }
+    else if (e.key === "Escape"){ cmdClose(); } });
+  document.addEventListener("keydown", e => { if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "k"){ e.preventDefault(); $("#cmd").hidden ? cmdOpen() : cmdClose(); } else if (e.key === "/" && !e.target.closest("input,select,textarea")){ e.preventDefault(); cmdOpen(); } });
+}
+
 /* ================= Boot ================= */
 function init(){
   renderTicker(); tick(); setInterval(tick, 1000);
@@ -2593,7 +2751,7 @@ function init(){
     const tr = e.target.closest("tr[data-k]"); if (tr){ selStrat = tr.dataset.k; renderDetail(); if (innerWidth < 980) $("#detail").scrollIntoView({behavior:"smooth"}); } });
   $("#lb").addEventListener("keydown", e => { const tr = e.target.closest("tr[data-k]"); if (tr && (e.key === "Enter" || e.key === " ")){ e.preventDefault(); selStrat = tr.dataset.k; renderDetail(); } });
   $("#ex-win").onclick = () => { exKind = "win"; renderExample(); }; $("#ex-loss").onclick = () => { exKind = "loss"; renderExample(); };
-  initToday(); initReplay(); initTools(); initJournal(); initCockpit();
+  initToday(); initReplay(); initTools(); initJournal(); initCockpit(); initCmd(); renderSideAcct();
   const h = (location.hash || "").slice(1);
   ready = true;
   showTab(h === "cockpit" ? "today" : TABS.includes(h) ? h : store.get("tab", store.get("kv:profile", null) ? "today" : "plan"));
