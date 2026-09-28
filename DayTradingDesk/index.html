@@ -399,6 +399,7 @@ body.compact .ticker,body.compact #top-front,body.compact .search-btn span,body.
   <nav class="tabs" role="tablist" aria-label="Sections">
     <div class="nav-label">Trade</div>
     <button role="tab" data-tab="plan" id="t-plan"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v16H4z"/><path d="M8 9h8M8 13h8M8 17h5"/></svg><span>My plan</span><kbd>1</kbd></button>
+    <button role="tab" data-tab="me" id="t-me"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0116 0"/></svg><span>My profile</span><kbd>P</kbd></button>
     <button role="tab" data-tab="today" id="t-today"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"/><path d="M12 12l4-3"/><path d="M12 4v2M4 12h2M18 12h2"/></svg><span>Cockpit</span><kbd>2</kbd></button>
     <button role="tab" data-tab="edge" id="t-edge"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l5-5 4 4 8-9"/><path d="M15 7h5v5"/></svg><span>Edge tools</span><kbd>3</kbd></button>
     <button role="tab" data-tab="journal" id="t-journal"><svg class="ni" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h11a2 2 0 012 2v16H8a2 2 0 01-2-2z"/><path d="M6 19a2 2 0 012-2h11"/><path d="M10 8h6"/></svg><span>Journal</span><kbd>4</kbd></button>
@@ -445,21 +446,17 @@ body.compact .ticker,body.compact #top-front,body.compact .search-btn span,body.
       <div style="overflow-x:auto"><svg class="chart" id="pl-hours" viewBox="0 0 760 150" role="img" aria-label="Your hours versus the market"></svg></div>
       <div id="pl-checks" class="small"></div>
     </div>
-    <div class="card">
-      <div class="card-h"><h3>My profile</h3><span class="pill" id="pf-saved">Not saved yet</span></div>
-      <form class="form" id="pf" autocomplete="off" style="margin-top:10px">
-        <label class="f">First name<input id="pf-name" type="text" placeholder="optional"></label>
-        <label class="f">Your time zone<select id="pf-tz"></select></label>
-        <label class="f">Experience<select id="pf-exp"><option value="new">Brand new</option><option value="some">Some sim / paper trading</option><option value="live">Traded live before</option></select></label>
-        <label class="f">Money free each month ($)<input id="pf-free" type="number" class="mono" min="0" step="10"></label>
-        <label class="f">Can trade from (your time)<input id="pf-ws" type="time"></label>
-        <label class="f">Until (your time)<input id="pf-we" type="time"></label>
-        <label class="f" style="grid-column:1/-1">Busy blocks (your time, e.g. 08:00-09:30, 16:00-18:00)<input id="pf-busy" type="text" class="mono"></label>
-        <label class="f">Eval account<select id="pf-size"><option>25K</option><option selected>50K</option><option>100K</option><option>150K</option></select></label>
-        <label class="f">Priority<select id="pf-pace"><option value="safe">Don't fail (slower)</option><option value="balanced">Balanced</option><option value="fast">Pass faster (riskier)</option></select></label>
-      </form>
-      <p class="small muted" id="pf-note" style="margin-top:10px"></p>
-      <div class="row" style="margin-top:10px"><button class="btn primary" id="pf-save">Save my profile</button></div>
+    <div class="grid" style="align-content:start">
+      <div class="card">
+        <div class="card-h"><div><div class="eyebrow">Launch checklist</div><h3 style="margin-top:6px" id="lc-head">0% ready</h3></div><span class="score" id="lc-score"></span></div>
+        <div class="meter" style="margin-top:10px"><i id="lc-meter" style="width:0%"></i></div>
+        <p class="small" id="lc-next" style="margin-top:10px"></p>
+        <a class="btn" href="#launch" data-jump="lc-card" style="margin-top:6px">Open the checklist ↓</a>
+      </div>
+      <div class="card">
+        <div class="card-h"><h3>About you</h3><button class="btn ghost" data-go="me">Edit profile →</button></div>
+        <dl class="kv" id="pl-me" style="margin-top:8px"></dl>
+      </div>
     </div>
   </div>
 
@@ -481,10 +478,70 @@ body.compact .ticker,body.compact #top-front,body.compact .search-btn span,body.
     <div class="rm" id="pl-road" style="margin-top:12px"></div>
   </div>
 
+  <div class="card" style="margin-top:16px" id="lc-card">
+    <div class="card-h"><div><div class="eyebrow">Launch checklist · from here to your first payout</div><h3 style="margin-top:6px">Everything to do, in order</h3></div><span class="pill" id="lc-pill"></span></div>
+    <p class="small muted">Steps marked <span class="pill cy" style="font-size:9px">auto</span> tick themselves when you do them in the app. "Every eval day" resets each morning. Your ticks are saved to the page's database.</p>
+    <div class="grid g2" id="lc-groups" style="margin-top:12px"></div>
+  </div>
+
   <div class="card" style="margin-top:16px">
     <div class="eyebrow">Your session, step by step</div><h3 style="margin-top:6px">What a trading day looks like for you</h3>
     <div class="rules" id="pl-day" style="margin-top:8px"></div>
   </div>
+</section>
+
+<!-- ======================= ME ======================= -->
+<section class="panel" id="p-me" role="tabpanel" aria-labelledby="t-me">
+  <div class="panel-head">
+    <div class="eyebrow">My profile · private to you</div>
+    <h2>Everything about <span class="grad">you</span> the plan needs</h2>
+    <p class="lede">Your plan, cockpit sizing, budget and checklist are all calculated from this page. It's saved to this page's database so it's there on any device. <b>Never store passwords or account logins here.</b></p>
+  </div>
+  <div class="row" style="justify-content:space-between"><span class="pill" id="pf-saved">Not saved yet</span><button class="btn primary" id="pf-save">Save my profile</button></div>
+  <p class="small muted" id="pf-note" style="margin-top:8px"></p>
+  <form id="pf" autocomplete="off" onsubmit="return false">
+  <div class="grid g2" style="margin-top:12px">
+    <div class="card"><div class="eyebrow">About me</div>
+      <div class="form" style="margin-top:10px">
+        <label class="f">First name<input id="pf-name" type="text" placeholder="optional"></label>
+        <label class="f">Experience<select id="pf-exp"><option value="new">Brand new</option><option value="videos">Brand new, watched videos</option><option value="some">Some sim / paper trading</option><option value="live">Traded live before</option></select></label>
+        <label class="f" style="grid-column:1/-1">Why I'm doing this (read it on bad days)<textarea id="pf-why" rows="2" placeholder="e.g. Build a second income stream without risking my savings."></textarea></label>
+        <label class="f" style="grid-column:1/-1">My goal for the next 90 days<input id="pf-goal" type="text" placeholder="e.g. Pass a LucidFlex 50K without breaking a rule"></label>
+      </div></div>
+    <div class="card"><div class="eyebrow">Schedule</div>
+      <div class="form" style="margin-top:10px">
+        <label class="f">Your time zone<select id="pf-tz"></select></label>
+        <label class="f">Can trade from (your time)<input id="pf-ws" type="time"></label>
+        <label class="f">Until (your time)<input id="pf-we" type="time"></label>
+        <label class="f" style="grid-column:1/-1">Busy blocks (your time, e.g. 08:00-09:30, 16:00-18:00)<input id="pf-busy" type="text" class="mono"></label>
+        <div class="f" style="grid-column:1/-1">Days I can trade<div class="row" id="pf-days" style="margin-top:4px"><label class="check" style="border:0;padding:0 8px 0 0"><input type="checkbox" value="Mon"><span>Mon</span></label><label class="check" style="border:0;padding:0 8px 0 0"><input type="checkbox" value="Tue"><span>Tue</span></label><label class="check" style="border:0;padding:0 8px 0 0"><input type="checkbox" value="Wed"><span>Wed</span></label><label class="check" style="border:0;padding:0 8px 0 0"><input type="checkbox" value="Thu"><span>Thu</span></label><label class="check" style="border:0;padding:0 8px 0 0"><input type="checkbox" value="Fri"><span>Fri</span></label></div></div>
+      </div></div>
+    <div class="card"><div class="eyebrow">Money</div>
+      <div class="form" style="margin-top:10px">
+        <label class="f">Money free each month ($)<input id="pf-free" type="number" class="mono" min="0" step="10"></label>
+        <label class="f">Max eval spending / month ($)<input id="pf-evalmax" type="number" class="mono" min="0" step="10"></label>
+        <label class="f">Tax set-aside on payouts (%)<input id="pf-tax" type="number" class="mono" min="0" max="60" step="1"></label>
+        <label class="f">Market data cost / month ($)<input id="pf-data" type="number" class="mono" min="0" step="1"></label>
+      </div></div>
+    <div class="card"><div class="eyebrow">Eval account</div>
+      <div class="form" style="margin-top:10px">
+        <label class="f">Eval size<select id="pf-size"><option>25K</option><option selected>50K</option><option>100K</option><option>150K</option></select></label>
+        <label class="f">Priority<select id="pf-pace"><option value="safe">Don't fail (slower)</option><option value="balanced">Balanced</option><option value="fast">Pass faster (riskier)</option></select></label>
+        <label class="f">Platform<select id="pf-platform"><option>Tradovate</option><option>NinjaTrader</option><option>TradingView</option><option>Other</option></select></label>
+        <label class="f">Account nickname / number<input id="pf-acct" type="text" placeholder="e.g. LFE-50K-1 (no passwords)"></label>
+        <label class="f">Bought on<input id="pf-buy" type="date"></label>
+        <label class="f">Price paid ($)<input id="pf-paid" type="number" class="mono" min="0" step="1"></label>
+        <label class="f">Evals bought so far<input id="pf-evals" type="number" class="mono" min="0" step="1"></label>
+      </div></div>
+    <div class="card"><div class="eyebrow">Accountability</div>
+      <div class="form" style="margin-top:10px">
+        <label class="f">Someone I tell when I break a rule<input id="pf-contact" type="text" placeholder="name only"></label>
+        <label class="f">My stop phrase<input id="pf-phrase" type="text" placeholder="e.g. Protect the account, not my ego"></label>
+      </div></div>
+    <div class="card"><div class="eyebrow">Notes</div>
+      <label class="f" style="margin-top:10px">Anything else (lessons, platform settings, reminders)<textarea id="pf-notes" rows="5"></textarea></label></div>
+  </div>
+  </form>
 </section>
 
 <!-- ======================= TODAY ======================= -->
@@ -1234,8 +1291,8 @@ function hover(svg, getInfo){
 }
 
 /* ================= Tabs & keyboard ================= */
-const TABS = ["plan","today","edge","journal","lab","fleet","prop","learn","replay","tools"];
-const PAGES = {plan:["Trade","My plan"], today:["Trade","Cockpit"], edge:["Trade","Edge tools"], journal:["Trade","Journal"], lab:["Research","Backtest Lab"], fleet:["Research","Research fleet"], prop:["Research","Prop eval"], learn:["Practice","Learn"], replay:["Practice","Replay"], tools:["Practice","Risk tools"]};
+const TABS = ["plan","today","edge","journal","lab","fleet","prop","learn","replay","tools","me"];
+const PAGES = {plan:["Trade","My plan"], today:["Trade","Cockpit"], edge:["Trade","Edge tools"], journal:["Trade","Journal"], lab:["Research","Backtest Lab"], fleet:["Research","Research fleet"], prop:["Research","Prop eval"], learn:["Practice","Learn"], replay:["Practice","Replay"], tools:["Practice","Risk tools"], me:["Trade","My profile"]};
 let current = "today", ready = false;
 function showTab(t){
   if (!TABS.includes(t)) t = "plan"; current = t;
@@ -1245,6 +1302,7 @@ function showTab(t){
   if (t === "journal") renderJournal();
   if (t === "today"){ renderGate(); renderEval(); renderTicket(); }
   if (t === "plan") renderPlan();
+  if (t === "me") fillProfileForm();
   if (t === "edge"){ if (!showTab.edgeDone){ showTab.edgeDone = true; initEdge(); } else renderEdge(); }
   if (t === "lab" && !showTab.labDone){ showTab.labDone = true; renderLab(); }
   if (t === "learn" && !showTab.learnDone){ showTab.learnDone = true; initLearn(); }
@@ -1260,7 +1318,8 @@ document.addEventListener("click", e => {
 });
 document.addEventListener("keydown", e => {
   if (e.target.closest("input,select,textarea") || e.metaKey || e.ctrlKey || e.altKey) return;
-  const n = e.key === "0" ? 10 : parseInt(e.key, 10); if (n >= 1 && n <= TABS.length){ showTab(TABS[n-1]); return; }
+  const n = e.key === "0" ? 10 : parseInt(e.key, 10); if (n >= 1 && n <= 10){ showTab(TABS[n-1]); return; }
+  if (e.key.toLowerCase() === "p" && current !== "replay"){ showTab("me"); return; }
   if (current !== "replay") return;
   const k = e.key.toLowerCase();
   if (k === "b") rpOpen(1); else if (k === "s") rpOpen(-1); else if (k === "f") rpFlat();
@@ -2358,7 +2417,7 @@ const KV = {db:null, cache:{},
 };
 async function loadKV(db){
   try{ const snap = await db.collection("kv").get(); snap.docs.forEach(d => { try{ const v = JSON.parse(d.data().v); KV.cache[d.id] = v; store.set("kv:"+d.id, v); }catch{} });
-    KV.db = db; applyProfile(); if (current === "plan") renderPlan(); if (current === "today"){ renderEval(); renderTicket(); renderGate(); } }
+    KV.db = db; applyProfile(); fillProfileForm(); renderSideAcct(); if (current === "plan") renderPlan(); if (current === "today"){ renderEval(); renderTicket(); renderGate(); } }
   catch(e){ console.warn(e); KV.db = db; }
 }
 /* ---- time zones ---- */
@@ -2371,7 +2430,7 @@ const toMin = t => { const m = /^(\d{1,2}):(\d{2})/.exec(t || ""); return m ? +m
 const etHM = m => `${Math.floor(m/60)}:${String(m%60).padStart(2,"0")}`;
 
 /* ---- profile ---- */
-const PROFILE_DEFAULT = {name:"", tz:LOCAL_TZ, exp:"new", free:1330, ws:"", we:"", busy:"08:00-09:30, 16:00-18:00", size:"50K", pace:"safe"};
+const PROFILE_DEFAULT = {name:"", tz:"America/New_York", exp:"videos", free:1330, ws:"10:00", we:"12:00", busy:"08:00-09:30, 16:00-18:00", days:["Mon","Tue","Wed","Thu","Fri"], size:"50K", pace:"safe", evalmax:160, tax:30, data:10, platform:"Tradovate", acct:"", buy:"", paid:"", evals:0, why:"", goal:"Pass a LucidFlex 50K without breaking a rule", contact:"", phrase:"Protect the account, not my ego", notes:""};
 function profile(){ const p = Object.assign({}, PROFILE_DEFAULT, KV.get("profile", {}) || {}); const off = tzOffsetMin(p.tz);
   if (!p.ws) p.ws = etHM(600 + off).padStart(5,"0"); if (!p.we) p.we = etHM(690 + off).padStart(5,"0"); return p; }
 function derived(p = profile()){
@@ -2387,7 +2446,7 @@ function derived(p = profile()){
   const off = tzOffsetMin(p.tz), wsE = toMin(p.ws) - off, weE = toMin(p.we) - off;
   const busy = (p.busy || "").split(",").map(x => x.trim().split("-").map(toMin)).filter(x => x.length === 2 && x[0] != null && x[1] != null).map(([a,b]) => [a - off, b - off]);
   const checks = []; for (let m = 600; m <= 930; m += 30){ const inW = m >= wsE && m <= weE, isBusy = busy.some(([a,b]) => m >= a && m < b); checks.push({et:m, local:m + off, ok: inW && !isBusy, busy:isBusy}); }
-  return {S, contracts, safeStop, paceC, dailyStop, perTrade, maxTrades: p.exp === "new" ? 3 : 4, streak:2, row, off, wsE, weE, busy, checks, fee:S.fee};
+  return {S, contracts, safeStop, paceC, dailyStop, perTrade, maxTrades: (p.exp === "new" || p.exp === "videos") ? 3 : 4, streak:2, row, off, wsE, weE, busy, checks, fee:S.fee};
 }
 function applyProfile(){
   const p = profile(), d = derived(p);
@@ -2403,11 +2462,19 @@ function fillProfileForm(){
   const p = profile(), tzs = ["America/New_York","America/Chicago","America/Denver","America/Phoenix","America/Los_Angeles","America/Anchorage","Pacific/Honolulu"];
   if (!tzs.includes(p.tz)) tzs.unshift(p.tz);
   $("#pf-tz").innerHTML = tzs.map(z => `<option value="${z}" ${z===p.tz?"selected":""}>${z.replace("America/","").replace("_"," ")}</option>`).join("");
-  $("#pf-name").value = p.name; $("#pf-exp").value = p.exp; $("#pf-free").value = p.free; $("#pf-ws").value = p.ws; $("#pf-we").value = p.we; $("#pf-busy").value = p.busy; $("#pf-size").value = p.size; $("#pf-pace").value = p.pace;
-  $("#pf-note").innerHTML = KV.get("profile", null) ? "Saved to this page's database, so it's available wherever you open it." : "Prefilled from your <b>AnswerRank plan</b>: about <b>$1,330/month</b> free after living costs, and calling blocks around 8–9:30 am and 4–6 pm. Your time zone comes from this device. Edit anything that's changed, then save.";
+  PF_FIELDS.forEach(k => { const e2 = $("#pf-" + k); if (e2) e2.value = p[k] ?? ""; });
+  $$("#pf-days input").forEach(c => c.checked = (p.days || []).includes(c.value));
+  $("#pf-note").innerHTML = KV.get("profile", null) ? "Saved to this page's database, so it's available wherever you open it." : "Prefilled from your answers: Eastern time, free 10:00 am–12:00 pm, brand new (you've watched videos), about $1,330/month free, LucidFlex 50K. Add anything else, then save.";
   $("#pf-saved").className = "pill " + (KV.get("profile", null) ? "up" : "amb"); $("#pf-saved").textContent = KV.get("profile", null) ? "Saved" : "Not saved yet";
 }
-function readProfileForm(){ return {name:$("#pf-name").value.trim(), tz:$("#pf-tz").value, exp:$("#pf-exp").value, free:+$("#pf-free").value || 0, ws:$("#pf-ws").value, we:$("#pf-we").value, busy:$("#pf-busy").value, size:$("#pf-size").value, pace:$("#pf-pace").value}; }
+const PF_FIELDS = ["name","tz","exp","free","ws","we","busy","size","pace","evalmax","tax","data","platform","acct","buy","paid","evals","why","goal","contact","phrase","notes"];
+const PF_NUM = new Set(["free","evalmax","tax","data","paid","evals"]);
+function readProfileForm(){ const o = {}; PF_FIELDS.forEach(k => { const v = $("#pf-" + k)?.value ?? ""; o[k] = PF_NUM.has(k) ? (v === "" ? "" : +v) : String(v).trim(); }); o.days = $$("#pf-days input").filter(c => c.checked).map(c => c.value); return o; }
+function initMe(){
+  fillProfileForm();
+  $("#pf-save").onclick = () => { KV.set("profile", readProfileForm()); store.set("limits", null); applyProfile(); fillProfileForm(); renderSideAcct(); toast("Profile saved. Your plan, checklist and cockpit are updated."); };
+  $("#pf").addEventListener("input", () => { $("#pf-saved").className = "pill amb"; $("#pf-saved").textContent = "Unsaved changes"; });
+}
 function progress(){
   const quiz = store.get("quiz", {}), qs = QUIZ.filter((q,i) => quiz[i] === q[2]).length;
   const rp = (store.get("rpScore", null) || {}).done || 0;
@@ -2416,10 +2483,9 @@ function progress(){
   return {qs, rp, trades: real.length, aPct: real.length ? A/real.length : 0, ev};
 }
 function renderPlan(){
-  if (!showTab.planInit){ showTab.planInit = true; fillProfileForm();
-    $("#pf-save").onclick = () => { KV.set("profile", readProfileForm()); store.set("limits", null); applyProfile(); fillProfileForm(); renderPlan(); toast("Profile saved. Your plan and cockpit are updated."); };
-    $("#pf").addEventListener("input", () => { $("#pf-saved").className = "pill amb"; $("#pf-saved").textContent = "Unsaved changes"; }); }
-  const p = KV.get("profile", null) ? profile() : Object.assign(profile(), readProfileForm()), d = derived(p), pr = progress(), name = p.name ? `, ${esc(p.name)}` : "";
+  const p = profile(), d = derived(p), pr = progress(), name = p.name ? `, ${esc(p.name)}` : "";
+  renderLaunch(p, d, pr);
+  $("#pl-me").innerHTML = `<dt>Experience</dt><dd>${{new:"Brand new", videos:"Brand new (videos)", some:"Sim / paper", live:"Traded live"}[p.exp] || p.exp}</dd><dt>Trading window</dt><dd>${hm(toMin(p.ws))}–${hm(toMin(p.we))} ${p.tz === "America/New_York" ? "ET" : "local"}</dd><dt>Days</dt><dd>${(p.days || []).join(" ") || "—"}</dd><dt>Free / month</dt><dd>${money0(+p.free || 0)}</dd><dt>Goal</dt><dd style="white-space:normal">${esc(p.goal || "—")}</dd>${p.phrase ? `<dt>Stop phrase</dt><dd style="white-space:normal">“${esc(p.phrase)}”</dd>` : ""}`;
   $("#pl-hello").innerHTML = `Your plan${name}: pass a Lucid ${p.size} eval <span class="grad">safely</span>`;
   const passP = d.row.pass_rate, failP = d.row.fail_rate;
   $("#pl-glance").innerHTML = [
@@ -2459,9 +2525,11 @@ function renderPlan(){
     `Frustrated or anxious? Tap it in the cockpit. Frustrated means a 15-minute lockout.`
   ].map(x => `<li><span>${x}</span></li>`).join("");
   // money
-  const attempts = passP ? Math.ceil(1/passP) : 3, cost = d.fee * attempts, perMonth = Math.min(d.fee * 2, Math.max(d.fee, Math.round(p.free * .12)));
+  const attempts = passP ? Math.ceil(1/passP) : 3, cost = d.fee * attempts, perMonth = +p.evalmax || Math.min(d.fee * 2, Math.max(d.fee, Math.round(p.free * .12)));
   $("#pl-money").innerHTML = [["List price", money0(d.fee), `LucidFlex ${p.size}, one-time`], ["Attempts to expect", attempts, `at a ${passP ? pct(passP) : "—"} pass rate`], ["Budget for passing", money0(cost), `${p.free ? Math.round(cost/p.free*100) : "—"}% of one month's free money`], ["Max per month", money0(perMonth), `≈ ${p.free ? Math.round(perMonth/p.free*100) : "—"}% of $${p.free.toLocaleString()} free`]]
     .map(([k,v,e]) => `<div class="stat"><small>${k}</small><b style="font-size:19px">${v}</b><em>${e}</em></div>`).join("");
+  const spent = (+p.paid || 0) + (+p.data || 0) * Math.max(0, p.buy ? Math.ceil((Date.now() - new Date(p.buy)) / 2.63e9) : 0);
+  if (p.paid || p.evals) $("#pl-money").insertAdjacentHTML("beforeend", `<div class="stat"><small>Spent so far</small><b style="font-size:19px">${money0(spent)}</b><em>${+p.evals || 1} eval(s) + data</em></div><div class="stat"><small>Tax set-aside</small><b style="font-size:19px">${+p.tax || 0}%</b><em>of every payout</em></div>`);
   $("#pl-money-note").innerHTML = `Rule of thumb: never buy a new eval the same day one fails. Wait until you've replayed 5 sessions and found what broke. The only money you ever put at risk is the eval fee. The firm's account absorbs the trading losses, so <b>don't open a personal futures account</b> while learning.`;
   // roadmap
   const phases = [
@@ -2488,6 +2556,57 @@ function renderPlan(){
     [hm(955 + off), "Flat. Log the day's closing balance in the eval tracker. Grade your trades A/B/C."]
   ].map(([t,x]) => `<div class="rule"><b>${t}</b><span>${x}</span></div>`).join("");
 }
+
+/* ================= Launch checklist ================= */
+function launchGroups(p, d, pr){
+  const ev = pr.ev, tax = +p.tax || 30;
+  return [
+    {id:"pre", title:"1 · Before you buy (free)", items:[
+      ["quiz", "Score 7/8 or better on the Learn quiz", pr.qs >= 7, "learn"],
+      ["ddsim", "Step through all 3 drawdown-simulator scenarios in Learn", null, "learn"],
+      ["replay", "Trade 10 replay sessions using only noise-band signals", pr.rp >= 10, "replay"],
+      ["trades", "Log 30 practice trades with 80%+ graded A", pr.trades >= 30 && pr.aPct >= .8, "journal"],
+      ["cal", `Block ${hm(toMin(p.ws))}–${hm(toMin(p.we))} on your calendar for trading days`, null],
+      ["budget", `Set a monthly eval spending cap (yours: ${p.evalmax ? money0(p.evalmax) : "not set"})`, !!p.evalmax, "me"]]},
+    {id:"setup", title:"2 · Buy and set up (day 1)", items:[
+      ["buy", `Buy a LucidFlex ${p.size} at lucidtrading.com (≈${money0(d.fee)} list; look for a discount). Record the date and price in your profile.`, !!p.buy || !!p.paid, "me", "https://lucidtrading.com"],
+      ["creds", "Find the credentials email from Lucid (arrives within minutes)", null],
+      ["rithmic", "Sign the Rithmic market-data agreements (RTrader app or browser)", null],
+      ["data", "Subscribe to CME real-time data as a non-professional (~$5–15/month)", null],
+      ["platform", `Log into ${p.platform || "Tradovate"} with the Lucid credentials and select the Lucid eval account, not a demo`, null],
+      ["bracket", `Build an MNQ bracket template: ${d.contracts} contract, stop at least ${d.safeStop} pts`, null],
+      ["drill", "Practice: place and cancel a bracket 3 times before your first live trade", null],
+      ["start", "Log your first closing balance in the cockpit's eval tracker", ev.days > 0, "today"]]},
+    {id:"daily", title:"3 · Every eval day (resets each morning)", daily:true, items:[
+      ["d-news", "Check today's news in the Edge tools calendar", null, "edge"],
+      ["d-levels", "Enter key levels and the noise-band inputs", null, "today"],
+      ["d-cockpit", "Cockpit open in side-by-side mode, sound on", null, "today"],
+      ["d-ticket", "Every trade went through the trade ticket", null, "today"],
+      ["d-close", "Log today's closing balance and grade your trades", null, "today"]]},
+    {id:"funded", title:"4 · After you pass", items:[
+      ["f-login", `Log into the funded account. Same ${d.contracts} MNQ, same rules.`, null],
+      ["f-days", `Trade 5 days of ${money0(d.S === BT.lucid.sizes["50K"] ? 150 : (LU.sizes[p.size].min_day || 150))}+ profit`, null],
+      ["f-kyc", "Complete KYC: government photo ID and proof of address (usually 1–3 business days)", null],
+      ["f-pay", `Request a payout: up to 50% of profit (max ${money0(LU.sizes[p.size].cap)}). You keep 90%.`, null],
+      ["f-tax", `Move ${tax}% of every payout into a tax savings account`, null],
+      ["f-floor", `Remember: after a payout the floor resets to ${money0(d.S.start + 100)}. Rebuild the cushion before anything else.`, null]]}
+  ];
+}
+function renderLaunch(p, d, pr){
+  const st = KV.get("launch", {}) || {}, today = todayNY(), groups = launchGroups(p, d, pr);
+  const isDone = (g, it) => it[2] === true || (g.daily ? st["day:" + today + ":" + it[0]] : st[it[0]]);
+  let total = 0, done = 0, next = null;
+  groups.forEach(g => { if (g.daily || g.id === "funded") return; g.items.forEach(it => { total++; if (isDone(g, it)) done++; else if (!next) next = it[1]; }); });
+  const pctv = total ? done / total : 0;
+  $("#lc-head").textContent = `${Math.round(pctv*100)}% ready to trade an eval`; $("#lc-score").innerHTML = `<span class="${pctv >= 1 ? "glow-up" : "amb-t"}">${done}/${total}</span>`;
+  $("#lc-meter").style.width = Math.round(pctv*100) + "%"; $("#lc-pill").textContent = `${done} of ${total} setup steps done`; $("#lc-pill").className = "pill " + (pctv >= 1 ? "up" : "amb");
+  $("#lc-next").innerHTML = next ? `<b>Next:</b> ${next}` : `<b class="up-t">Set up and ready.</b> Use the "Every eval day" list each session.`;
+  $("#lc-groups").innerHTML = groups.map(g => { const n = g.items.filter(it => isDone(g, it)).length;
+    return `<div class="card" style="background:var(--surface-2)"><div class="card-h"><h3>${g.title}</h3><span class="pill ${n === g.items.length ? "up" : ""}">${n}/${g.items.length}</span></div>${g.items.map(it => { const auto = it[2] !== null && it[2] !== undefined, ok = isDone(g, it);
+      return `<label class="check"><input type="checkbox" data-lc="${g.daily ? "day:" + today + ":" + it[0] : it[0]}" ${ok ? "checked" : ""} ${auto ? "disabled" : ""}><span style="flex:1">${it[1]}${auto ? ' <span class="pill cy" style="font-size:9px;padding:2px 6px">auto</span>' : ""}${it[4] ? ` <a href="${it[4]}" target="_blank" rel="noopener">open ↗</a>` : ""}</span>${it[3] ? `<button class="btn ghost" data-go="${it[3]}" style="padding:2px 6px">→</button>` : ""}</label>`; }).join("")}</div>`; }).join("");
+}
+document.addEventListener("change", e => { const c = e.target.closest("[data-lc]"); if (!c) return; const st = KV.get("launch", {}) || {}; st[c.dataset.lc] = c.checked; KV.set("launch", st); renderPlan(); });
+document.addEventListener("click", e => { const a = e.target.closest("[data-jump]"); if (!a) return; e.preventDefault(); $("#" + a.dataset.jump).scrollIntoView({behavior:"smooth"}); });
 
 /* ================= Eval tracker ================= */
 function evalState(){ return KV.get("eval", null) || {size: profile().size, days:[]}; }
@@ -2711,7 +2830,7 @@ function cmdBuild(q){
   Object.entries(PAGES).forEach(([k,[g,t]]) => out.push({grp:"Pages", label:t, sub:g, run:() => showTab(k)}));
   [["Toggle side-by-side mode", "Cockpit", () => { showTab("today"); $("#cp-compact").click(); }], ["Start a new replay session", "Practice", () => { showTab("replay"); newSession(); }],
    ["Log a trade", "Journal", () => { showTab("journal"); setTimeout(() => $("#jf-entry").focus(), 50); }], ["Turn sound alerts on/off", "Cockpit", () => { showTab("today"); $("#cp-sound").click(); }],
-   ["Edit my profile", "My plan", () => { showTab("plan"); setTimeout(() => $("#pf-name").focus(), 50); }], ["Run the expectancy simulator", "Risk tools", () => { showTab("tools"); }]]
+   ["Edit my profile", "My profile", () => { showTab("me"); setTimeout(() => $("#pf-name").focus(), 50); }], ["Open the launch checklist", "My plan", () => { showTab("plan"); setTimeout(() => $("#lc-card").scrollIntoView({behavior:"smooth"}), 60); }], ["Run the expectancy simulator", "Risk tools", () => { showTab("tools"); }]]
     .forEach(([l, s2, run]) => out.push({grp:"Actions", label:l, sub:s2, run}));
   BT.strats.forEach(st => out.push({grp:"Strategies", label:st.name, sub:`${VNAME[st.verdict]} · PF ${st.all.pf.toFixed(2)}`, run:() => { selStrat = st.key; showTab("lab"); renderDetail(); setTimeout(() => $("#detail").scrollIntoView({behavior:"smooth"}), 60); }}));
   GLOSS.forEach(g => out.push({grp:"Key terms", label:g[0], sub:g[1], run:() => { showTab("learn"); setTimeout(() => { $("#gl-q").value = g[0]; glCat = "All"; renderGloss(); $("#l-terms").scrollIntoView({behavior:"smooth"}); }, 60); }}));
@@ -2751,7 +2870,7 @@ function init(){
     const tr = e.target.closest("tr[data-k]"); if (tr){ selStrat = tr.dataset.k; renderDetail(); if (innerWidth < 980) $("#detail").scrollIntoView({behavior:"smooth"}); } });
   $("#lb").addEventListener("keydown", e => { const tr = e.target.closest("tr[data-k]"); if (tr && (e.key === "Enter" || e.key === " ")){ e.preventDefault(); selStrat = tr.dataset.k; renderDetail(); } });
   $("#ex-win").onclick = () => { exKind = "win"; renderExample(); }; $("#ex-loss").onclick = () => { exKind = "loss"; renderExample(); };
-  initToday(); initReplay(); initTools(); initJournal(); initCockpit(); initCmd(); renderSideAcct();
+  initToday(); initReplay(); initTools(); initJournal(); initCockpit(); initMe(); initCmd(); renderSideAcct();
   const h = (location.hash || "").slice(1);
   ready = true;
   showTab(h === "cockpit" ? "today" : TABS.includes(h) ? h : store.get("tab", store.get("kv:profile", null) ? "today" : "plan"));
