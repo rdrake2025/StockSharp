@@ -6,14 +6,18 @@ import bt
 D = os.environ["NQ_DATA"]
 days = pickle.load(open(os.path.join(D, "days.pkl"), "rb"))
 byd = {str(d["date"]): d for d in days}
-res = pickle.load(open(os.path.join(D, "res_base.pkl"), "rb"))
+res = pickle.load(open(os.path.join(D, "res_all.pkl"), "rb"))
+proof = json.load(open(os.path.join(D, "proof.json")))
+PR = proof["rows"]
 
-def verdict(r):
-    a, o = r["all"], r["oos"]; yrs = r["years"]; pos = sum(v["pts"] > 0 for v in yrs.values()) / len(yrs)
+def verdict(k, r):
+    """Evidence tier from proof.py: proven / promising / unproven / none (loses money) / bench."""
     if r["family"] == "Benchmark": return "bench"
-    if a["pf"] >= 1.12 and o["pf"] >= 1.1 and pos >= 0.7 and a["sharpe"] > 0.3: return "edge"
-    if a["pf"] >= 1.04 and o["pf"] >= 1.0: return "marginal"
-    return "none"
+    p = PR[k]
+    if r["all"]["pf"] < 1: return "none"
+    if p["holm"] and p.get("p_dir", 1) < 0.01 and p.get("p_day", 1) < 0.01: return "proven"
+    if p["p"] < 0.05 and p.get("p_dir", 1) < 0.05 and p["ci_pf"][0] > 1: return "promising"
+    return "unproven"
 
 def bars5(d):
     b = bt.five(d); base = d["o"][0]
@@ -51,7 +55,10 @@ for k in order:
             t = rng.choice(pool); d = byd[t["date"]]; same = [x for x in tr if x["date"] == t["date"]]
             ex.append(dict(kind=want, day=bars5(d), trades=[dict(side=x["side"], i=x["i"], j=x["j"], entry=x["entry"], exit=x["exit"],
                         stop=x["stop0"], pts=round(x["pts"], 2), why=x["why"]) for x in same]))
-    out["strats"].append(dict(key=k, name=r["name"], family=r["family"], verdict=verdict(r),
+    pp = PR[k]
+    out["strats"].append(dict(key=k, name=r["name"], family=r["family"], verdict=verdict(k, r), new=r.get("new", False),
+        proof=dict(t=pp["t"], p=round(pp["p"], 5), p_adj=round(pp["p_adj"], 4), holm=pp["holm"], dsr=pp["dsr"], ci_sharpe=pp["ci_sharpe"], ci_pf=pp["ci_pf"],
+                   p_dir=pp.get("p_dir"), p_day=pp.get("p_day"), dir_hist=pp.get("dir_hist"), dir_edges=pp.get("dir_edges"), actual=pp.get("actual")),
         all={kk: (round(v, 4) if isinstance(v, float) and math.isfinite(v) else v) for kk, v in r["all"].items()},
         ins={kk: (round(v, 4) if isinstance(v, float) and math.isfinite(v) else v) for kk, v in r["ins"].items()},
         oos={kk: (round(v, 4) if isinstance(v, float) and math.isfinite(v) else v) for kk, v in r["oos"].items()},
@@ -85,6 +92,15 @@ def clean(o):
     if isinstance(o, (np.floating, float)): return float(o) if math.isfinite(o) else None
     if isinstance(o, np.bool_): return bool(o)
     return o
+import lucid
+out["proof"] = dict(n_trials=proof["n_trials"], wf_noise=proof["wf_noise"], wf_select=[dict(year=w["year"], picks=w["picks"], pts=w["pts"]) for w in proof["wf_select"]])
+out["lucid"] = dict(results=json.load(open(os.path.join(D, "lucid.json"))), luck=json.load(open(os.path.join(D, "lucid_luck.json"))), sizes=lucid.SIZES, micro_extra=lucid.MICRO_EXTRA)
+dates = [str(d["date"]) for d in days]; out["dates"] = [dates[0], dates[-1]]
+out["series"] = {}
+for k in ["noise", "drive", "lunch", "late_mom", "orb5_z", "gap_go"]:
+    pts, low, n = lucid.day_series(res[k]["trades"], dates)
+    out["series"][k] = dict(p=[int(round(x * 4)) for x in pts], l=[int(round(x * 4)) for x in low], n=[int(x) for x in n])
+out["series_dates"] = dates
 s = json.dumps(clean(out), separators=(",", ":"))
 open(os.path.join(os.path.dirname(__file__), "..", "bt-data.json"), "w").write(s)
 print("bytes", len(s)); print(json.dumps(out["daystats"]), out["sigma"][:4])

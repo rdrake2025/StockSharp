@@ -133,8 +133,9 @@ th.sort{cursor:pointer;user-select:none} th.sort:hover{color:var(--ink)} th.sort
 
 /* ---------- leaderboard ---------- */
 .verdict{font:800 10.5px/1 var(--mono);letter-spacing:.08em;padding:5px 8px;border-radius:6px;text-transform:uppercase;white-space:nowrap}
-.verdict.edge{background:linear-gradient(135deg,rgba(43,227,160,.25),rgba(43,227,160,.08));color:var(--up);box-shadow:0 0 14px rgba(43,227,160,.25)}
-.verdict.marginal{background:var(--amber-dim);color:var(--amber)}
+.verdict.proven,.verdict.edge{background:linear-gradient(135deg,rgba(43,227,160,.25),rgba(43,227,160,.08));color:var(--up);box-shadow:0 0 14px rgba(43,227,160,.25)}
+.verdict.promising{background:var(--cyan-dim);color:var(--cyan)}
+.verdict.unproven,.verdict.marginal{background:var(--amber-dim);color:var(--amber)}
 .verdict.none{background:var(--down-dim);color:var(--down)}
 .verdict.bench{background:var(--surface-2);color:var(--muted)}
 .rank{font:800 13px/1 var(--mono);color:var(--faint)}
@@ -203,6 +204,21 @@ details.meth{border:1px solid var(--line);border-radius:12px;padding:0 16px;back
 details.meth summary{cursor:pointer;padding:14px 0;font-weight:700;color:var(--ink)}
 details.meth[open] summary{border-bottom:1px solid var(--line);margin-bottom:12px}
 details.meth > div{padding-bottom:16px}
+.evlist{display:grid;gap:0;margin:0;padding:0;list-style:none}
+.evlist li{display:grid;grid-template-columns:26px 1fr auto;gap:10px;align-items:center;padding:8px 0;border-bottom:1px solid var(--line);font-size:14px}
+.evlist li:last-child{border-bottom:0}
+.evlist .ic{width:22px;height:22px;border-radius:6px;display:grid;place-items:center;font:800 13px/1 var(--mono)}
+.evlist .ok .ic{background:var(--up-dim);color:var(--up);box-shadow:0 0 12px rgba(43,227,160,.25)}
+.evlist .no .ic{background:var(--down-dim);color:var(--down)}
+.evlist .val{font:600 12.5px/1 var(--mono);color:var(--muted)}
+.score{font:800 44px/1 var(--mono)}
+td.heat{position:relative}
+td.heat i{position:absolute;left:0;top:6px;bottom:6px;border-radius:0 4px 4px 0;opacity:.22}
+td.heat span{position:relative}
+ol.stepsl{margin:0;padding-left:0;list-style:none;counter-reset:q;display:grid;gap:12px}
+ol.stepsl li{counter-increment:q;display:grid;grid-template-columns:34px 1fr;gap:12px;font-size:14px}
+ol.stepsl li::before{content:counter(q);width:30px;height:30px;border-radius:9px;display:grid;place-items:center;font:800 14px/1 var(--mono);background:linear-gradient(135deg,var(--amber),var(--amber-2));color:#1A1203}
+ol.stepsl b{color:var(--ink)}
 footer.foot{margin-top:48px;padding-top:18px;border-top:1px solid var(--line);color:var(--faint);font-size:12.5px;max-width:95ch}
 @media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}.draw{stroke-dashoffset:0}}
 @media (max-width:640px){.clockmini{display:none}nav.tabs{margin-left:0;width:100%}nav.tabs button kbd{display:none}.big-out{font-size:36px}.rule{grid-template-columns:1fr;gap:2px}}
@@ -226,10 +242,11 @@ footer.foot{margin-top:48px;padding-top:18px;border-top:1px solid var(--line);co
     <nav class="tabs" role="tablist" aria-label="Sections">
       <button role="tab" data-tab="today" id="t-today"><kbd>1</kbd>Today</button>
       <button role="tab" data-tab="lab" id="t-lab"><kbd>2</kbd>Backtest Lab</button>
-      <button role="tab" data-tab="learn" id="t-learn"><kbd>3</kbd>Learn</button>
-      <button role="tab" data-tab="replay" id="t-replay"><kbd>4</kbd>Replay</button>
-      <button role="tab" data-tab="tools" id="t-tools"><kbd>5</kbd>Risk tools</button>
-      <button role="tab" data-tab="journal" id="t-journal"><kbd>6</kbd>Journal</button>
+      <button role="tab" data-tab="prop" id="t-prop"><kbd>3</kbd>Prop eval</button>
+      <button role="tab" data-tab="learn" id="t-learn"><kbd>4</kbd>Learn</button>
+      <button role="tab" data-tab="replay" id="t-replay"><kbd>5</kbd>Replay</button>
+      <button role="tab" data-tab="tools" id="t-tools"><kbd>6</kbd>Risk tools</button>
+      <button role="tab" data-tab="journal" id="t-journal"><kbd>7</kbd>Journal</button>
     </nav>
   </div>
   <div class="ticker" aria-label="Backtest highlights"><div class="ticker-track" id="ticker"></div></div>
@@ -263,7 +280,7 @@ footer.foot{margin-top:48px;padding-top:18px;border-top:1px solid var(--line);co
     <div class="card">
       <div class="card-h">
         <div><div class="eyebrow">Best-tested strategy</div><h3 style="margin-top:6px">Noise-band signal for today</h3></div>
-        <span class="verdict edge">Edge in backtest</span>
+        <span class="verdict proven">Statistically proven</span>
       </div>
       <p class="small">Enter today's 9:30 open and yesterday's 4:00 pm close. The bands show how far NQ normally wanders from the open by each half hour. A close outside the band at a <b>:00 or :30 check</b> is the signal. <a href="#lab" data-go="lab" data-strat="noise">See the backtest →</a></p>
       <div class="form">
@@ -317,7 +334,7 @@ footer.foot{margin-top:48px;padding-top:18px;border-top:1px solid var(--line);co
         <thead><tr>
           <th>#</th><th>Strategy</th><th>Verdict</th>
           <th class="n sort" data-k="n">Trades</th><th class="n sort" data-k="win">Win %</th><th class="n sort" data-k="pf">Profit factor</th>
-          <th class="n sort" data-k="avg_pts">Avg pts</th><th class="n sort" data-k="sharpe" data-dir="desc">Sharpe</th><th class="n sort" data-k="oos">2022–25 Sharpe</th>
+          <th class="n sort" data-k="avg_pts">Avg pts</th><th class="n sort" data-k="sharpe" data-dir="desc">Sharpe</th><th class="n sort" data-k="oos">2022–25 Sharpe</th><th class="n sort" data-k="padj" title="Chance the result is luck, corrected for the number of strategies tested">Luck p (adj.)</th>
           <th class="n sort" data-k="yrs">Up years</th><th>10-year equity</th>
         </tr></thead>
         <tbody id="lb-body"></tbody>
@@ -328,15 +345,21 @@ footer.foot{margin-top:48px;padding-top:18px;border-top:1px solid var(--line);co
   <div class="split" style="margin-top:16px" id="detail">
     <div class="card">
       <div class="card-h"><div><div class="eyebrow" id="d-family"></div><h3 id="d-name" style="font-size:22px;margin-top:6px"></h3></div><span id="d-verdict"></span></div>
-      <div class="stats" id="d-stats" style="margin-top:14px"></div>
+      <div class="stats" id="d-stats" style="margin-top:14px;grid-template-columns:repeat(auto-fit,minmax(min(100%,190px),1fr))"></div>
       <div class="card-h" style="margin-top:14px"><span class="small muted">Cumulative NQ points after costs · shaded = out-of-sample (2022+)</span><span class="small mono" id="d-eq-end"></span></div>
       <div class="chart-box"><svg class="chart" id="d-equity" viewBox="0 0 760 280" role="img" aria-label="Equity curve"></svg></div>
       <div class="grid g2" style="margin-top:6px">
-        <div><div class="small muted">Points by year</div><div class="chart-box"><svg class="chart" id="d-years" viewBox="0 0 380 170" role="img" aria-label="Points by year"></svg></div></div>
-        <div><div class="small muted" id="d-hist-label">R-multiple distribution</div><div class="chart-box"><svg class="chart" id="d-hist" viewBox="0 0 380 170" role="img" aria-label="Distribution"></svg></div></div>
+        <div><div class="small muted">Points by year</div><div class="chart-box"><svg class="chart" id="d-years" viewBox="0 0 600 190" role="img" aria-label="Points by year"></svg></div></div>
+        <div><div class="small muted" id="d-hist-label">R-multiple distribution</div><div class="chart-box"><svg class="chart" id="d-hist" viewBox="0 0 600 190" role="img" aria-label="Distribution"></svg></div></div>
       </div>
     </div>
     <div class="grid" style="align-content:start">
+      <div class="card hot">
+        <div class="card-h"><h3>Proof tests</h3><span class="score" id="d-score"></span></div>
+        <ul class="evlist" id="d-proof"></ul>
+        <div class="small muted" id="d-rand-cap" style="margin-top:12px"></div>
+        <div class="chart-box"><svg class="chart" id="d-rand" viewBox="0 0 440 150" role="img" aria-label="Random-direction test"></svg></div>
+      </div>
       <div class="card">
         <h3>Rules as tested</h3>
         <div class="rules" id="d-rules"></div>
@@ -360,6 +383,15 @@ footer.foot{margin-top:48px;padding-top:18px;border-top:1px solid var(--line);co
     <div class="legend"><span><i style="background:var(--amber)"></i>VWAP</span><span><i style="background:var(--violet)"></i>Prior-day high / low / close</span><span><i style="background:var(--up)"></i>Long entry / win</span><span><i style="background:var(--down)"></i>Short entry / stop</span><span>Hover the chart for prices</span></div>
   </div>
 
+  <div class="card" style="margin-top:16px">
+    <div class="card-h"><div><div class="eyebrow">Walk-forward proof</div><h3 style="margin-top:6px">Would it have worked if you only knew the past?</h3></div><span class="pill up" id="wf-pill"></span></div>
+    <p class="small">A backtest can look good because its settings were tuned on the same data. Walk-forward removes that. Each year, settings are chosen <b>only from the previous 3 years</b> and then traded on a year the choice never saw.</p>
+    <div class="grid g2" style="margin-top:8px">
+      <div><div class="small muted">Noise-band momentum: settings re-picked each year from 9 combinations</div><div class="chart-box"><svg class="chart" id="wf-noise" viewBox="0 0 440 200" role="img" aria-label="Walk-forward points by year"></svg></div></div>
+      <div><div class="small muted">Picking the top 3 of all 27 strategies each year by past Sharpe, then trading them equally</div><div class="table-wrap" style="margin-top:6px;max-height:230px"><table><thead><tr><th>Year</th><th>Chosen from the past</th><th class="n">Points</th></tr></thead><tbody id="wf-sel"></tbody></table></div></div>
+    </div>
+  </div>
+
   <div class="grid g2" style="margin-top:16px">
     <div class="card">
       <h3>When NQ moves: average 5-minute range by time of day</h3>
@@ -370,6 +402,58 @@ footer.foot{margin-top:48px;padding-top:18px;border-top:1px solid var(--line);co
       <summary>How the backtest was run</summary>
       <div class="small" id="meth"></div>
     </details>
+  </div>
+</section>
+
+<!-- ======================= PROP ======================= -->
+<section class="panel" id="p-prop" role="tabpanel" aria-labelledby="t-prop">
+  <div class="panel-head">
+    <div class="eyebrow">Prop firm evaluation · Lucid Trading</div>
+    <h2>Pass a Lucid eval with a <span class="grad">tested</span> strategy, not luck</h2>
+    <p class="lede">A prop evaluation lets you trade the firm's capital after you hit a profit target without breaking its drawdown rules. I replayed each strategy through Lucid's <b>LucidFlex</b> rules starting on every third session from 2015 to 2025, then compared it with the same trades in random directions. The difference between the two is the edge.</p>
+  </div>
+  <div class="stats" id="lu-strip"></div>
+  <div class="split" style="margin-top:16px">
+    <div class="card">
+      <div class="card-h"><h3>Pass rates by size and contracts</h3>
+        <div class="row"><select id="lu-strat" style="width:auto" aria-label="Strategy"></select><div class="seg" role="group" aria-label="Account size" id="lu-size"><button data-s="25K" aria-pressed="false">25K</button><button data-s="50K" aria-pressed="true">50K</button><button data-s="100K" aria-pressed="false">100K</button><button data-s="150K" aria-pressed="false">150K</button></div></div></div>
+      <div class="table-wrap" style="margin-top:10px"><table><thead><tr><th class="n">MNQ</th><th class="n">Pass</th><th class="n">Luck pass</th><th class="n">Fail</th><th class="n">Median days</th><th class="n">Fee / pass</th><th class="n">Paid (1 yr)</th><th class="n">EV</th></tr></thead><tbody id="lu-table"></tbody></table></div>
+      <p class="small muted" style="margin-top:8px">"Luck pass" is the noise-band trades with coin-flip directions (5 runs averaged), tested at 50K and 150K. Rows not reaching pass or fail within 500 sessions count as still going. Expected value = pass rate × average paid out in the first funded year − evaluation fee. Micros pay extra commission here (≈ $1.24 round trip).</p>
+    </div>
+    <div class="grid" style="align-content:start">
+      <div class="card hot"><div class="eyebrow">Recommendation from the data</div><div id="lu-rec" style="margin-top:8px"></div></div>
+      <div class="card">
+        <div class="card-h"><h3>Replay one attempt</h3><div class="row"><label class="f" style="grid-template-columns:auto 70px;align-items:center">MNQ<input id="lu-micros" type="number" class="mono" value="2" min="1" max="100"></label><button class="btn primary" id="lu-run">Random start ▸</button></div></div>
+        <div class="chart-box"><svg class="chart" id="lu-path" viewBox="0 0 520 230" role="img" aria-label="Evaluation balance path"></svg></div>
+        <p class="small" id="lu-cap"></p>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid g2" style="margin-top:16px">
+    <div class="card">
+      <div class="eyebrow">How to get the evaluation</div>
+      <h3 style="margin-top:6px">Step by step</h3>
+      <ol class="stepsl" style="margin-top:12px">
+        <li><div><b>Prove it to yourself first.</b> Trade noise-band momentum in the Replay drill and a free broker sim for 4+ weeks. Log every trade in the Journal. Your win rate should land near 39%, with average wins about 2× average losses.</div></li>
+        <li><div><b>Choose LucidFlex.</b> It has an end-of-day trailing drawdown, no daily loss limit, the 50% consistency rule during the evaluation only, and no consistency rule once funded. The 50K size scored best in this simulator for risk vs. cost.</div></li>
+        <li><div><b>Buy it at <a href="https://lucidtrading.com" target="_blank" rel="noopener">lucidtrading.com</a>.</b> It's a one-time fee with no monthly rebill or activation fee. Third-party trackers listed the 50K at $146 on Sept 16, 2026, and discount codes are common. Confirm the price at checkout.</div></li>
+        <li><div><b>Size it like the table.</b> On a 50K, 1 MNQ never failed from any start date but took about 7 months. 2–4 MNQ passed 43–54% of the time in 1.5–3 months, which was the best expected value. The drawdown is enforced intraday even though it only trails at end of day, so one bad morning can end the account.</div></li>
+        <li><div><b>Follow the house rules.</b> Flat by 4:45 pm ET. No single day can be more than 50% of your total profit when you pass. Trades under 5 seconds that make over half your profit get reviewed. Check the news rules for your plan.</div></li>
+        <li><div><b>Once funded, plan payouts.</b> On 50K: 5 days of $150+ profit, then withdraw up to 50% of profit (max $2,000) at a 90/10 split. A payout resets your drawdown floor to $50,100, so keep a cushion.</div></li>
+      </ol>
+    </div>
+    <div class="card">
+      <div class="eyebrow">LucidFlex rules used in the simulator</div>
+      <div class="table-wrap" style="margin-top:10px"><table><thead><tr><th>Size</th><th class="n">Target</th><th class="n">Max loss (EOD trail)</th><th class="n">Locks at</th><th class="n">Max size</th><th class="n">List price*</th></tr></thead><tbody id="lu-rules"></tbody></table></div>
+      <ul class="clean small" style="margin-top:12px">
+        <li>The drawdown trails your highest end-of-day balance, then <b>locks at start + $100</b> once the balance passes start + max loss + $100.</li>
+        <li>Consistency: your largest day must be ≤ 50% of total profit to pass (evaluation only). Minimum 2 trading days.</li>
+        <li>Funded scaling: 50K starts at 2 minis / 20 micros until +$1,000 profit.</li>
+        <li>Payouts are typically paid as contractor income, not futures trading gains, so the 60/40 tax treatment usually doesn't apply. Ask a tax professional.</li>
+      </ul>
+      <p class="small muted" style="margin-top:10px">*Prices and payout details from third-party trackers dated Sept 2026. Targets, drawdown and consistency are from Lucid's help center. Rules change, so read the current help center before you buy. Sources: <a href="https://support.lucidtrading.com/en/articles/12945790-lucidflex-evaluation-account" target="_blank" rel="noopener">LucidFlex evaluation</a> · <a href="https://support.lucidtrading.com/en/articles/12945815-lucidflex-drawdown" target="_blank" rel="noopener">LucidFlex drawdown</a> · <a href="https://support.lucidtrading.com/en/articles/12945805-lucidflex-consistency-percentage" target="_blank" rel="noopener">consistency</a> · <a href="https://proptradingvibes.com/blog/lucid-trading-lucidflex-account" target="_blank" rel="noopener">payout &amp; scaling summary</a> · <a href="https://tradetanto.com/learn/lucid-trading-rules-explained-every-plan-rule-and-limit" target="_blank" rel="noopener">all Lucid plans</a>.</p>
+    </div>
   </div>
 </section>
 
@@ -458,7 +542,7 @@ footer.foot{margin-top:48px;padding-top:18px;border-top:1px solid var(--line);co
         <div class="rule"><b>1 · Learn</b><span>2–4 weeks. Study the Lab's top strategies. Watch NQ 9:30–11:30 ET daily and mark the open, prior close, VWAP and the noise bands.</span></div>
         <div class="rule"><b>2 · Sim</b><span>4–8 weeks. Replay drill here + your broker's paper account. Trade <b>one</b> tested strategy. Journal everything.</span></div>
         <div class="rule"><b>3 · 1 MNQ</b><span>Risk ≤ 1% per trade, daily loss limit 2–3%. Your live win rate should look like the backtest's.</span></div>
-        <div class="rule"><b>4 · Scale</b><span>Add one micro at a time after 3 profitable months. 10 MNQ = 1 NQ.</span></div>
+        <div class="rule"><b>4 · Scale</b><span>Add one micro at a time after 3 profitable months, or take a prop evaluation (see the <a href="#prop" data-go="prop">Prop eval</a> tab) to trade the firm's capital. 10 MNQ = 1 NQ.</span></div>
       </div>
     </div>
   </div>
@@ -674,7 +758,7 @@ function hover(svg, getInfo){
 }
 
 /* ================= Tabs & keyboard ================= */
-const TABS = ["today","lab","learn","replay","tools","journal"];
+const TABS = ["today","lab","prop","learn","replay","tools","journal"];
 let current = "today", ready = false;
 function showTab(t){
   if (!TABS.includes(t)) t = "today"; current = t;
@@ -684,6 +768,7 @@ function showTab(t){
   if (t === "journal") renderJournal();
   if (t === "today") renderGate();
   if (t === "lab" && !showTab.labDone){ showTab.labDone = true; renderLab(); }
+  if (t === "prop" && !showTab.propDone){ showTab.propDone = true; renderProp(); }
 }
 $$("nav.tabs button").forEach(b => b.addEventListener("click", () => { showTab(b.dataset.tab); try{ history.replaceState(null,"","#"+b.dataset.tab); }catch{} }));
 document.addEventListener("click", e => {
@@ -736,7 +821,7 @@ function drawTape(){
   });
   for (let h = 0; h <= 24; h += 3) txt(svg, X(h*60), 60, (h === 24 ? 24 : String(h).padStart(2,"0")) + ":00", {"text-anchor":"middle", "font-size":10.5});
   const n = nyNow(); const x = X(n.mins + n.s/60);
-  el("line",{x1:x, x2:x, y1:8, y2:48, stroke:"var(--amber)", "stroke-width":2.5, filter:"url(#glow)"}, svg);
+  el("rect",{x:x-1.5, y:8, width:3, height:40, rx:1.5, fill:"var(--amber)", filter:"url(#glow)"}, svg);
   el("path",{d:`M${x-6} 4 L${x+6} 4 L${x} 11 Z`, fill:"var(--amber)"}, svg);
   txt(svg, Math.min(Math.max(x,24),616), 78, "NOW", {"text-anchor":"middle", fill:"var(--amber)", "font-weight":700});
 }
@@ -842,15 +927,30 @@ const RULES = {
   ema_pb:{rules:{Setup:"5-min 9 EMA above 20 EMA, 20 EMA rising (reverse for shorts).", Entry:"Bar tags the 20 EMA and closes back above; enter next bar.", Stop:"Beyond the last 2 bars (min 4 pts).", Target:"2R."}, src:"Popular retail moving-average pullback."},
   pdh_fail:{rules:{Setup:"Opened inside yesterday's range, then poked 2+ ticks beyond its high or low before noon.", Entry:"First 5-min close back inside; fade it.", Stop:"Beyond the failed-breakout extreme.", Target:"2R."}, src:"Popular ‘trapped traders’ fade."},
   imom:{rules:{Setup:"Return from yesterday's 4:00 close to 10:00 today.", Entry:"At 3:30, trade in that return's direction.", Exit:"4:00 close."}, src:"Gao, Han, Li & Zhou (2018), “Market Intraday Momentum”, Journal of Financial Economics (SPY)."},
-  bench:{rules:{Entry:"Buy every day at the 9:30 open.", Exit:"Sell at the 4:00 close."}, src:"Benchmark: what simply being long during market hours earned."}
+  bench:{rules:{Entry:"Buy every day at the 9:30 open.", Exit:"Sell at the 4:00 close."}, src:"Benchmark: what simply being long during market hours earned."},
+  drive:{rules:{Setup:"Measure 9:30–10:00. The move from the open must be at least 0.25%.", Entry:"At 10:00, join the direction of that move.", Stop:"The 9:30 opening price.", Exit:"Hold to the 4:00 close."}, src:"Opening-drive continuation, a classic momentum rule, fixed before testing."},
+  lunch:{rules:{Setup:"Mark the 11:30–1:30 range (at least 8 pts wide).", Entry:"Stop order 1 tick beyond whichever side breaks first after 1:30 (until 3:30).", Stop:"Other side of the lunch range.", Exit:"Hold to the 4:00 close."}, src:"Lunch-range (midday compression) breakout."},
+  late_mom:{rules:{Setup:"At 3:00 pm, compare price with the 9:30 open.", Entry:"Trade in that direction at 3:00.", Exit:"4:00 close. No stop."}, src:"Late-day momentum: the day's direction tends to carry into the close."},
+  vwap_trend:{rules:{Setup:"At 10:30, price is above both VWAP and the open (or below both).", Entry:"Join that side at 10:30.", Exit:"First 5-min close back across VWAP, or the 4:00 close."}, src:"VWAP trend-following."},
+  nr4_orb:{rules:{Setup:"Yesterday's range was the narrowest of the last 4 sessions (NR4).", Entry:"30-min opening range breakout (stop order).", Stop:"Other side of the range.", Target:"2× the range."}, src:"Toby Crabel's narrow-range volatility-contraction filter."},
+  on_break:{rules:{Setup:"Opened inside the overnight (Globex) range.", Entry:"First 5-min close beyond the overnight high or low before noon.", Stop:"Far side of the breakout bar (min 10 pts).", Exit:"4:00 close."}, src:"Overnight range breakout."},
+  on_fade:{rules:{Setup:"Price tests the overnight high or low before noon.", Entry:"5-min close back inside the range; fade toward VWAP.", Stop:"Beyond the test extreme.", Target:"VWAP."}, src:"Overnight-extreme fade."},
+  bb_break:{rules:{Setup:"5-min Bollinger Bands (20, 2σ).", Entry:"First close outside a band after 10:00; join the move.", Exit:"Close back through the middle band, or 4:00."}, src:"Bollinger band breakout."},
+  rsi2:{rules:{Setup:"5-min RSI(2).", Entry:"Buy below 10, sell above 90 (10:00–3:00).", Stop:"1.5× the opening 5-min average range.", Exit:"RSI crosses 50, or 4:00."}, src:"Larry Connors-style RSI(2) mean reversion."},
+  orb_fade:{rules:{Setup:"Price breaks the 30-min opening range.", Entry:"First 5-min close back inside; fade it.", Stop:"Beyond the breakout extreme.", Target:"Other side of the range."}, src:"Failed opening-range breakout fade."},
+  orb5_gap:{rules:{Setup:"First 5-min candle points the same way as the overnight gap.", Entry:"At 9:35 in that direction.", Stop:"The candle's far extreme.", Target:"10R or the 4:00 close."}, src:"Gap-filtered version of Zarattini & Aziz (2023)."},
+  channel:{rules:{Setup:"5-min bars after 10:30.", Entry:"Close beyond the prior 12-bar (1-hour) high or low.", Exit:"Close beyond the opposite 6-bar channel, or 4:00."}, src:"Intraday Donchian channel breakout."}
 };
 const TAKE = {
+  proven:"Passed every proof test, including the correction for testing many strategies. This is the one to learn and paper trade first.",
+  promising:"Beats random direction and random days, but it doesn't survive the correction for testing 45 variants. It could still be luck. Only trade it alongside the proven strategy.",
+  unproven:"Made money after costs, but the evidence isn't strong enough to rule out luck.",
   edge:"Profitable in and out of sample, in most years, and robust to parameter and cost changes. It's worth learning and paper trading first.",
   marginal:"Slightly positive after costs, but thin or inconsistent across years. Small execution mistakes can erase it.",
   none:"Lost money over 10 years after costs. Popular doesn't mean profitable. Avoid it or treat it as a warning sign.",
   bench:"The baseline to beat. A strategy with a lower Sharpe than this added risk without adding edge."
 };
-const VNAME = {edge:"Edge", marginal:"Marginal", none:"No edge", bench:"Benchmark"};
+const VNAME = {proven:"Proven", promising:"Promising", unproven:"Unproven", edge:"Edge", marginal:"Marginal", none:"Loses money", bench:"Benchmark"};
 let selStrat = "noise", exKind = "win", lbSort = {k:"sharpe", dir:-1};
 const yrsUp = s => Object.values(s.years).filter(y => y.pts > 0).length;
 function sparkline(s, w = 120, h = 30){
@@ -864,11 +964,12 @@ function sparkline(s, w = 120, h = 30){
 function renderLab(){
   const m = BT.meta, top = SBY.noise, ds = BT.daystats;
   $("#lab-lede").innerHTML = `I tested ${BT.strats.length - 1} intraday strategies (from academic papers and popular retail playbooks) on <b>${m.sessions.toLocaleString()} real NQ sessions</b> from ${m.first.slice(0,4)} to mid-${m.last.slice(0,4)}. Entries and exits use 1-minute bars, and every trade pays ${m.cost} points in costs. Rules were fixed before testing, and 2022–2025 is held out as an out-of-sample check.`;
-  const edge = BT.strats.filter(s => s.verdict === "edge").length, none = BT.strats.filter(s => s.verdict === "none").length;
-  const strip = [["Sessions tested", m.sessions, v => Math.round(v).toLocaleString()],["Strategies", BT.strats.length - 1, v => Math.round(v)],["With an edge", edge, v => `<span class="glow-up">${Math.round(v)}</span>`],["Lost money", none, v => `<span class="glow-down">${Math.round(v)}</span>`],["Best Sharpe", top.all.sharpe, v => `<span class="glow-up">${v.toFixed(2)}</span>`],["Best total (1 MNQ)", top.all.tot_pts*2, v => `<span class="glow-up">+${money0(v)}</span>`]];
+  const edge = BT.strats.filter(s => s.verdict === "proven" || s.verdict === "promising").length, none = BT.strats.filter(s => s.verdict === "none").length;
+  const strip = [["Sessions tested", m.sessions, v => Math.round(v).toLocaleString()],["Strategies", BT.strats.length - 1, v => Math.round(v)],["Proven + promising", edge, v => `<span class="glow-up">${Math.round(v)}</span>`],["Lost money", none, v => `<span class="glow-down">${Math.round(v)}</span>`],["Best Sharpe", top.all.sharpe, v => `<span class="glow-up">${v.toFixed(2)}</span>`],["Best total (1 MNQ)", top.all.tot_pts*2, v => `<span class="glow-up">+${money0(v)}</span>`]];
   $("#lab-strip").innerHTML = strip.map(([k]) => `<div class="stat"><small>${k}</small><b></b></div>`).join("");
   $$("#lab-strip .stat b").forEach((b,i) => countUp(b, strip[i][1], strip[i][2]));
   const mom = BT.strats.filter(s => ["Momentum","Breakout"].includes(s.family) && s.verdict !== "bench"), rev = BT.strats.filter(s => ["Reversion","Trend"].includes(s.family));
+  $("#lab-lede").innerHTML += ` Each strategy then faces <b>7 proof tests</b>, including a correction for the ${BT.proof.n_trials} strategy and parameter variants tried.`;
   const avgPF = a => (a.reduce((x,s) => x + s.all.pf, 0)/a.length).toFixed(2);
   $("#findings").innerHTML = [
     ["Momentum beats fading", `PF ${avgPF(mom)} vs ${avgPF(rev)}`, `Breakout and momentum rules averaged a profit factor of ${avgPF(mom)}. Pullback and fade rules averaged ${avgPF(rev)}. NQ tends to keep moving in the direction it breaks.`],
@@ -876,30 +977,32 @@ function renderLab(){
     ["Winners win less often", pct(top.all.win), `win rate for the best strategy. Its average win is ${(top.all.avg_win/-top.all.avg_loss).toFixed(1)}× its average loss. Expect more losing trades than winning ones.`],
     ["Normal day on NQ", `${ds.med_range} pts`, `median 9:30–4:00 range (${ds.med_range_pct}%) in 2023–25. That's ${money0(ds.med_range*2)} per MNQ.`]
   ].map(([h,b,p]) => `<div class="card find"><div class="eyebrow">${h}</div><div class="big grad">${b}</div><p class="small">${p}</p></div>`).join("");
-  renderLeaderboard(); renderDetail(); drawTOD();
+  renderLeaderboard(); renderDetail(); drawTOD(); renderWF();
   $("#meth").innerHTML = `<ul class="clean">
     <li><b>Data:</b> continuous front-month NQ futures, 1-minute bars, ${m.first} to ${m.last} (${m.sessions.toLocaleString()} full regular sessions; half-days skipped). Roll days are excluded from strategies that use prior-day levels.</li>
     <li><b>Fills:</b> signals use completed bars and fill at the next bar's open. Stop entries fill at the trigger, or worse on a gap. If a bar touches both stop and target, the stop counts. Targets need a tick of trade-through.</li>
     <li><b>Costs:</b> ${m.cost} NQ points per round trip (≈ $15 per NQ). Robustness runs at 0.5–2.0 pts kept noise-band momentum positive in every case (PF 1.21–1.32).</li>
     <li><b>Parameters:</b> fixed in advance from the source papers or common practice. Noise-band momentum was re-run with 9 lookback × band-width combos: PF 1.25–1.31 in all of them.</li>
+    <li><b>Proof tests:</b> t-test on daily returns with Holm–Bonferroni correction across ${BT.proof.n_trials} strategy and parameter variants; 20-day block bootstrap (2,000 resamples); 2,000 random-direction runs; 500 random-day runs; walk-forward re-selection each year. The strictest measure, the Deflated Sharpe Ratio, gives the noise-band strategy ${Math.round(SBY.noise.proof.dsr*100)}% confidence its true Sharpe is above zero after accounting for every variant tried. That's strong, not certain.</li>
     <li><b>Sharpe:</b> daily returns on 1 contract's notional, annualized, zero on no-trade days. <b>Out of sample:</b> 2022-01-01 onward.</li>
     <li><b>Limits:</b> one dataset, not verified against CME; no market-impact model; trading hours only; results are per contract and unlevered. Code: <span class="mono">DayTradingDesk/backtest/</span>.</li></ul>`;
 }
 function renderLeaderboard(){
-  const keyv = s => lbSort.k === "oos" ? s.oos.sharpe : lbSort.k === "yrs" ? yrsUp(s) : s.all[lbSort.k];
+  const keyv = s => lbSort.k === "oos" ? s.oos.sharpe : lbSort.k === "yrs" ? yrsUp(s) : lbSort.k === "padj" ? -s.proof.p_adj : s.all[lbSort.k];
   const rows = BT.strats.slice().sort((a,b) => (keyv(a) - keyv(b)) * lbSort.dir);
   const maxPF = Math.max(...BT.strats.map(s => s.all.pf));
   $("#lb-body").innerHTML = rows.map((s,i) => {
     const pfw = Math.max(0, Math.min(1, (s.all.pf - 0.7) / (maxPF - 0.7))) * 100;
     return `<tr class="click ${s.key===selStrat?"sel":""}" data-k="${s.key}" tabindex="0">
       <td class="rank">${String(i+1).padStart(2,"0")}</td>
-      <td><b style="color:var(--ink)">${s.name}</b><div class="small muted">${s.family}</div></td>
+      <td><b style="color:var(--ink)">${s.name}</b>${s.new?' <span class="pill cy" style="font-size:9px;padding:2px 6px">new</span>':""}<div class="small muted">${s.family}</div></td>
       <td><span class="verdict ${s.verdict}">${VNAME[s.verdict]}</span></td>
       <td class="n">${s.all.n.toLocaleString()}</td><td class="n">${pct(s.all.win)}</td>
       <td class="n"><span class="${s.all.pf>=1.1?"up-t":s.all.pf<1?"down-t":""}">${s.all.pf.toFixed(2)}</span><span class="bar-in"><i style="left:0;width:${pfw}%;background:${s.all.pf>=1?"var(--up)":"var(--down)"}"></i></span></td>
       <td class="n ${cls(s.all.avg_pts)}">${num(s.all.avg_pts,2,1)}</td>
       <td class="n ${cls(s.all.sharpe)}"><b>${s.all.sharpe.toFixed(2)}</b></td>
       <td class="n ${cls(s.oos.sharpe)}">${s.oos.sharpe.toFixed(2)}</td>
+      <td class="n ${s.proof.p_adj < .05 ? "up-t" : ""}">${s.proof.p_adj < .001 ? "<0.001" : s.proof.p_adj >= 1 ? "1.00" : s.proof.p_adj.toFixed(3)}</td>
       <td class="n">${yrsUp(s)}/${Object.keys(s.years).length}</td>
       <td>${sparkline(s)}</td></tr>`; }).join("");
   $$("#lb thead th.sort").forEach(th => { if (th.dataset.k === lbSort.k) th.dataset.dir = lbSort.dir > 0 ? "asc" : "desc"; else delete th.dataset.dir; });
@@ -920,7 +1023,8 @@ function renderDetail(){
   drawEquity(s); drawYears(s); drawHist(s);
   $("#d-rules").innerHTML = Object.entries(R.rules).map(([k,v]) => `<div class="rule"><b>${k}</b><span>${v}</span></div>`).join("");
   $("#d-source").textContent = "Source: " + R.src;
-  $("#d-take").innerHTML = `<b class="${s.verdict==="edge"?"up-t":s.verdict==="none"?"down-t":"amb-t"}">${VNAME[s.verdict]}.</b> ${TAKE[s.verdict]} Longs: ${s.long.n} trades, <span class="${cls(s.long.pts)}">${num(s.long.pts,0,1)} pts</span>. Shorts: ${s.short.n} trades, <span class="${cls(s.short.pts)}">${num(s.short.pts,0,1)} pts</span>.`;
+  renderProof(s);
+  $("#d-take").innerHTML = `<b class="${s.verdict==="proven"?"up-t":s.verdict==="promising"?"":s.verdict==="none"?"down-t":"amb-t"}">${VNAME[s.verdict]}.</b> ${TAKE[s.verdict]} Longs: ${s.long.n} trades, <span class="${cls(s.long.pts)}">${num(s.long.pts,0,1)} pts</span>. Shorts: ${s.short.n} trades, <span class="${cls(s.short.pts)}">${num(s.short.pts,0,1)} pts</span>.`;
   const yrs = (new Date(BT.meta.last) - new Date(BT.meta.first)) / 3.156e10;
   $("#d-money").innerHTML = `<dt>Per year, 1 MNQ</dt><dd class="${cls(s.all.tot_pts)}">${money0(s.all.tot_pts*2/yrs,1)}</dd><dt>Per year, 1 NQ</dt><dd class="${cls(s.all.tot_pts)}">${money0(s.all.tot_pts*20/yrs,1)}</dd><dt>Worst drawdown, 1 MNQ</dt><dd class="down-t">${money0(-s.dd_pts*2)}</dd><dt>Trades per year</dt><dd>${Math.round(s.all.n/yrs)}</dd>`;
   exKind = "win"; renderExample();
@@ -991,6 +1095,122 @@ function drawTOD(){
   r.forEach((v,i) => { const t = 570 + i*5; const hot = t < 600 || (t >= 600 && t < 610) || t >= 955; el("rect",{x:L + i*bw + .5, y:Y(v), width:Math.max(1,bw-1), height:H-B-Y(v), rx:1.5, fill: hot ? "url(#gAmb)" : "url(#gCy)", stroke: hot ? "var(--amber)" : "var(--cyan)", "stroke-width":.6}, svg); });
   [0,12,24,36,48,60,72].forEach(i => txt(svg, L + i*bw + bw/2, H-7, barTime(i), {"text-anchor":"middle", "font-size":10}));
   hover(svg, fx => { const i = Math.floor((fx - L)/bw); if (i < 0 || i >= r.length) return null; return {x:L + i*bw + bw/2, y:Y(r[i]), html:`${barTime(i)}–${barTime(i+1)} ET<br>avg range <b>${r[i].toFixed(1)} pts</b><br>${BT.tod.vol[i].toFixed(1)}% of day's volume`}; });
+}
+
+/* ================= Proof ================= */
+function proofTests(s){
+  const P = s.proof, yrs = Object.values(s.years), up = yrs.filter(y => y.pts > 0).length / yrs.length;
+  const f = (x, d = 3) => x == null ? "—" : x < 0.001 ? "<0.001" : x.toFixed(d);
+  return [
+    [s.all.pf > 1, "Profitable after costs", `PF ${s.all.pf.toFixed(2)}`],
+    [P.ci_pf[0] > 1, "Profit factor stays above 1 in 95% of bootstrap resamples", `${P.ci_pf[0].toFixed(2)}–${P.ci_pf[1].toFixed(2)}`],
+    [P.p_dir != null && P.p_dir < .05, "Beats the same trades with random directions", `p ${f(P.p_dir)}`],
+    [P.p_day != null && P.p_day < .05, "Beats the same timing on random days", `p ${f(P.p_day)}`],
+    [s.oos.sharpe > 0 && s.oos.pf > 1, "Profitable out of sample (2022–25)", `Sharpe ${s.oos.sharpe.toFixed(2)}`],
+    [up >= .7, "Profitable in 70%+ of years", `${Math.round(up*yrs.length)}/${yrs.length}`],
+    [P.holm, `Significant after correcting for ${BT.proof.n_trials} variants tested`, `adj. p ${f(P.p_adj)}`]
+  ];
+}
+function renderProof(s){
+  const T = proofTests(s), n = T.filter(t => t[0]).length;
+  $("#d-score").innerHTML = `<span class="${n >= 6 ? "glow-up" : n >= 4 ? "amb-t" : "glow-down"}">${n}/7</span>`;
+  $("#d-proof").innerHTML = T.map(([ok, label, v]) => `<li class="${ok?"ok":"no"}"><span class="ic">${ok?"✓":"✕"}</span><span>${label}</span><span class="val">${v}</span></li>`).join("");
+  const svg = $("#d-rand"); svg.innerHTML = ""; const P = s.proof;
+  if (!P.dir_hist){ $("#d-rand-cap").textContent = "Randomization tests are only run on strategies with a profit factor above 1.08."; return; }
+  $("#d-rand-cap").innerHTML = `2,000 runs of the same ${s.all.n.toLocaleString()} trades with <b>coin-flip directions</b>. The line is the real result (${num(P.actual,0,1)} pts).`;
+  const {W, H} = vb(svg), L = 6, Rm = 6, T2 = 18, B = 22, e = P.dir_edges, lo = Math.min(e[0], P.actual), hi = Math.max(e[e.length-1], P.actual) * 1.02 + 1;
+  const X = v => L + (v - lo)/(hi - lo)*(W - L - Rm), m = Math.max(...P.dir_hist);
+  P.dir_hist.forEach((c,i) => { const x0 = X(e[i]), x1 = X(e[i+1]), h = c/m*(H - T2 - B); el("rect",{x:x0+.5, y:H-B-h, width:Math.max(1,x1-x0-1), height:h, rx:1.5, fill:"var(--faint)", opacity:.8}, svg); });
+  const xa = X(P.actual);
+  el("rect",{x:xa-2, y:T2-4, width:4, height:H-B-T2+4, rx:2, fill: P.actual > 0 ? "var(--up)" : "var(--down)", filter:"url(#glow)"}, svg);
+  txt(svg, Math.min(xa, W - 60), T2 - 8, "REAL", {fill: P.actual > 0 ? "var(--up)" : "var(--down)", "font-weight":800});
+  [e[0], 0, e[e.length-1]].forEach(v => { if (v >= lo && v <= hi) txt(svg, X(v), H-6, num(v,0,1), {"text-anchor":"middle", "font-size":10}); });
+}
+function renderWF(){
+  const wf = BT.proof.wf_noise, svg = $("#wf-noise"); svg.innerHTML = ""; const {W, H} = vb(svg), T = 20, B = 24;
+  const m = Math.max(...wf.map(w => Math.abs(w.pts))), bw = (W - 10)/wf.length, Y0 = H - B - (H - T - B) * (Math.max(0, ...wf.map(w=>w.pts)) / (Math.max(0, ...wf.map(w=>w.pts)) - Math.min(0, ...wf.map(w=>w.pts)) || 1));
+  const sc = (H - T - B) / ((Math.max(0, ...wf.map(w=>w.pts)) - Math.min(0, ...wf.map(w=>w.pts))) || 1);
+  el("line",{x1:5, x2:W-5, y1:Y0, y2:Y0, stroke:"var(--line-2)"}, svg);
+  wf.forEach((w,i) => { const h = Math.abs(w.pts)*sc, x = 5 + i*bw + bw*.18; el("rect",{x, y:w.pts >= 0 ? Y0 - h : Y0, width:bw*.64, height:Math.max(1.5,h), rx:3, fill:w.pts >= 0 ? "var(--up)" : "var(--down)", filter:"url(#glow)"}, svg);
+    txt(svg, x + bw*.32, w.pts >= 0 ? Y0 - h - 5 : Y0 + h + 12, num(w.pts,0,1), {"text-anchor":"middle", "font-size":10, fill:"var(--ink)"}); txt(svg, x + bw*.32, H-6, w.year, {"text-anchor":"middle", "font-size":10}); });
+  hover(svg, fx => { const i = Math.floor((fx - 5)/bw); if (i < 0 || i >= wf.length) return null; const w = wf[i]; return {x:5 + i*bw + bw/2, y:Y0, html:`${w.year}: <b class="${cls(w.pts)}">${num(w.pts,0,1)} pts</b><br>settings: ${w.params}<br>${w.n} trades`}; });
+  const up = wf.filter(w => w.pts > 0).length, tot = wf.reduce((a,w) => a + w.pts, 0), sel = BT.proof.wf_select, stot = sel.reduce((a,w) => a + w.pts, 0);
+  $("#wf-pill").textContent = `${up}/${wf.length} years up · ${num(tot,0,1)} pts`;
+  $("#wf-sel").innerHTML = sel.map(w => `<tr><td class="mono">${w.year}</td><td class="small" style="white-space:normal">${w.picks.join(" · ")}</td><td class="n ${cls(w.pts)}"><b>${num(w.pts,0,1)}</b></td></tr>`).join("") + `<tr><td><b>Total</b></td><td class="small muted">${sel.filter(w => w.pts > 0).length}/${sel.length} years profitable</td><td class="n ${cls(stot)}"><b>${num(stot,0,1)}</b></td></tr>`;
+}
+
+/* ================= Prop eval (Lucid) ================= */
+const LU = BT.lucid, LUNAMES = {"noise+lunch":"Noise-band + lunch breakout (combined)"};
+let luStrat = "noise", luSize = "50K";
+const luName = k => LUNAMES[k] || (SBY[k] ? SBY[k].name : k);
+function luSeries(k){
+  const dec = s => ({p:s.p.map(x => x/4), l:s.l.map(x => x/4), n:s.n});
+  if (BT.series[k]) return dec(BT.series[k]);
+  if (k === "noise+lunch"){ const a = dec(BT.series.noise), b = dec(BT.series.lunch); return {p:a.p.map((x,i) => x + b.p[i]), l:a.l.map((x,i) => x + b.l[i]), n:a.n.map((x,i) => x + b.n[i])}; }
+  return null;
+}
+function luEval(ser, s0, micros, S, maxDays = 500){
+  let bal = S.start, peak = bal, mll = bal - S.mll, locked = false, best = 0, traded = 0; const path = [{k:s0, bal, mll}];
+  for (let k = s0; k < Math.min(ser.p.length, s0 + maxDays); k++){
+    if (!ser.n[k]) continue; traded++;
+    const per = micros*2, cost = LU.micro_extra*ser.n[k]*per;
+    if (bal + ser.l[k]*per - cost <= mll){ path.push({k, bal: mll, mll}); return {out:"fail", days:traded, end:k, path}; }
+    const day = ser.p[k]*per - cost; bal += day;
+    if (bal <= mll){ path.push({k, bal, mll}); return {out:"fail", days:traded, end:k, path}; }
+    best = Math.max(best, day); peak = Math.max(peak, bal);
+    if (!locked){ if (peak > S.start + S.mll + 100){ locked = true; mll = S.start + 100; } else mll = peak - S.mll; }
+    path.push({k, bal, mll});
+    const prof = bal - S.start;
+    if (prof >= S.target && traded >= 2 && best <= .5*prof) return {out:"pass", days:traded, end:k, path};
+  }
+  return {out:"timeout", days:traded, end:s0 + maxDays - 1, path};
+}
+function renderProp(){
+  const sel = $("#lu-strat"); sel.innerHTML = Object.keys(LU.results).map(k => `<option value="${k}" ${k===luStrat?"selected":""}>${luName(k)}</option>`).join("");
+  sel.onchange = e => { luStrat = e.target.value; renderLuTable(); luRun(); };
+  $("#lu-size").onclick = e => { const b = e.target.closest("[data-s]"); if (!b) return; luSize = b.dataset.s; $$("#lu-size button").forEach(x => x.setAttribute("aria-pressed", x === b)); renderLuTable(); luRun(); };
+  $("#lu-run").onclick = luRun; $("#lu-micros").onchange = luRun;
+  $("#lu-rules").innerHTML = Object.entries(LU.sizes).map(([k,S]) => `<tr class="${k==="50K"?"sel":""}"><td class="mono"><b>${k}</b></td><td class="n">${money0(S.target)}</td><td class="n">${money0(S.mll)}</td><td class="n">${money0(S.start + 100)}</td><td class="n">${S.max_micro/10} NQ / ${S.max_micro} MNQ</td><td class="n">${money0(S.fee)}</td></tr>`).join("");
+  const n50 = LU.results.noise.filter(r => r.size === "50K"), best = n50.reduce((a,r) => r.pass_rate > a.pass_rate ? r : a), l1 = LU.luck["50K|1"], l2 = LU.luck["50K|2"], r2 = n50.find(r => r.micros === 2);
+  const strip = [["Noise-band pass rate (50K, 1 MNQ)", best.pass_rate*100, v => `<span class="glow-up">${v.toFixed(0)}%</span>`], ["Same trades, random direction", l1.pass_rate*100, v => `<span class="glow-down">${v.toFixed(0)}%</span>`], ["Pass rate at 2 MNQ", r2.pass_rate*100, v => `<span class="glow-up">${v.toFixed(0)}%</span>`], ["Luck at 2 MNQ", l2.pass_rate*100, v => `<span class="glow-down">${v.toFixed(0)}%</span>`], ["Median sessions to pass (2 MNQ)", r2.med_days, v => Math.round(v)], ["Fee per pass (2 MNQ)", r2.cost_per_pass, v => money0(v)]];
+  $("#lu-strip").innerHTML = strip.map(([k]) => `<div class="stat"><small>${k}</small><b></b></div>`).join("");
+  $$("#lu-strip .stat b").forEach((b,i) => countUp(b, strip[i][1], strip[i][2]));
+  renderLuTable(); luRun();
+}
+function renderLuTable(){
+  const rows = LU.results[luStrat].filter(r => r.size === luSize), bestEV = rows.reduce((a,r) => r.ev > a.ev ? r : a, rows[0]), bestP = rows.reduce((a,r) => r.pass_rate > a.pass_rate ? r : a, rows[0]);
+  $("#lu-table").innerHTML = rows.map(r => { const lk = LU.luck[`${luSize}|${r.micros}`];
+    return `<tr class="${r === bestEV ? "sel" : ""}"><td class="n"><b>${r.micros}</b></td>
+    <td class="n heat"><i style="width:${r.pass_rate*100}%;background:var(--up)"></i><span class="${r.pass_rate >= .4 ? "up-t" : ""}"><b>${pct(r.pass_rate)}</b></span></td>
+    <td class="n muted">${lk ? pct(lk.pass_rate) : "—"}</td>
+    <td class="n heat"><i style="width:${r.fail_rate*100}%;background:var(--down)"></i><span class="${r.fail_rate >= .5 ? "down-t" : ""}">${pct(r.fail_rate)}</span></td>
+    <td class="n">${r.med_days ?? "—"}</td><td class="n">${r.cost_per_pass ? money0(r.cost_per_pass) : "—"}</td><td class="n">${money0(r.funded_paid)}</td>
+    <td class="n ${cls(r.ev)}"><b>${money0(r.ev,1)}</b></td></tr>`; }).join("");
+  const S = LU.sizes[luSize], lk = LU.luck[`${luSize}|${bestEV.micros}`];
+  $("#lu-rec").innerHTML = `<p style="font-size:15px"><b style="color:var(--ink)">${luName(luStrat)}</b> on a <b style="color:var(--ink)">${luSize} LucidFlex</b>:</p>
+    <div class="stats" style="margin-top:10px"><div class="stat"><small>Best value</small><b style="font-size:18px">${bestEV.micros} MNQ</b><em>${pct(bestEV.pass_rate)} pass · median ${bestEV.med_days ?? "—"} sessions · EV ${money0(bestEV.ev,1)}</em></div><div class="stat"><small>Safest</small><b style="font-size:18px">${bestP.micros} MNQ</b><em>${pct(bestP.pass_rate)} pass · ${pct(bestP.fail_rate)} fail · median ${bestP.med_days ?? "—"} sessions</em></div></div>
+    <p class="small" style="margin-top:10px">${lk ? `Random-direction trading at ${bestEV.micros} MNQ passes <b class="down-t">${pct(lk.pass_rate)}</b> of the time with EV <b class="down-t">${money0(lk.ev,1)}</b>, so the gap is the strategy's edge. ` : ""}${bestEV.ev <= 0 ? '<b class="down-t">No size has positive expected value for this strategy. Skip it for evals.</b>' : `Budget for ${Math.max(1, Math.ceil(1/Math.max(bestEV.pass_rate,.01)))} attempts (${money0(S.fee*Math.ceil(1/Math.max(bestEV.pass_rate,.01)))} in fees at list price) to expect one pass.`}</p>`;
+  $("#lu-micros").value = bestEV.micros;
+}
+function luRun(){
+  const ser = luSeries(luStrat), svg = $("#lu-path"); svg.innerHTML = "";
+  if (!ser){ $("#lu-cap").textContent = "Path replay is available for single strategies."; return; }
+  const S = LU.sizes[luSize], m = Math.max(1, Math.min(S.max_micro, Math.floor(val("lu-micros") || 1)));
+  const s0 = Math.floor(Math.random() * (ser.p.length - 520)), r = luEval(ser, s0, m, S);
+  const {W, H} = vb(svg), L = 8, Rr = 62, T = 14, B = 22, P = r.path;
+  const vals = P.flatMap(x => [x.bal, x.mll]).concat([S.start + S.target, S.start - S.mll]); const lo = Math.min(...vals), hi = Math.max(...vals);
+  const X = i => L + i/Math.max(1, P.length-1)*(W - L - Rr), Y = v => T + (hi - v)/(hi - lo || 1)*(H - T - B);
+  const grid = v => { el("line",{x1:L, x2:W-Rr, y1:Y(v), y2:Y(v), stroke:"var(--grid)"}, svg); txt(svg, W-Rr+6, Y(v)+4, money0(v)); };
+  const step = niceStep((hi-lo)/4); for (let v = Math.ceil(lo/step)*step; v <= hi; v += step) grid(v);
+  el("line",{x1:L, x2:W-Rr, y1:Y(S.start + S.target), y2:Y(S.start + S.target), stroke:"var(--up)", "stroke-dasharray":"6 4", "stroke-width":1.5}, svg); txt(svg, L+4, Y(S.start + S.target) - 5, "TARGET", {fill:"var(--up)", "font-weight":800});
+  el("path",{d:P.map((x,i) => `${i?"L":"M"}${X(i).toFixed(1)} ${Y(x.mll).toFixed(1)}`).join(""), fill:"none", stroke:"var(--down)", "stroke-width":2}, svg);
+  txt(svg, L+4, Y(P[0].mll) + 14, "MAX LOSS LIMIT (trails, then locks)", {fill:"var(--down)", "font-weight":700, "font-size":10});
+  const line = el("path",{d:P.map((x,i) => `${i?"L":"M"}${X(i).toFixed(1)} ${Y(x.bal).toFixed(1)}`).join(""), fill:"none", stroke:"var(--amber)", "stroke-width":2.4, filter:"url(#glow)"}, svg); animateDraw(line);
+  const lp = P[P.length-1], col = r.out === "pass" ? "var(--up)" : r.out === "fail" ? "var(--down)" : "var(--amber)";
+  el("circle",{cx:X(P.length-1), cy:Y(lp.bal), r:6, fill:col, stroke:"var(--bg)", "stroke-width":2, filter:"url(#glow)"}, svg);
+  hover(svg, fx => { const i = Math.max(0, Math.min(P.length-1, Math.round((fx - L)/(W - L - Rr)*(P.length-1)))); return {x:X(i), y:Y(P[i].bal), html:`${BT.series_dates[P[i].k]}<br>balance <b class="amb-t">${money0(P[i].bal)}</b><br>max loss limit <span class="down-t">${money0(P[i].mll)}</span>`}; });
+  const d0 = BT.series_dates[s0], d1 = BT.series_dates[Math.min(r.end, BT.series_dates.length-1)];
+  $("#lu-cap").innerHTML = `Started ${d0} with ${m} MNQ. <b style="color:${col}">${r.out === "pass" ? "PASSED" : r.out === "fail" ? "FAILED" : "STILL GOING after 500 sessions"}</b> after ${r.days} trading sessions (${d1}). Click again for another random start.`;
 }
 
 /* ================= Noise band (Today) ================= */
@@ -1322,7 +1542,7 @@ function initToday(){
 
 /* ================= Ticker ================= */
 function renderTicker(){
-  const items = BT.strats.filter(s => s.verdict !== "bench").map(s => { const up = s.all.pf >= 1;
+  const items = BT.strats.filter(s => s.verdict !== "bench").sort((a,b) => ["proven","promising","unproven","none"].indexOf(a.verdict) - ["proven","promising","unproven","none"].indexOf(b.verdict)).map(s => { const up = s.all.pf >= 1;
     return `<span><b>${s.name.toUpperCase()}</b> PF ${s.all.pf.toFixed(2)} <span class="${up?"up-t":"down-t"}">${up?"▲":"▼"} ${num(s.all.tot_pts,0,1)} pts</span> <span class="verdict ${s.verdict}" style="font-size:9px;padding:3px 6px">${VNAME[s.verdict]}</span></span>`; });
   items.push(`<span><b>MEDIAN NQ DAY</b> ${BT.daystats.med_range} pts</span>`, `<span><b>HIGH/LOW IN 1ST HOUR</b> ${pct(BT.daystats.hi_first_hour)}</span>`);
   $("#ticker").innerHTML = items.join("") + items.join("");
@@ -1346,5 +1566,6 @@ function init(){
   showTab(TABS.includes(h) ? h : store.get("tab", "today"));
 }
 init();
+window.NQDESK = {luEval, luSeries, LU};  // exposed for verification
 })();
 </script>
