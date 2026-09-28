@@ -102,6 +102,8 @@ for k in ["noise", "drive", "lunch", "late_mom", "orb5_z", "gap_go"]:
     out["series"][k] = dict(p=[int(round(x * 4)) for x in pts], l=[int(round(x * 4)) for x in low], n=[int(x) for x in n])
 out["series_dates"] = dates
 out["regime"] = json.load(open(os.path.join(D, "regime.json")))
+from strategies_scout import LEDGER
+out["scout"] = LEDGER
 s = json.dumps(clean(out), separators=(",", ":"))
 open(os.path.join(os.path.dirname(__file__), "..", "bt-data.json"), "w").write(s)
 print("bytes", len(s)); print(json.dumps(out["daystats"]), out["sigma"][:4])

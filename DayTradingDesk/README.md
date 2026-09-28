@@ -6,9 +6,10 @@ Nasdaq-100 futures (NQ / MNQ). Open `index.html` in any browser.
 | Tab | What it does |
 | --- | --- |
 | Today | Live New York session clock, front-month contract, trade/no-trade gate from your daily limits, noise-band signal calculator, checklist, key levels |
+| Research fleet | Eight research agents modeled on the AnswerRank pipeline (Scout, Auditor, Skeptic, Regime analyst, Portfolio builder, Risk officer, Reporter, Bookkeeper), regime heatmap, portfolios, correlations, Scout research ledger |
 | Prop eval | Lucid Trading LucidFlex rules, pass-rate simulator by size and contracts, luck baseline, how to get the eval |
-| Backtest Lab | 27 strategies + benchmark tested on 2,630 real NQ sessions (2015 to Jul 2025): leaderboard, equity curves, yearly results, real example trades |
-| Learn | Workflow, order book, futures vs. QQQ, contract specs and roll calendar, costs, learning path |
+| Backtest Lab | 41 strategies + benchmark tested on 2,630 real NQ sessions (2015 to Jul 2025): leaderboard, equity curves, yearly results, real example trades |
+| Learn | Beginner course: 40-term glossary, candlestick / ticks-to-dollars / bracket / expectancy visuals, interactive trailing-drawdown simulator, consistency-rule checker, why evals fail, 8-question quiz; plus workflow, order book, futures vs. QQQ, contract specs and roll calendar, costs, learning path |
 | Replay | Trade 160 real NQ sessions bar by bar with a bracket (keys: B, S, F, →, Space, N) |
 | Risk tools | Position sizer, reward:risk planner, Monte Carlo simulator that loads any backtested strategy |
 | Journal | Trade log, stats, your results vs. the backtest per setup, CSV copy/import |
@@ -40,7 +41,8 @@ and had negative expected value at every size. Rules sourced from Lucid's help c
 # 1. download data (Hugging Face: mdelcristo/NQ-F_1min_OHLCV_Parquet) into $NQ_DATA as NQ_<year>.parquet
 cd backtest
 NQ_DATA=/path/to/data python3 load.py     # builds per-session arrays
-NQ_DATA=/path/to/data python3 run_all.py      # runs all 27 strategies + benchmark
+NQ_DATA=/path/to/data python3 run_all.py      # runs all 41 strategies + benchmark (incl. strategies_scout.py)
+NQ_DATA=/path/to/data python3 regime.py       # regime analyst + portfolio builder
 NQ_DATA=/path/to/data python3 robust.py       # parameter and cost sensitivity
 NQ_DATA=/path/to/data python3 proof.py        # significance, bootstrap, randomization, walk-forward
 NQ_DATA=/path/to/data python3 lucid.py        # LucidFlex evaluation simulator

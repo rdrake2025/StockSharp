@@ -2,19 +2,20 @@
 import os, pickle
 import bt
 from strategies_more import MORE
+from strategies_scout import SCOUT
 
 def main():
     data = os.environ.get("NQ_DATA", "data")
     days = pickle.load(open(os.path.join(data, "days.pkl"), "rb"))
     split = "2022-01-01"
     nd_in = sum(1 for d in days if str(d["date"]) < split); nd_out = len(days) - nd_in
-    allS = {**bt.STRATS, **MORE}; res = {}
+    allS = {**bt.STRATS, **MORE, **SCOUT}; res = {}
     for k, (name, fam, fn) in allS.items():
         tr = bt.run(days, fn)
         ins = [t for t in tr if t["date"] < split]; oos = [t for t in tr if t["date"] >= split]
         years = {}
         for t in tr: years.setdefault(t["date"][:4], []).append(t)
-        res[k] = dict(name=name, family=fam, new=k in MORE, all=bt.metrics(tr, len(days)), ins=bt.metrics(ins, nd_in), oos=bt.metrics(oos, nd_out),
+        res[k] = dict(name=name, family=fam, new=k in MORE or k in SCOUT, scout=k in SCOUT, all=bt.metrics(tr, len(days)), ins=bt.metrics(ins, nd_in), oos=bt.metrics(oos, nd_out),
                       years={y: dict(n=len(v), pts=sum(t["pts"] for t in v), ret=sum(t["ret"] for t in v), win=sum(t["pts"] > 0 for t in v) / len(v)) for y, v in sorted(years.items())},
                       trades=tr)
         a, o = res[k]["all"], res[k]["oos"]

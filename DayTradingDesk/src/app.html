@@ -236,6 +236,25 @@ ol.stepsl b{color:var(--ink)}
 .brief li::before{content:counter(b,decimal-leading-zero);font:800 13px/30px var(--mono);color:var(--amber)}
 .brief b{color:var(--ink)}
 .heat td.hc{text-align:center;font-family:var(--mono);font-weight:700;font-size:13px}
+.gl-grid{display:grid;gap:10px;grid-template-columns:repeat(auto-fill,minmax(min(100%,280px),1fr));margin-top:12px}
+.term{background:rgba(10,16,34,.7);border:1px solid var(--line);border-radius:12px;padding:12px 14px}
+.term b{display:block;color:var(--ink);font:750 15px/1.2 var(--display);font-stretch:108%}
+.term .cat{font:700 9.5px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--cyan);margin-top:5px;display:inline-block}
+.term p{font-size:13.5px;margin-top:7px;color:var(--text)}
+.term .ex{font:500 12px/1.45 var(--mono);color:var(--amber);margin-top:7px}
+.fail{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr))}
+.fail .card{border-left:3px solid var(--down)}
+.fail .fix{color:var(--up);font-weight:600;font-size:13.5px;margin-top:8px}
+.quiz-q{padding:14px 0;border-bottom:1px solid var(--line)}
+.quiz-q:last-child{border-bottom:0}
+.quiz-q .opts{display:grid;gap:6px;margin-top:8px;grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr))}
+.quiz-q button{border:1px solid var(--line-2);background:rgba(6,10,21,.7);border-radius:9px;padding:9px 12px;text-align:left;cursor:pointer;color:var(--text);font-size:14px}
+.quiz-q button:hover{border-color:var(--muted)}
+.quiz-q button.right{border-color:var(--up);background:var(--up-dim);color:var(--ink)}
+.quiz-q button.wrong{border-color:var(--down);background:var(--down-dim)}
+.quiz-q .why{font-size:13.5px;margin-top:8px}
+.big-toggle{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+input[type=range]{accent-color:var(--amber);width:100%}
 footer.foot{margin-top:48px;padding-top:18px;border-top:1px solid var(--line);color:var(--faint);font-size:12.5px;max-width:95ch}
 @media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}.draw{stroke-dashoffset:0}}
 @media (max-width:640px){.clockmini{display:none}nav.tabs{margin-left:0;width:100%}nav.tabs button kbd{display:none}.big-out{font-size:36px}.rule{grid-template-columns:1fr;gap:2px}}
@@ -513,7 +532,96 @@ footer.foot{margin-top:48px;padding-top:18px;border-top:1px solid var(--line);co
     <h2>How day trading NQ futures works</h2>
     <p class="lede">A day trader opens and closes every position within one session, so nothing is held overnight. The edge is small, so costs, position size and discipline decide whether you keep any of it.</p>
   </div>
-  <div class="subnav"><a class="chip" href="#l-flow">Workflow</a><a class="chip" href="#l-mech">Order book</a><a class="chip" href="#l-contract">Contracts</a><a class="chip" href="#l-costs">Costs &amp; capital</a><a class="chip" href="#l-path">Your path</a></div>
+  <div class="subnav"><a class="chip" href="#l-start">Start here</a><a class="chip" href="#l-terms">Key terms</a><a class="chip" href="#l-visual">Visual guides</a><a class="chip" href="#l-dd">Drawdown simulator</a><a class="chip" href="#l-fail">Why evals fail</a><a class="chip" href="#l-quiz">Quiz</a><a class="chip" href="#l-flow">Workflow</a><a class="chip" href="#l-contract">Contracts</a><a class="chip" href="#l-path">Your path</a></div>
+
+  <div class="card hot" id="l-start">
+    <div class="eyebrow">Start here · the whole idea in 60 seconds</div>
+    <div class="grid g3" style="margin-top:12px">
+      <div><h3>1 · What you trade</h3><p class="small" style="margin-top:6px"><b>MNQ</b> is a contract that tracks the Nasdaq-100. Every 1-point move is <b>$2</b> per contract. NQ moves about 200 points on a normal day, so one MNQ swings about $400.</p></div>
+      <div><h3>2 · How you win</h3><p class="small" style="margin-top:6px">Wait for a <b>tested setup</b>, enter with a <b>stop</b> (where you're wrong) already placed, and let winners run further than losers. You can win only 39% of trades and still make money if wins are 2× losses.</p></div>
+      <div><h3>3 · How you pass an eval</h3><p class="small" style="margin-top:6px">Make the <b>profit target</b> without your balance ever touching the <b>max loss limit</b>, which follows your best end-of-day balance up. Small size and patience beat big size and hope.</p></div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:16px" id="l-terms">
+    <div class="card-h"><div><div class="eyebrow">Key terms</div><h3 style="margin-top:6px">The words you'll hear, in plain English</h3></div>
+      <input id="gl-q" type="text" placeholder="Search terms… (e.g. drawdown)" style="max-width:280px" aria-label="Search terms"></div>
+    <div class="row" id="gl-cats" style="margin-top:12px"></div>
+    <div class="gl-grid" id="gl-grid"></div>
+  </div>
+
+  <div id="l-visual" class="grid g2" style="margin-top:16px">
+    <div class="card">
+      <div class="eyebrow">Visual guide</div><h3 style="margin-top:6px">Reading a candlestick</h3>
+      <svg class="chart" id="vg-candle" viewBox="0 0 520 250" role="img" aria-label="Candlestick anatomy"></svg>
+      <p class="small">Each candle is one time block, 5 minutes on this site's charts. <b class="up-t">Green</b> means price closed higher than it opened; <b class="down-t">red</b> means lower. The thin wicks show how far price stretched before pulling back.</p>
+    </div>
+    <div class="card">
+      <div class="eyebrow">Visual guide</div><h3 style="margin-top:6px">Points, ticks and dollars</h3>
+      <label class="f" style="margin-top:8px">NQ moves this many points: <b class="mono amb-t" id="tk-val" style="font-size:16px">25</b><input id="tk-pts" type="range" min="0.25" max="250" step="0.25" value="25"></label>
+      <div class="stats" id="tk-out" style="margin-top:12px;grid-template-columns:repeat(2,minmax(0,1fr))"></div>
+      <svg class="chart" id="tk-bar" viewBox="0 0 520 70" role="img" aria-label="Move compared with a typical day" style="margin-top:10px"></svg>
+      <p class="small">1 point = 4 ticks. The smallest move is one tick (0.25 pts), worth $0.50 on MNQ and $5 on NQ. The bar compares your move with a typical NQ day.</p>
+    </div>
+    <div class="card">
+      <div class="eyebrow">Visual guide</div><h3 style="margin-top:6px">A bracket order: your trade's seatbelt</h3>
+      <svg class="chart" id="vg-bracket" viewBox="0 0 520 260" role="img" aria-label="Bracket order diagram"></svg>
+      <p class="small">A <b>bracket</b> places your stop-loss and profit target together with the entry. Whichever gets hit first closes the trade and cancels the other (that's "OCO", one-cancels-other). You decide the risk <i>before</i> emotions kick in.</p>
+    </div>
+    <div class="card">
+      <div class="eyebrow">Visual guide</div><h3 style="margin-top:6px">Why a 39% win rate can pay</h3>
+      <svg class="chart" id="vg-exp" viewBox="0 0 520 250" role="img" aria-label="Expectancy visual"></svg>
+      <p class="small">100 trades of the proven strategy's shape: 39 winners averaging about 2× the size of 61 losers. More red squares, but the green ones are bigger. This is <b>positive expectancy</b>.</p>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:16px" id="l-dd">
+    <div class="card-h"><div><div class="eyebrow">Eval survival · the #1 reason accounts fail</div><h3 style="margin-top:6px">Trailing drawdown simulator (LucidFlex 50K rules)</h3></div>
+      <div class="seg" role="group" aria-label="Scenario" id="dd-scn"><button data-s="0" aria-pressed="true">Clean pass</button><button data-s="1" aria-pressed="false">Intraday breach</button><button data-s="2" aria-pressed="false">Consistency trap</button></div></div>
+    <p class="small">Start $50,000 · target +$3,000 · max loss $2,000. The <b class="down-t">red line</b> is the max loss limit (MLL). It moves up with your best <b>end-of-day</b> balance, never down, and locks at $50,100 once you've closed above $52,100. Your balance touching it at <b>any moment</b> fails the account.</p>
+    <div class="chart-box" style="margin-top:8px"><svg class="chart" id="dd-chart" viewBox="0 0 900 300" role="img" aria-label="Trailing drawdown"></svg></div>
+    <label class="f" style="margin-top:10px">Step through the days: <b class="mono" id="dd-day"></b><input id="dd-step" type="range" min="1" max="10" value="10"></label>
+    <div class="gate" id="dd-note" style="margin-top:10px"></div>
+  </div>
+
+  <div class="grid g2" style="margin-top:16px">
+    <div class="card">
+      <div class="eyebrow">Eval survival</div><h3 style="margin-top:6px">Consistency-rule checker</h3>
+      <p class="small">LucidFlex evaluations require your <b>biggest single day ≤ 50%</b> of total profit when you pass. Enter your daily P&amp;L (comma separated):</p>
+      <input id="cc-in" type="text" class="mono" value="400, 650, -200, 1800, 350" style="margin-top:8px" aria-label="Daily profits">
+      <div class="stats" id="cc-out" style="margin-top:12px"></div>
+      <div class="gate" id="cc-gate" style="margin-top:10px"></div>
+    </div>
+    <div class="card">
+      <div class="eyebrow">Eval survival</div><h3 style="margin-top:6px">Beginner rules that pass evals</h3>
+      <div class="rules">
+        <div class="rule"><b>Size</b><span>Start with <b>1–2 MNQ</b> on a 50K. Its $2,000 max loss is ~50 bad points on 20 MNQ, but ~500 on 2 MNQ.</span></div>
+        <div class="rule"><b>Daily cap</b><span>Stop for the day at <b>−$400</b> (20% of the max loss). Five bad days in a row still leaves you alive.</span></div>
+        <div class="rule"><b>Setups</b><span>Only the tested strategy. Every trade logged in the Journal with a grade.</span></div>
+        <div class="rule"><b>News</b><span>Flat 5 minutes before 8:30 CPI/jobs, 10:00 data, and 2:00 FOMC.</span></div>
+        <div class="rule"><b>Big day</b><span>After any day worth 30%+ of your target, go back to normal size. Don't press it.</span></div>
+        <div class="rule"><b>Clock</b><span>Flat by 3:55 pm ET (the firm's hard cutoff is 4:45 pm).</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div style="margin-top:16px" id="l-fail">
+    <div class="eyebrow">Eval survival</div><h3 style="margin-top:6px;margin-bottom:12px">Six ways beginners fail evals, and the fix for each</h3>
+    <div class="fail">
+      <div class="card"><h3>Oversizing</h3><p class="small">Trading 10–20 micros because the platform allows 40. One normal 50-point pullback on 20 MNQ is −$2,000: the whole account.</p><p class="fix">Fix: size so a full stop costs ≤ 10% of the max loss.</p></div>
+      <div class="card"><h3>Revenge trading</h3><p class="small">Taking a new trade right after a loss to "win it back", usually bigger and without a setup.</p><p class="fix">Fix: 2 losses in a row = done for the day. The Today tab's gate enforces it.</p></div>
+      <div class="card"><h3>Forgetting the intraday check</h3><p class="small">"End-of-day drawdown" sounds like only the close counts. It doesn't. Dipping to the limit at 11 am ends the account even if you'd have recovered.</p><p class="fix">Fix: know your MLL number every morning. Your stop must sit above it.</p></div>
+      <div class="card"><h3>One lucky day</h3><p class="small">A +$1,800 day on a $3,000 target breaks the 50% consistency rule. You'd need $3,600 total to pass.</p><p class="fix">Fix: cap each day around 30–40% of the target. Use the checker above.</p></div>
+      <div class="card"><h3>Trading the news</h3><p class="small">CPI and FOMC can move NQ 100+ points in seconds, and stops can fill far past their price (slippage).</p><p class="fix">Fix: be flat before scheduled releases.</p></div>
+      <div class="card"><h3>Moving the stop</h3><p class="small">Dragging a stop further away "to give it room" turns a planned −$60 loss into −$600.</p><p class="fix">Fix: brackets on every trade. Stops only move toward profit, never away.</p></div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:16px" id="l-quiz">
+    <div class="card-h"><div><div class="eyebrow">Check yourself</div><h3 style="margin-top:6px">Eval readiness quiz</h3></div><span class="pill" id="qz-score">0 / 8</span></div>
+    <div id="qz"></div>
+    <button class="btn ghost" id="qz-reset">Reset quiz</button>
+  </div>
 
   <div class="steps" id="l-flow">
     <div class="step"><h3>Read context</h3><p class="small">Before 9:30: overnight high/low, prior day high/low/close, economic calendar (8:30, 10:00, 2:00 ET).</p></div>
@@ -817,6 +925,7 @@ function showTab(t){
   if (t === "journal") renderJournal();
   if (t === "today") renderGate();
   if (t === "lab" && !showTab.labDone){ showTab.labDone = true; renderLab(); }
+  if (t === "learn" && !showTab.learnDone){ showTab.learnDone = true; initLearn(); }
   if (t === "fleet" && !showTab.fleetDone){ showTab.fleetDone = true; renderFleet(); }
   if (t === "prop" && !showTab.propDone){ showTab.propDone = true; renderProp(); }
 }
@@ -989,6 +1098,20 @@ const RULES = {
   rsi2:{rules:{Setup:"5-min RSI(2).", Entry:"Buy below 10, sell above 90 (10:00–3:00).", Stop:"1.5× the opening 5-min average range.", Exit:"RSI crosses 50, or 4:00."}, src:"Larry Connors-style RSI(2) mean reversion."},
   orb_fade:{rules:{Setup:"Price breaks the 30-min opening range.", Entry:"First 5-min close back inside; fade it.", Stop:"Beyond the breakout extreme.", Target:"Other side of the range."}, src:"Failed opening-range breakout fade."},
   orb5_gap:{rules:{Setup:"First 5-min candle points the same way as the overnight gap.", Entry:"At 9:35 in that direction.", Stop:"The candle's far extreme.", Target:"10R or the 4:00 close."}, src:"Gap-filtered version of Zarattini & Aziz (2023)."},
+  fomc_pre:{rules:{When:"Scheduled FOMC statement days (8 a year).", Entry:"Long at the 9:30 open.", Exit:"1:55 pm, before the 2:00 statement."}, src:"Lucca & Moench (2015), Journal of Finance; Kurov, Wolfe & Gilbert (2021) on its decline. Found by the Scout agent."},
+  fomc_post:{rules:{When:"FOMC statement days.", Entry:"Short at 2:05 pm, after the first reaction.", Exit:"4:00 close."}, src:"Citi strategists' FOMC-day statistics (via Investing.com). Found by the Scout agent."},
+  fomc_fade:{rules:{When:"FOMC statement days.", Entry:"At 2:30 (press conference), fade the 2:00–2:30 move.", Stop:"Beyond the 2:00–2:30 extreme.", Exit:"3:30 pm."}, src:"Narain & Sangani (2026), International Journal of Central Banking. Found by the Scout agent."},
+  overnight:{rules:{Entry:"Long at 11:30 pm ET on the Globex session (European pre-open).", Exit:"3:30 am ET. Flat long before the 9:30 open."}, src:"Bondarenko & Muravyev (2023, JFQA); NY Fed (2026) reports it vanished after 2021. Found by the Scout agent."},
+  overnight_c:{rules:{Setup:"Yesterday's 9:30–4:00 return was in the bottom third of the last 40 sessions.", Entry:"Long 11:30 pm ET.", Exit:"3:30 am ET."}, src:"Boyarchenko, Larsen & Whelan (2023, RFS). Found by the Scout agent."},
+  dash4cash:{rules:{Setup:"S = the month-end settlement deadline (T−3 before Sept 2017, T−2 until May 2024, then T−1).", Short:"Hold 9:30–4:00 on the 5 sessions before S.", Long:"Hold 9:30–4:00 from S through the 3rd session of the new month."}, src:"Etula, Rinne, Suominen & Vaittinen (2020), Review of Financial Studies. Found by the Scout agent."},
+  dash4cash_l:{rules:{Setup:"Same calendar as the dash for cash.", Long:"Hold 9:30–4:00 from the settlement day S through the 3rd session of the new month. No shorts."}, src:"Etula et al. (2020). Found by the Scout agent."},
+  rebal:{rules:{Signal:"NQ's month-to-date return up to yesterday's close.", Entry:"If up: short 9:30–4:00 on T−4…T−1, long on T. If down: the reverse."}, src:"Harvey, Mazzoleni & Melone (2025), NBER. NQ-only proxy (the paper also uses bonds). Found by the Scout agent."},
+  tom:{rules:{When:"The last trading day of the month and the first three of the next.", Entry:"Long at 9:30.", Exit:"4:00 close."}, src:"Lakonishok & Smidt (1988); McConnell & Xu (2008). Found by the Scout agent."},
+  fomc_cycle:{rules:{When:"Even weeks of the FOMC cycle (week 0 = day before the meeting to 3 days after, then 5-session weeks).", Entry:"Long 9:30–4:00 on even-week days."}, src:"Cieslak, Morse & Vissing-Jorgensen (2019), Journal of Finance. Found by the Scout agent."},
+  open_rev:{rules:{Setup:"The 9:30–9:45 move is larger than 2 standard deviations of the last 40 sessions.", Entry:"Fade it at 9:45.", Stop:"Beyond the 9:30–9:45 extreme.", Exit:"4:00 close."}, src:"Grant, Wolf & Yu (2005), Journal of Banking & Finance. Found by the Scout agent."},
+  opex:{rules:{When:"Monday–Thursday of the week with the monthly option expiration (3rd Friday).", Entry:"Long 9:30–4:00."}, src:"Stivers & Sun (2013). Found by the Scout agent."},
+  preholiday:{rules:{When:"The last session before an NYSE holiday closure.", Entry:"Long 9:30–4:00."}, src:"Ariel (1990), Journal of Finance. Found by the Scout agent."},
+  monday:{rules:{When:"The first session of the week.", Entry:"Short at 9:30.", Exit:"10:15."}, src:"Harris (1986), Journal of Financial Economics. Found by the Scout agent."},
   channel:{rules:{Setup:"5-min bars after 10:30.", Entry:"Close beyond the prior 12-bar (1-hour) high or low.", Exit:"Close beyond the opposite 6-bar channel, or 4:00."}, src:"Intraday Donchian channel breakout."}
 };
 const TAKE = {
@@ -1187,6 +1310,176 @@ function renderWF(){
   const up = wf.filter(w => w.pts > 0).length, tot = wf.reduce((a,w) => a + w.pts, 0), sel = BT.proof.wf_select, stot = sel.reduce((a,w) => a + w.pts, 0);
   $("#wf-pill").textContent = `${up}/${wf.length} years up · ${num(tot,0,1)} pts`;
   $("#wf-sel").innerHTML = sel.map(w => `<tr><td class="mono">${w.year}</td><td class="small" style="white-space:normal">${w.picks.join(" · ")}</td><td class="n ${cls(w.pts)}"><b>${num(w.pts,0,1)}</b></td></tr>`).join("") + `<tr><td><b>Total</b></td><td class="small muted">${sel.filter(w => w.pts > 0).length}/${sel.length} years profitable</td><td class="n ${cls(stot)}"><b>${num(stot,0,1)}</b></td></tr>`;
+}
+
+/* ================= Learn: beginner tools ================= */
+const GLOSS = [
+  ["Futures contract","Basics","An agreement to buy or sell an index at a future date. Day traders never hold to that date. They just trade the price moves.","MNQ, NQ, ES, MES"],
+  ["MNQ / NQ","Basics","Micro and E-mini Nasdaq-100 futures. Same price, different size: MNQ is $2 per point, NQ is $20. 10 MNQ = 1 NQ.","50 pts × $2 = $100 per MNQ"],
+  ["Point","Basics","One full unit of the index price, e.g. 23,500 → 23,501.","1 pt = $2 MNQ / $20 NQ"],
+  ["Tick","Basics","The smallest price step: 0.25 points.","1 tick = $0.50 MNQ / $5 NQ"],
+  ["Leverage","Basics","Controlling a large amount of index value with little money. It makes small moves matter a lot, both ways.","1 MNQ at 23,500 ≈ $47,000 of index"],
+  ["Margin","Basics","Money your broker holds while a position is open. Day-trade margin is small; it isn't the most you can lose.",""],
+  ["Front month / roll","Basics","The contract most people trade right now. About 8 days before expiry, traders switch (roll) to the next quarter's contract.","NQZ26 → NQH27 in December"],
+  ["RTH / Globex","Sessions","Regular trading hours are 9:30–4:00 ET. Globex is the nearly 24-hour electronic session around them.",""],
+  ["Opening range","Sessions","The high and low of the first 5, 15 or 30 minutes after 9:30. Many strategies trade the break of it.",""],
+  ["Bid / Ask / Spread","Orders","Bid = best price buyers pay. Ask = best price sellers accept. Spread = the gap, usually 1 tick on NQ.","Bid 23,500.00 / Ask 23,500.25"],
+  ["Market order","Orders","Buy or sell right now at the best available price. Fast, but you can get a slightly worse fill.",""],
+  ["Limit order","Orders","Buy or sell only at your price or better. It may never fill.",""],
+  ["Stop order","Orders","Becomes a market order when price touches it. Used for stop-losses and breakout entries.",""],
+  ["Bracket / OCO","Orders","Entry plus stop-loss plus target placed together. When one exit fills, the other cancels (one-cancels-other).",""],
+  ["Slippage","Orders","Getting filled at a worse price than planned, common in fast markets and on stops.","Stop at 23,480 fills at 23,478"],
+  ["Flatten","Orders","Close every open position right now.",""],
+  ["Long / Short","Orders","Long = you profit if price rises. Short = you profit if price falls. In futures both are equally easy.",""],
+  ["VWAP","Indicators","Volume-weighted average price since the open: the day's 'fair value'. Above it = buyers in control.",""],
+  ["Noise band","Indicators","How far NQ normally wanders from the open by a given time. Moves outside it signal real momentum. The proven strategy's core.",""],
+  ["Momentum vs. mean reversion","Indicators","Momentum bets moves continue; mean reversion bets they snap back. On NQ intraday, momentum tested far better.",""],
+  ["Stop-loss","Risk","The price where your idea is proven wrong and you exit. Set it before you enter.",""],
+  ["R (risk unit)","Risk","Your planned loss on a trade. A win of 2R made twice what you risked.","Risk $50, make $100 = +2R"],
+  ["Position size","Risk","How many contracts to trade, chosen so your stop costs a fixed small amount (e.g. 1% of the account).",""],
+  ["Drawdown","Risk","The drop from your highest balance to a later low. Evals cap it.","Peak $51,000 → $49,800 = $1,200 drawdown"],
+  ["Win rate","Stats","The share of trades that make money. Useless alone: it must be read with win size vs. loss size.",""],
+  ["Profit factor (PF)","Stats","Total won ÷ total lost. Above 1 is profitable. The proven strategy's is 1.30.",""],
+  ["Expectancy","Stats","Average profit per trade over many trades: win% × avg win − loss% × avg loss.",""],
+  ["Sharpe ratio","Stats","Return per unit of volatility. Above 1 is strong for a trading strategy.",""],
+  ["Backtest","Stats","Replaying fixed rules over past data to see how they would have done.",""],
+  ["Overfitting","Stats","Tuning rules until they fit the past perfectly, so they fail on new data. The Lab's proof tests guard against it.",""],
+  ["Out-of-sample","Stats","Data the rules were never tuned on. Here, 2022–2025. The honest test.",""],
+  ["Evaluation (eval)","Prop firms","A paid challenge. Hit the profit target without breaking rules and the firm funds an account for you.","LucidFlex 50K: +$3,000 target"],
+  ["Profit target","Prop firms","How much you must make to pass the evaluation.",""],
+  ["Max loss limit (MLL)","Prop firms","The balance you must never touch. Touching it, even intraday, fails the account.","50K starts at $48,000"],
+  ["EOD trailing drawdown","Prop firms","The MLL moves up with your highest closing balance, never down, until it locks.",""],
+  ["Lock","Prop firms","Once your balance clears start + MLL + $100, the limit stops trailing and freezes at start + $100.","50K locks at $50,100"],
+  ["Consistency rule","Prop firms","Your biggest day can't be more than a set share of your total profit (50% on LucidFlex evals).",""],
+  ["Payout / split","Prop firms","Withdrawing funded profits. Lucid pays 90% to you, 10% to the firm.",""],
+  ["Scaling plan","Prop firms","Funded accounts start with fewer allowed contracts and unlock more as profit grows.",""],
+  ["FOMC / CPI / NFP","Events","Federal Reserve decisions (2 pm), inflation data and the jobs report (8:30 am). These are the biggest scheduled market movers.",""]
+];
+let glCat = "All";
+function renderGloss(){
+  const cats = ["All", ...new Set(GLOSS.map(g => g[1]))];
+  $("#gl-cats").innerHTML = cats.map(c => `<button class="chip" data-c="${c}" style="${c===glCat?"background:var(--amber);color:#1A1203;border-color:transparent":""}">${c}</button>`).join("");
+  const q = ($("#gl-q").value || "").toLowerCase().trim();
+  const list = GLOSS.filter(g => (glCat === "All" || g[1] === glCat) && (!q || (g[0] + " " + g[2]).toLowerCase().includes(q)));
+  $("#gl-grid").innerHTML = list.map(g => `<div class="term"><b>${g[0]}</b><span class="cat">${g[1]}</span><p>${g[2]}</p>${g[3] ? `<div class="ex">${g[3]}</div>` : ""}</div>`).join("") || `<p class="muted">No term matches "${esc(q)}".</p>`;
+}
+function drawCandleAnatomy(){
+  const svg = $("#vg-candle"); svg.innerHTML = "";
+  const c = (x, o, cl, h, l, col) => { el("line",{x1:x, x2:x, y1:h, y2:l, stroke:col, "stroke-width":2.5}, svg); el("rect",{x:x-22, y:Math.min(o,cl), width:44, height:Math.abs(o-cl), rx:3, fill:col}, svg); };
+  const lab = (x1, y, s2, sub) => { el("line",{x1, y1:y, x2:x1 + 34, y2:y, stroke:"var(--faint)", "stroke-dasharray":"3 3"}, svg); txt(svg, x1 + 40, y + 4, s2, {fill:"var(--ink)", "font-size":12.5, "font-weight":700, "font-family":"var(--body)"}); if (sub) txt(svg, x1 + 40, y + 18, sub, {fill:"var(--muted)", "font-size":10.5, "font-family":"var(--body)"}); };
+  c(70, 170, 80, 40, 205, "var(--up)"); c(320, 80, 170, 45, 215, "var(--down)");
+  lab(92, 40, "High", "top of the wick"); lab(92, 80, "Close", "price ended here"); lab(92, 170, "Open", "price started here"); lab(92, 205, "Low", "bottom of the wick");
+  lab(342, 80, "Open", "started high"); lab(342, 170, "Close", "ended lower");
+  txt(svg, 70, 240, "UP candle", {"text-anchor":"middle", fill:"var(--up)", "font-weight":800}); txt(svg, 320, 240, "DOWN candle", {"text-anchor":"middle", fill:"var(--down)", "font-weight":800});
+}
+function renderTicks(){
+  const p = parseFloat($("#tk-pts").value) || 0; $("#tk-val").textContent = p.toFixed(2) + " pts";
+  $("#tk-out").innerHTML = [["Ticks", Math.round(p*4)], ["1 MNQ", money(p*2)], ["2 MNQ", money(p*4)], ["1 NQ", money(p*20)]].map(([k,v]) => `<div class="stat"><small>${k}</small><b style="font-size:19px">${v}</b></div>`).join("");
+  const svg = $("#tk-bar"); svg.innerHTML = ""; const med = BT.daystats.med_range, W = 500, x = Math.min(1, p/(med*1.15))*W;
+  el("rect",{x:10, y:18, width:W, height:22, rx:6, fill:"var(--surface-2)"}, svg);
+  el("rect",{x:10, y:18, width:Math.max(2, x), height:22, rx:6, fill:"url(#gAmb)", stroke:"var(--amber)"}, svg);
+  const mx = 10 + med/(med*1.15)*W; el("rect",{x:mx-1, y:12, width:2, height:34, fill:"var(--cyan)"}, svg);
+  txt(svg, mx, 62, `typical NQ day: ${med} pts`, {"text-anchor":"middle", fill:"var(--cyan)", "font-size":11});
+}
+function drawBracket(){
+  const svg = $("#vg-bracket"); svg.innerHTML = ""; const Y = v => 230 - (v - 23440)/(23580 - 23440)*200;
+  const path = [23500,23496,23490,23493,23488,23495,23504,23512,23509,23520,23532,23528,23541,23552];
+  el("rect",{x:150, y:Y(23550), width:330, height:Y(23500)-Y(23550), fill:"var(--up-dim)"}, svg);
+  el("rect",{x:150, y:Y(23500), width:330, height:Y(23475)-Y(23500), fill:"var(--down-dim)"}, svg);
+  [[23550,"TARGET 23,550 (+50 pts = +$100 / MNQ)","var(--up)"],[23500,"ENTRY 23,500 (buy)","var(--amber)"],[23475,"STOP 23,475 (−25 pts = −$50 / MNQ)","var(--down)"]].forEach(([v,l,c]) => { el("line",{x1:150, x2:480, y1:Y(v), y2:Y(v), stroke:c, "stroke-width":2}, svg); txt(svg, 156, Y(v) - 6, l, {fill:c, "font-weight":700}); });
+  const d = path.map((v,i) => `${i?"L":"M"}${(160 + i*24).toFixed(0)} ${Y(v).toFixed(1)}`).join(""); const pl = el("path",{d, fill:"none", stroke:"var(--ink)", "stroke-width":2.2}, svg); animateDraw(pl);
+  el("circle",{cx:160 + 13*24, cy:Y(23552), r:6, fill:"var(--up)", filter:"url(#glow)"}, svg);
+  txt(svg, 10, 40, "Reward : risk", {fill:"var(--muted)"}); txt(svg, 10, 64, "2 : 1", {fill:"var(--ink)", "font-size":26, "font-weight":800});
+  txt(svg, 10, 110, "Break-even", {fill:"var(--muted)"}); txt(svg, 10, 132, "win rate 33%", {fill:"var(--ink)", "font-size":16, "font-weight":700});
+  txt(svg, 10, 190, "Target hit →", {fill:"var(--up)", "font-weight":700}); txt(svg, 10, 208, "stop auto-cancels", {fill:"var(--muted)"});
+}
+function drawExpectancy(){
+  const svg = $("#vg-exp"); svg.innerHTML = ""; const r = rng(3), cells = [];
+  for (let i = 0; i < 100; i++) cells.push(i < 39 ? 1 : 0); for (let i = 99; i > 0; i--){ const j = Math.floor(r()*(i+1)); [cells[i], cells[j]] = [cells[j], cells[i]]; }
+  cells.forEach((w,i) => { const x = 10 + (i%20)*17, y = 10 + Math.floor(i/20)*17, s = w ? 15 : 9, o = (15 - s)/2; el("rect",{x:x+o, y:y+o, width:s, height:s, rx:2, fill: w ? "var(--up)" : "var(--down)", opacity: w ? 1 : .75}, svg); });
+  const aw = 55, al = 27, tot = 39*aw - 61*al;
+  txt(svg, 370, 30, "39 wins × ~55 pts", {fill:"var(--up)", "font-weight":700}); txt(svg, 370, 50, `= +${(39*aw).toLocaleString()} pts`, {fill:"var(--up)"});
+  txt(svg, 370, 85, "61 losses × ~27 pts", {fill:"var(--down)", "font-weight":700}); txt(svg, 370, 105, `= −${(61*al).toLocaleString()} pts`, {fill:"var(--down)"});
+  el("line",{x1:370, x2:510, y1:122, y2:122, stroke:"var(--line-2)"}, svg);
+  txt(svg, 370, 145, `Net +${tot.toLocaleString()} pts`, {fill:"var(--ink)", "font-weight":800, "font-size":15}); txt(svg, 370, 165, `≈ +${money0(tot*2)} per MNQ`, {fill:"var(--amber)"});
+  txt(svg, 10, 112, "Big = win · small = loss", {fill:"var(--muted)", "font-size":11});
+  txt(svg, 10, 240, "Averages from the 10-year noise-band backtest.", {fill:"var(--faint)", "font-size":10.5});
+}
+const DD_SCN = [
+  {name:"Clean pass", days:[[350,-150],[500,-200],[-250,-420],[600,-100],[400,-250],[700,-150],[-300,-480],[650,-120],[350,-60],[0,0]], n:9},
+  {name:"Intraday breach", days:[[600,-100],[900,-150],[700,-200],[-400,-650],[300,-900],[0,0],[0,0],[0,0],[0,0],[0,0]], n:5},
+  {name:"Consistency trap", days:[[300,-100],[1800,-150],[400,-300],[500,-200],[-200,-400],[400,-150],[450,-100],[0,0],[0,0],[0,0]], n:7}
+];
+let ddS = 0;
+function ddRun(sc, upto){
+  const S = {start:50000, mll:2000, target:3000}; let bal = S.start, peak = bal, mll = bal - S.mll, locked = false, best = 0; const pts = [];
+  for (let k = 0; k < Math.min(upto, sc.n); k++){
+    const [day, dip] = sc.days[k], low = bal + dip, m0 = mll;
+    if (low <= mll){ pts.push({k, open:bal, low, close:low, mll:m0, fail:true}); return {pts, out:"fail", k}; }
+    bal += day; best = Math.max(best, day); peak = Math.max(peak, bal);
+    if (!locked){ if (peak > S.start + S.mll + 100){ locked = true; mll = S.start + 100; } else mll = peak - S.mll; }
+    const prof = bal - S.start; pts.push({k, open:bal - day, low: Math.min(bal - day, low), close:bal, mll:m0, mllNext:mll, locked, prof, best});
+    if (prof >= S.target && best <= .5*prof) return {pts, out:"pass", k};
+  }
+  return {pts, out:"running", k:upto-1};
+}
+function renderDD(){
+  const sc = DD_SCN[ddS], step = +$("#dd-step").value, r = ddRun(sc, step), svg = $("#dd-chart"); svg.innerHTML = "";
+  $("#dd-step").max = sc.n; if (step > sc.n) $("#dd-step").value = sc.n;
+  const {W, H} = vb(svg), L = 60, Rr = 20, T = 14, B = 28, lo = 47500, hi = 53800;
+  const X = i => L + (i + .5)/10*(W - L - Rr), Y = v => T + (hi - v)/(hi - lo)*(H - T - B), bw = (W - L - Rr)/10;
+  [48000, 49000, 50000, 51000, 52000, 53000].forEach(v => { el("line",{x1:L, x2:W-Rr, y1:Y(v), y2:Y(v), stroke:"var(--grid)"}, svg); txt(svg, L-6, Y(v)+4, "$" + (v/1000) + "k", {"text-anchor":"end"}); });
+  el("line",{x1:L, x2:W-Rr, y1:Y(53000), y2:Y(53000), stroke:"var(--up)", "stroke-dasharray":"6 4", "stroke-width":1.5}, svg); txt(svg, W-Rr-4, Y(53000)-6, "TARGET $53,000", {"text-anchor":"end", fill:"var(--up)", "font-weight":800});
+  for (let i = 0; i < 10; i++) txt(svg, X(i), H-8, "Day " + (i+1), {"text-anchor":"middle", "font-size":10.5, fill: i < sc.n ? "var(--muted)" : "var(--faint)"});
+  let prevM = 48000, md = "";
+  r.pts.forEach((p,i) => { md += `${i?"L":"M"}${(X(i)-bw/2).toFixed(1)} ${Y(p.mll).toFixed(1)} L${(X(i)+bw/2).toFixed(1)} ${Y(p.mll).toFixed(1)}`; });
+  el("path",{d:md, fill:"none", stroke:"var(--down)", "stroke-width":3}, svg);
+  r.pts.forEach((p,i) => { el("line",{x1:X(i), x2:X(i), y1:Y(Math.max(p.open, p.close)), y2:Y(p.low), stroke: p.fail ? "var(--down)" : "var(--muted)", "stroke-width":2}, svg);
+    el("rect",{x:X(i)-bw*.28, y:Y(Math.max(p.open, p.close)), width:bw*.56, height:Math.max(2, Math.abs(Y(p.open) - Y(p.close))), rx:3, fill: p.fail ? "var(--down)" : p.close >= p.open ? "var(--up)" : "var(--down)"}, svg);
+    if (p.fail){ el("circle",{cx:X(i), cy:Y(p.low), r:9, fill:"none", stroke:"var(--down)", "stroke-width":3, filter:"url(#glow)"}, svg); txt(svg, X(i), Y(p.low) + 24, "TOUCHED THE LIMIT", {"text-anchor":"middle", fill:"var(--down)", "font-weight":800}); }
+    if (p.locked && !(r.pts[i-1] && r.pts[i-1].locked)) txt(svg, X(i)+bw/2, Y(p.mllNext) - 8, "LOCKS $50,100", {"text-anchor":"middle", fill:"var(--down)", "font-weight":800, "font-size":10.5}); });
+  const last = r.pts[r.pts.length-1], note = $("#dd-note"); $("#dd-day").textContent = `Day ${Math.min(step, sc.n)} of ${sc.n}`;
+  if (r.out === "fail"){ note.className = "gate stop"; note.innerHTML = `<span class="dot off"></span><div><strong>Failed on day ${r.k+1}</strong><div class="small">The balance dipped to ${money0(last.low)} during the day and touched the ${money0(last.mll)} limit. It doesn't matter that the account was up the day before, or that price might have come back. Smaller size (half the contracts) would have survived this dip with room to spare.</div></div>`; }
+  else if (r.out === "pass"){ note.className = "gate ok"; note.innerHTML = `<span class="dot live"></span><div><strong>Passed on day ${r.k+1}</strong><div class="small">+${money0(last.prof)} profit; biggest day ${money0(last.best)} = ${Math.round(last.best/last.prof*100)}% of profit (≤ 50% ✓). Steady days, no hero trades.</div></div>`; }
+  else { const c = last ? last.best/Math.max(1,last.prof) : 0; note.className = "gate warn";
+    note.innerHTML = `<span class="dot warn"></span><div><strong>${last ? `Profit ${money0(last.prof)} · limit now ${money0(last.mllNext)}${last.locked ? " (locked)" : ""}` : "Start"}</strong><div class="small">${last && last.prof >= 3000 && c > .5 ? `Target reached, but the biggest day (${money0(last.best)}) is ${Math.round(c*100)}% of profit. The consistency rule says keep trading until profit ≥ ${money0(last.best*2)}.` : last && last.locked ? "The limit has locked. From here, only a drop to $50,100 can fail you." : "Each green day pushes the red line up. Losses never move it down."}</div></div>`; }
+}
+function renderCC(){
+  const v = ($("#cc-in").value || "").split(/[ ,;]+/).map(Number).filter(x => isFinite(x) && x !== 0);
+  const tot = v.reduce((a,b) => a + b, 0), best = Math.max(0, ...v), pctv = tot > 0 ? best/tot : 0, need = Math.max(0, best*2 - tot);
+  $("#cc-out").innerHTML = [["Total profit", money0(tot,1)], ["Biggest day", money0(best)], ["Biggest ÷ total", tot > 0 ? Math.round(pctv*100) + "%" : "—"]].map(([k,x]) => `<div class="stat"><small>${k}</small><b style="font-size:19px">${x}</b></div>`).join("");
+  const g = $("#cc-gate");
+  if (tot <= 0){ g.className = "gate warn"; g.innerHTML = "Enter your daily results to check."; }
+  else if (pctv <= .5){ g.className = "gate ok"; g.innerHTML = `<span class="dot live"></span><div><strong>Consistent ✓</strong><div class="small">Your biggest day is within 50% of total profit.${tot < 3000 ? ` Now reach the $3,000 target (${money0(3000 - tot)} to go on a 50K).` : ""}</div></div>`; }
+  else { g.className = "gate stop"; g.innerHTML = `<span class="dot off"></span><div><strong>Too much from one day</strong><div class="small">You need ${money0(need)} more profit (total ${money0(best*2)}) before you can pass, even if you've already hit the target. Keep days smaller than ${money0(Math.max(tot, 3000)*.4)}.</div></div>`; }
+}
+const QUIZ = [
+  ["NQ moves 30 points. What do you make or lose on 2 MNQ?", ["$60","$120","$600","$30"], 1, "30 pts × $2 × 2 contracts = $120."],
+  ["What does a tick equal on MNQ?", ["$0.25","$0.50","$5","$2"], 1, "A tick is 0.25 points × $2 = $0.50."],
+  ["On an EOD trailing drawdown eval, your balance dips to the max loss limit at 11 am, then recovers by the close. What happens?", ["Nothing, only the close counts","You fail the account","The limit moves down","You get a warning"], 1, "The limit only moves at end of day, but it is enforced all day. Touching it fails the account."],
+  ["Target $3,000. Your biggest day was $1,800 and total profit is $3,000. Under a 50% consistency rule…", ["You pass","You need $3,600 total","You fail","You must lose $1,800"], 1, "Biggest day must be ≤ 50% of profit, so total must reach 2 × $1,800 = $3,600."],
+  ["A strategy wins 39% of trades. Can it be profitable?", ["No, never","Yes, if average wins are big enough vs losses","Only on NQ","Only in uptrends"], 1, "Win rate × win size vs loss rate × loss size decides it. The proven strategy wins 39% with wins ≈ 2× losses."],
+  ["Your stop is 25 points and you'll risk $100. How many MNQ?", ["1","2","4","5"], 1, "25 pts × $2 = $50 per MNQ, so $100 ÷ $50 = 2 MNQ."],
+  ["Which strategy family lost money most often in 10 years of NQ tests?", ["Momentum / breakouts","Fading / mean reversion","Calendar effects","Benchmark"], 1, "Every strategy in the 'loses money' group bet on reversals."],
+  ["Best time to be flat?", ["10:30 am","Right before scheduled news like CPI or FOMC","12:00 pm","Never"], 1, "Scheduled releases cause huge, fast moves and slippage."]
+];
+function renderQuiz(){
+  const st = store.get("quiz", {}); let score = 0;
+  $("#qz").innerHTML = QUIZ.map(([q, opts, ans, why], i) => { const a = st[i]; if (a === ans) score++;
+    return `<div class="quiz-q"><b style="color:var(--ink)">${i+1}. ${q}</b><div class="opts">${opts.map((o,j) => `<button data-q="${i}" data-a="${j}" class="${a != null ? (j === ans ? "right" : j === a ? "wrong" : "") : ""}">${o}</button>`).join("")}</div>${a != null ? `<p class="why ${a === ans ? "up-t" : "down-t"}">${a === ans ? "✓ Correct." : "✕ Not quite."} <span style="color:var(--text)">${why}</span></p>` : ""}</div>`; }).join("");
+  $("#qz-score").textContent = `${score} / ${QUIZ.length}`; $("#qz-score").className = "pill " + (score === QUIZ.length ? "up" : score >= 5 ? "amb" : "");
+}
+function initLearn(){
+  renderGloss(); $("#gl-q").addEventListener("input", renderGloss);
+  $("#gl-cats").addEventListener("click", e => { const b = e.target.closest("[data-c]"); if (!b) return; glCat = b.dataset.c; renderGloss(); });
+  drawCandleAnatomy(); drawBracket(); drawExpectancy();
+  $("#tk-pts").addEventListener("input", renderTicks); renderTicks();
+  $("#dd-scn").onclick = e => { const b = e.target.closest("[data-s]"); if (!b) return; ddS = +b.dataset.s; $$("#dd-scn button").forEach(x => x.setAttribute("aria-pressed", x === b)); $("#dd-step").value = DD_SCN[ddS].n; renderDD(); };
+  $("#dd-step").addEventListener("input", renderDD); renderDD();
+  $("#cc-in").addEventListener("input", renderCC); renderCC();
+  $("#qz").addEventListener("click", e => { const b = e.target.closest("[data-q]"); if (!b) return; const st = store.get("quiz", {}); if (st[b.dataset.q] != null) return; st[b.dataset.q] = +b.dataset.a; store.set("quiz", st); renderQuiz(); });
+  $("#qz-reset").onclick = () => { store.set("quiz", {}); renderQuiz(); };
+  renderQuiz();
 }
 
 /* ================= Research fleet ================= */
