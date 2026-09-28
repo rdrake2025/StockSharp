@@ -12,8 +12,8 @@ Nasdaq-100 futures (NQ / MNQ). Open `index.html` in any browser.
 | Prop eval | Lucid Trading LucidFlex rules, pass-rate simulator by size and contracts, luck baseline, how to get the eval |
 | Edge tools | Official FOMC / CPI / jobs-report calendar (auto news blackouts), similar-day pre-market outlook with walk-forward skill test, intraday range projection, noise-band exit manager, stop-placement analyzer from real trade excursions |
 | Backtest Lab | 41 strategies + benchmark tested on 2,630 real NQ sessions (2015 to Jul 2025): leaderboard, equity curves, yearly results, real example trades |
-| Learn | Beginner course: 40-term glossary, candlestick / ticks-to-dollars / bracket / expectancy visuals, interactive trailing-drawdown simulator, consistency-rule checker, why evals fail, 8-question quiz; plus workflow, order book, futures vs. QQQ, contract specs and roll calendar, costs, learning path |
-| Replay | Trade 160 real NQ sessions bar by bar with a bracket (keys: B, S, F, →, Space, N) |
+| Learn | "Your strategy in 6 steps" on a real NQ morning; beginner course: 40-term glossary, candlestick / ticks-to-dollars / bracket / expectancy visuals, interactive trailing-drawdown simulator, consistency-rule checker, why evals fail, 8-question quiz; plus workflow, order book, futures vs. QQQ, contract specs and roll calendar, costs, learning path |
+| Replay | Signal drill (20 rapid-fire "long / short / no trade" questions at real check moments), then trade 160 real NQ sessions bar by bar with a bracket, optional system-managed exits and 12:00 hand-off, a "Next check" jump, and grading against the strategy's signals in your window (keys: B, S, F, →, Space, N) |
 | Risk tools | Position sizer, reward:risk planner, Monte Carlo simulator that loads any backtested strategy |
 | Journal | Trade log, stats, your results vs. the backtest per setup, CSV copy/import |
 
@@ -34,9 +34,18 @@ picking the top 3 of all 27 strategies each year by past Sharpe was up 8 of 8 ye
 
 `backtest/lucid.py` replays each strategy through LucidFlex rules (EOD trailing max loss enforced intraday, locks at
 start + $100; 50% consistency; min 2 days; funded payouts after 5 qualifying days, 50% of profit up to the cap, 90/10 split),
-starting on every third session 2015–2025. On a 50K with noise-band momentum: 1 MNQ passed 66% (0% failed, median 152
-sessions); 2 MNQ passed 54% (median 70); 4 MNQ passed 43% (median 30). The same trades with random directions passed 8–13%
+starting on every third session 2015–2025. On a 50K with noise-band momentum: 1 MNQ passed 66% (0% failed, median 256
+calendar sessions); 2 MNQ median 121; 3 MNQ median 70. The same trades with random directions passed 8–13%
 and had negative expected value at every size. Rules sourced from Lucid's help center and third-party trackers (Sept 2026).
+
+## Personal version: morning + hand-off (10:00–12:00 ET schedule)
+
+The full strategy holds 68% of trades past noon. `backtest/window.py` and `backtest/personal.py` test a version for
+a 10–12 schedule: entries only at the 10:00–11:30 checks, trailing exits until 12:00, then a fixed stop at the
+12:00 trailing level held to the close. PF 1.26, Sharpe 0.70 (t = 2.25), 8 of 11 years up, about $1,130 a year per MNQ.
+LucidFlex 50K, calendar sessions to pass: 1 MNQ median 385 (42% pass, 7% fail); step-up 1 → 2 MNQ at +$1,000
+median 307 (50% pass, 10% fail). `BEGINNER_REVIEW.md` logs a beginner walkthrough of the app, the time to
+profitability before and after the v11 changes, and why.
 
 ## Rebuilding
 
@@ -51,6 +60,8 @@ NQ_DATA=/path/to/data python3 proof.py        # significance, bootstrap, randomi
 NQ_DATA=/path/to/data python3 lucid.py        # LucidFlex evaluation simulator
 NQ_DATA=/path/to/data python3 lucid_luck.py   # random-direction baseline for the simulator
 NQ_DATA=/path/to/data python3 funded.py       # funded-account year simulations by size, contracts and payout policy
+NQ_DATA=/path/to/data python3 window.py       # time-window variants of noise-band
+NQ_DATA=/path/to/data python3 personal.py     # morning + hand-off version: stats, eval plans, funded
 NQ_DATA=/path/to/data python3 edge.py         # outlook features, range tables, adverse-excursion quantiles
 NQ_DATA=/path/to/data python3 export.py       # writes ../bt-data.json
 cd .. && python3 build.py                 # src/app.html + bt-data.json -> index.html

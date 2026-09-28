@@ -106,6 +106,7 @@ from strategies_scout import LEDGER
 out["scout"] = LEDGER
 out["edge"] = json.load(open(os.path.join(D, "edge.json")))
 out["funded"] = json.load(open(os.path.join(D, "funded.json")))
+out["personal"] = json.load(open(os.path.join(D, "personal.json")))
 # replay grading: what the proven strategy did on each replay day, and its noise bands at each check
 didx = {str(d["date"]): i for i, d in enumerate(days)}
 ntr = {}

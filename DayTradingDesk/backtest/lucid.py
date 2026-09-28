@@ -90,7 +90,7 @@ def study(series, sizes=("25K", "50K", "100K", "150K"), micro_opts=(1, 2, 3, 4, 
             if m > S["max_micro"]: continue
             res = [eval_run(pts, low, n, s, m, S) for s in starts]
             p = np.mean([r[0] == "pass" for r in res]); f = np.mean([r[0] == "fail" for r in res])
-            dp = [r[1] for r in res if r[0] == "pass"]
+            dp = [r[2] - s + 1 for r, s in zip(res, starts) if r[0] == "pass"]   # calendar sessions from start to pass
             fund = [funded_run(pts, low, n, r[2] + 1, m, S) for r in res if r[0] == "pass" and r[2] + 1 < len(pts) - 250]
             paid = np.mean([x[0] for x in fund]) if fund else 0.0
             out.append(dict(size=sz, micros=m, pass_rate=round(float(p), 3), fail_rate=round(float(f), 3),

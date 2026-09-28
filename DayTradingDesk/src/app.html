@@ -483,6 +483,7 @@ body.compact .ticker,body.compact #top-front,body.compact .search-btn span,body.
       <div class="card"><div class="card-h"><h3>Your strategy</h3><span class="verdict proven">Proven</span></div><div id="ov-strat" style="margin-top:6px"></div></div>
     </div>
   </div>
+  <div class="card" style="margin-top:16px"><div class="card-h"><div><div class="eyebrow">Your timeline</div><h3 style="margin-top:6px">Road to profitable</h3></div><button class="btn ghost" data-go="plan">Details →</button></div><div id="ov-tl" style="margin-top:8px"></div></div>
   <div class="grid g2" style="margin-top:16px">
     <div class="card"><div class="card-h"><h3>Last 4 weeks</h3><button class="btn ghost" data-go="journal">Journal →</button></div><div class="cal-mini" id="ov-cal" style="margin-top:10px"></div><p class="small muted" id="ov-cal-note" style="margin-top:8px"></p></div>
     <div class="card"><div class="card-h"><h3>Equity</h3><span class="small mono" id="ov-eq-v"></span></div><svg class="chart" id="ov-eq" viewBox="0 0 560 150" role="img" aria-label="Journal equity"></svg></div>
@@ -536,6 +537,24 @@ body.compact .ticker,body.compact #top-front,body.compact .search-btn span,body.
     <div class="eyebrow">Your roadmap</div><h3 style="margin-top:6px">From zero to funded, one checkpoint at a time</h3>
     <p class="small muted">Progress fills in automatically from what you do in the app: the quiz, replay sessions, journal trades and the eval tracker.</p>
     <div class="rm" id="pl-road" style="margin-top:12px"></div>
+  </div>
+
+  <div class="card" style="margin-top:16px" id="tl-card">
+    <div class="card-h"><div><div class="eyebrow">Your timeline</div><h3 style="margin-top:6px">When you can expect to be profitable</h3></div><span class="pill amb">estimate</span></div>
+    <div id="tl-body" style="margin-top:10px"></div>
+  </div>
+
+  <div class="card" style="margin-top:16px" id="tv-card">
+    <div class="eyebrow">Platform setup · Tradovate</div><h3 style="margin-top:6px">Where every number comes from</h3>
+    <div class="rules" style="margin-top:10px">
+      <div class="rule"><b>Chart</b><span>Open <b>MNQ</b> (front month, e.g. MNQZ26) on a <b>5-minute</b> chart. Add the <b>VWAP</b> indicator from the indicators menu. Each 5-minute candle's close at :55→:00 and :25→:30 is your check close (the 9:55 candle closes at 10:00).</span></div>
+      <div class="rule"><b>Two prices</b><span><b>Today's open:</b> the open of the 9:30 candle. <b>Prior close:</b> the close of yesterday's 3:55 candle (the 4:00 pm close). Type both into the cockpit's noise-band card before 10:00.</span></div>
+      <div class="rule"><b>Bracket</b><span>In the order settings, create a bracket/strategy template: stop loss <b id="tv-stop"></b> (<span id="tv-ticks"></span> ticks), <b>no profit target</b>, 1 contract. Every entry then goes in with its stop attached.</span></div>
+      <div class="rule"><b>Hand-off</b><span>At the end of your window, drag or edit the stop order to the level the cockpit shows. Check it's a <b>stop</b> order, not a limit.</span></div>
+      <div class="rule"><b>Phone</b><span>Install the Tradovate mobile app and log in with the same Lucid credentials, so you can flatten from anywhere by 3:55 pm ET.</span></div>
+      <div class="rule"><b>Account</b><span>Before every trade, confirm the <b>Lucid eval account</b> (or sim) is selected, not a demo you didn't mean to use.</span></div>
+    </div>
+    <p class="small muted" style="margin-top:8px">Menu names change between platform versions. If something isn't where described, search the platform's help for "bracket" or "VWAP".</p>
   </div>
 
   <div class="card" style="margin-top:16px" id="lc-card">
@@ -912,7 +931,7 @@ body.compact .ticker,body.compact #top-front,body.compact .search-btn span,body.
     <div class="card">
       <div class="card-h"><h3>Pass rates by size and contracts</h3>
         <div class="row"><select id="lu-strat" style="width:auto" aria-label="Strategy"></select><div class="seg" role="group" aria-label="Account size" id="lu-size"><button data-s="25K" aria-pressed="false">25K</button><button data-s="50K" aria-pressed="true">50K</button><button data-s="100K" aria-pressed="false">100K</button><button data-s="150K" aria-pressed="false">150K</button></div></div></div>
-      <div class="table-wrap" style="margin-top:10px"><table><thead><tr><th class="n">MNQ</th><th class="n">Pass</th><th class="n">Luck pass</th><th class="n">Fail</th><th class="n">Median days</th><th class="n">Fee / pass</th><th class="n">Paid (1 yr)</th><th class="n">EV</th></tr></thead><tbody id="lu-table"></tbody></table></div>
+      <div class="table-wrap" style="margin-top:10px"><table><thead><tr><th class="n">MNQ</th><th class="n">Pass</th><th class="n">Luck pass</th><th class="n">Fail</th><th class="n">Median sessions</th><th class="n">Fee / pass</th><th class="n">Paid (1 yr)</th><th class="n">EV</th></tr></thead><tbody id="lu-table"></tbody></table></div>
       <p class="small muted" style="margin-top:8px">"Luck pass" is the noise-band trades with coin-flip directions (5 runs averaged), tested at 50K and 150K. Rows not reaching pass or fail within 500 sessions count as still going. Expected value = pass rate × average paid out in the first funded year − evaluation fee. Micros pay extra commission here (≈ $1.24 round trip).</p>
     </div>
     <div class="grid" style="align-content:start">
@@ -975,7 +994,7 @@ body.compact .ticker,body.compact #top-front,body.compact .search-btn span,body.
     <div class="card"><div class="card-h"><h3>Replay fidelity</h3><span class="small muted" id="co-fid-cap"></span></div><svg class="chart" id="co-fid" viewBox="0 0 520 170" role="img" aria-label="Replay fidelity by session"></svg><p class="small muted" style="margin-top:6px">How closely each replay matched the proven strategy. The target is 80%+ on 10 sessions in a row.</p></div>
   </div>
   <div class="card" style="margin-top:16px">
-    <div class="card-h"><div><div class="eyebrow">Training program</div><h3 style="margin-top:6px">8 weeks to eval-ready</h3></div><span class="pill" id="co-prog-pill"></span></div>
+    <div class="card-h"><div><div class="eyebrow">Training program</div><h3 style="margin-top:6px">About 8 weeks to eval-ready</h3></div><span class="pill" id="co-prog-pill"></span></div>
     <div class="rm" id="co-prog" style="margin-top:12px"></div>
   </div>
   <div class="card" style="margin-top:16px" id="co-funded">
@@ -991,7 +1010,7 @@ body.compact .ticker,body.compact #top-front,body.compact .search-btn span,body.
     <h2>How day trading NQ futures works</h2>
     <p class="lede">A day trader opens and closes every position within one session, so nothing is held overnight. The edge is small, so costs, position size and discipline decide whether you keep any of it.</p>
   </div>
-  <div class="subnav"><a class="chip" href="#l-start">Start here</a><a class="chip" href="#l-terms">Key terms</a><a class="chip" href="#l-visual">Visual guides</a><a class="chip" href="#l-dd">Drawdown simulator</a><a class="chip" href="#l-fail">Why evals fail</a><a class="chip" href="#l-quiz">Quiz</a><a class="chip" href="#l-flow">Workflow</a><a class="chip" href="#l-contract">Contracts</a><a class="chip" href="#l-path">Your path</a></div>
+  <div class="subnav"><a class="chip" href="#l-start">Start here</a><a class="chip" href="#l-howto">Strategy in 6 steps</a><a class="chip" href="#l-terms">Key terms</a><a class="chip" href="#l-visual">Visual guides</a><a class="chip" href="#l-dd">Drawdown simulator</a><a class="chip" href="#l-fail">Why evals fail</a><a class="chip" href="#l-quiz">Quiz</a><a class="chip" href="#l-flow">Workflow</a><a class="chip" href="#l-contract">Contracts</a><a class="chip" href="#l-path">Your path</a></div>
 
   <div class="card hot" id="l-start">
     <div class="eyebrow">Start here · the whole idea in 60 seconds</div>
@@ -1000,6 +1019,12 @@ body.compact .ticker,body.compact #top-front,body.compact .search-btn span,body.
       <div><h3>2 · How you win</h3><p class="small" style="margin-top:6px">Wait for a <b>tested setup</b>, enter with a <b>stop</b> (where you're wrong) already placed, and let winners run further than losers. You can win only 39% of trades and still make money if wins are 2× losses.</p></div>
       <div><h3>3 · How you pass an eval</h3><p class="small" style="margin-top:6px">Make the <b>profit target</b> without your balance ever touching the <b>max loss limit</b>, which follows your best end-of-day balance up. Small size and patience beat big size and hope.</p></div>
     </div>
+  </div>
+
+  <div class="card" style="margin-top:16px" id="l-howto">
+    <div class="card-h"><div><div class="eyebrow">Your strategy in 6 steps · a real NQ morning</div><h3 style="margin-top:6px" id="sw-title"></h3></div><div class="seg" id="sw-steps"></div></div>
+    <div class="chart-box" style="margin-top:8px"><svg class="chart" id="sw-chart" viewBox="0 0 1080 330" role="img" aria-label="Strategy walkthrough"></svg></div>
+    <p id="sw-text" style="margin-top:10px"></p>
   </div>
 
   <div class="card" style="margin-top:16px" id="l-terms">
@@ -1171,10 +1196,17 @@ body.compact .ticker,body.compact #top-front,body.compact .search-btn span,body.
     <h2>Replay drill</h2>
     <p class="lede">A real NQ session from 2015–2025, picked at random, date hidden. The first 30 minutes are shown. Step forward bar by bar, trade with a bracket, and the day is revealed at the close.</p>
   </div>
+  <div class="card hot" id="dr-card" style="margin-bottom:16px">
+    <div class="card-h"><div><div class="eyebrow">Signal drill · the fastest way to learn the strategy</div><h3 style="margin-top:6px" id="dr-q">At this check, you're flat. What do you do?</h3></div><div class="row"><span class="pill" id="dr-prog"></span><span class="score" id="dr-score"></span></div></div>
+    <div class="chart-box"><svg class="chart" id="dr-chart" viewBox="0 0 1080 330" role="img" aria-label="Drill chart"></svg></div>
+    <div class="row" style="margin-top:10px"><button class="btn buy" data-dr="1">Go long</button><button class="btn sell" data-dr="-1">Go short</button><button class="btn" data-dr="0">No trade</button><span style="flex:1"></span><button class="btn primary" id="dr-next" disabled>Next question ▸</button></div>
+    <div class="gate" id="dr-fb" style="margin-top:10px" hidden></div>
+    <p class="small muted" style="margin-top:8px">Real NQ sessions. Cyan lines are the noise bands; the last candle is the one that just closed at the check. <b>Rule:</b> close above the upper band → long; below the lower band → short; inside → no trade. 20 questions per set, target 90%+.</p>
+  </div>
   <div class="card">
     <div class="card-h">
       <div class="row"><span class="pill cy" id="rp-date">Session hidden</span><span class="pill" id="rp-time">10:00 ET</span><span class="pill" id="rp-pos">Flat</span></div>
-      <div class="row"><label class="row small muted" style="gap:6px"><input type="checkbox" id="rp-bands" style="accent-color:var(--cyan)"> Signal bands</label><label class="row small muted" style="gap:6px"><input type="checkbox" id="rp-levels" checked style="accent-color:var(--amber)"> Prior-day levels</label><span class="small muted">Day P&amp;L</span><b class="num" id="rp-pnl" style="font-size:24px">$0.00</b></div>
+      <div class="row"><label class="row small muted" style="gap:6px"><input type="checkbox" id="rp-bands" style="accent-color:var(--cyan)"> Signal bands</label><label class="row small muted" style="gap:6px" title="Trail and hand off like the strategy"><input type="checkbox" id="rp-sysx" checked style="accent-color:var(--up)"> System exits</label><label class="row small muted" style="gap:6px"><input type="checkbox" id="rp-levels" checked style="accent-color:var(--amber)"> Prior-day levels</label><span class="small muted">Day P&amp;L</span><b class="num" id="rp-pnl" style="font-size:24px">$0.00</b></div>
     </div>
     <div class="chart-box"><svg class="chart" id="rp-chart" viewBox="0 0 1080 400" role="img" aria-label="Replay chart"></svg></div>
     <div class="legend"><span><i style="background:var(--amber)"></i>VWAP</span><span><i style="background:var(--cyan)"></i>Opening range (first 30 min)</span><span><i style="background:var(--violet)"></i>Prior-day high / low / close</span></div>
@@ -1190,6 +1222,7 @@ body.compact .ticker,body.compact #top-front,body.compact .search-btn span,body.
       <button class="btn" id="rp-flat">Flatten <kbd>F</kbd></button>
       <span style="flex:1"></span>
       <button class="btn" id="rp-next">Next bar <kbd>→</kbd></button>
+      <button class="btn" id="rp-jump" title="Jump to the next :00/:30 check">Next check ▸▸</button>
       <button class="btn" id="rp-play">Play <kbd>Space</kbd></button>
       <button class="btn primary" id="rp-new">New session <kbd>N</kbd></button>
     </div>
@@ -1417,7 +1450,7 @@ function showTab(t){
   if (t === "me") fillProfileForm();
   if (t === "edge"){ if (!showTab.edgeDone){ showTab.edgeDone = true; initEdge(); } else renderEdge(); }
   if (t === "lab" && !showTab.labDone){ showTab.labDone = true; renderLab(); }
-  if (t === "learn" && !showTab.learnDone){ showTab.learnDone = true; initLearn(); }
+  if (t === "learn" && !showTab.learnDone){ showTab.learnDone = true; initLearn(); swInit(); }
   if (t === "fleet" && !showTab.fleetDone){ showTab.fleetDone = true; renderFleet(); }
   if (t === "prop" && !showTab.propDone){ showTab.propDone = true; renderProp(); }
 }
@@ -2151,14 +2184,14 @@ function renderCoach(){
   if (f.length){ const bw = (W - 40)/Math.max(10, f.length); f.forEach((x,i) => el("rect",{x:34 + i*bw + 2, y:Y(x.s), width:bw - 4, height:Math.max(2, Y(0) - Y(x.s)), rx:3, fill: x.s >= 80 ? "var(--up)" : x.s >= 50 ? "var(--amber)" : "var(--down)"}, svg)); }
   else txt(svg, W/2, H/2, "Finish a replay session to get your first score", {"text-anchor":"middle", fill:"var(--muted)", "font-size":12, "font-family":"var(--body)"});
   // program
-  const pr = progress(), fAll = c.fid, bandsF = fAll.filter(x => x.b).length, f70 = fAll.filter(x => !x.b && x.s >= 70).length, ls = launchStatus();
+  const pr = progress(), fAll = c.fid, drill90 = (KV.get("drill", []) || []).filter(x => x.c/x.n >= .9).length, f80 = fAll.filter(x => x.s >= 80).length, ls = launchStatus();
   const safeStops = realTrades().filter(t => t.stop != null && Math.abs(t.entry - t.stop) >= d.safeStop).length, cockpitT = realTrades().filter(t => (t.notes || "").includes("cockpit")).length;
   const prog = [
     ["Week 1 · Foundations", "Key terms, the drawdown simulator, 7/8 on the quiz.", Math.min(1, pr.qs/7), `quiz ${pr.qs}/8`, "learn"],
-    ["Week 2 · Read the bands", "5 replay sessions with Signal bands ON. Just take the signals.", Math.min(1, bandsF/5), `${Math.min(bandsF,5)}/5 graded`, "replay"],
-    ["Week 3 · Trade without training wheels", "5 more replays with bands OFF, scoring 70%+.", Math.min(1, f70/5), `${f70}/5 at 70%+`, "replay"],
+    ["Week 2 · Signal drill", "3 drill sets at 90%+ (about 5 minutes each). Fastest way to learn the signal.", Math.min(1, drill90/3), `${drill90}/3 sets at 90%+`, "replay"],
+    ["Week 2–3 · Graded replays", "5 replays with System exits on, scoring 80%+ on your window's signals.", Math.min(1, f80/5), `${f80}/5 at 80%+`, "replay"],
     ["Week 4 · Risk like a pro", `Stop analyzer, then 10 journal trades with stops ≥ ${d.safeStop} pts.`, Math.min(1, safeStops/10), `${safeStops}/10 safe stops`, "edge"],
-    ["Weeks 5–6 · Paper trade live", "20 trades through the cockpit ticket on a sim account, 80%+ clean.", Math.min(1, cockpitT/20) * (c.clean != null && c.clean < .8 && cockpitT >= 20 ? .9 : 1), `${cockpitT}/20 cockpit trades`, "today"],
+    ["Weeks 4–8 · Sim trade live", "10 trades through the cockpit ticket on a sim account, 80%+ clean. Signals come on ~44% of mornings.", Math.min(1, cockpitT/10) * (c.clean != null && c.clean < .8 && cockpitT >= 10 ? .9 : 1), `${cockpitT}/10 cockpit trades`, "today"],
     ["Week 7 · Eval-ready", "Launch checklist 100%, profile saved, budget set.", ls.pct, `${Math.round(ls.pct*100)}% checklist`, "plan"],
     ["Week 8+ · The eval", `LucidFlex ${profile().size}, ${d.contracts} MNQ, cockpit side-by-side every session.`, evalCalc().state === "passed" ? 1 : evalCalc().days ? .5 : 0, evalCalc().days ? `day ${evalCalc().days}` : "not started", "today"]
   ];
@@ -2166,6 +2199,58 @@ function renderCoach(){
   $("#co-prog").innerHTML = prog.map(([t,dsc,v,lab,tab],i) => `<div class="ph ${v >= 1 ? "done" : i === cur ? "now" : ""}"><span class="n">${v >= 1 ? "✓" : i+1}</span><div><b style="color:var(--ink)">${t}</b><div class="small muted">${dsc}</div><div class="bar"><i style="width:${Math.round(v*100)}%"></i></div></div><button class="btn ghost" data-go="${tab}">${lab} →</button></div>`).join("");
   $("#co-prog-pill").className = "pill " + (cur < 0 ? "up" : "amb"); $("#co-prog-pill").textContent = cur < 0 ? "Complete" : `Week ${Math.min(cur + 1, 8)} of 8`;
   $("#co-funded-body").innerHTML = fundedHeadline();
+}
+
+/* ================= Strategy walkthrough ================= */
+let SW = null;
+function swInit(){
+  const pick = BT.replay.find(r => !r.nog && r.ub && (r.sys || []).some(t => t[0] > 0 && t[1] === 30 && t[2] > 150)) || BT.replay.find(r => !r.nog && r.ub && (r.sys || []).length);
+  if (!pick) return; const D = decodeDay(pick), t = D.sys[0], d = derived(), stop = t.entry - t.side * d.safeStop;
+  let trail = null; for (let k = 1; k <= 4; k++){ const i = 5 + 6*k; trail = t.side > 0 ? Math.max(D.ub[k], D.vw[i]) : Math.min(D.lb[k], D.vw[i]); }
+  SW = {D, t, stop, trail, step:0};
+  $("#sw-steps").innerHTML = [1,2,3,4,5,6].map(i => `<button data-sw="${i-1}" aria-pressed="${i === 1}">${i}</button>`).join("");
+  $("#sw-steps").onclick = e => { const b = e.target.closest("[data-sw]"); if (!b) return; SW.step = +b.dataset.sw; $$("#sw-steps button").forEach(x => x.setAttribute("aria-pressed", x === b)); swDraw(); };
+  swDraw();
+}
+function swDraw(){
+  const {D, t, stop, trail, step} = SW, dir = t.side > 0 ? "long" : "short", upTo = [6, 6, 7, 18, 30, 78][step];
+  const levels = [], markers = [];
+  for (let k = 0; k < 12; k++){ const i0 = 6 + 6*k; if (i0 - 6 > upTo) break; const i1 = Math.min(77, i0 + 5); levels.push({y:D.ub[k], color:"var(--cyan)", i0: i0 - 6 < 0 ? 0 : i0 - 6, i1: i1 - 6, dash:"3 3", w:1.3, fit:false, hideOff:true, label: k === 0 ? "upper band" : ""}, {y:D.lb[k], color:"var(--cyan)", i0: i0 - 6 < 0 ? 0 : i0 - 6, i1: i1 - 6, dash:"3 3", w:1.3, fit:false, hideOff:true, label: k === 0 ? "lower band" : ""}); }
+  if (step >= 1) markers.push({i:t.i, price:t.entry, dir:t.side, label:dir.toUpperCase()});
+  if (step >= 2) levels.push({y:stop, color:"var(--down)", i0:t.i, label:`bracket stop (${derived().safeStop} pts)`, w:1.6});
+  if (step >= 4) levels.push({y:trail, color:"var(--amber)", i0:30, label:"12:00 hand-off stop", w:2});
+  if (step >= 5) markers.push({i:t.j, price:t.exit, exit:1, win:t.pts > 0, label:(t.pts > 0 ? "+" : "") + t.pts.toFixed(0) + " pts"});
+  candles($("#sw-chart"), D, upTo, {vwap:true, levels, markers, slots:78});
+  const day = new Date(D.date + "T12:00:00Z").toLocaleDateString("en-US",{month:"short", day:"numeric", year:"numeric", timeZone:"UTC"});
+  const T = [
+    ["9:30–10:00 · Watch, don't trade", `It's ${day}. The first 30 minutes are noisy, so you only watch. Write down the <b>9:30 open</b> and <b>yesterday's 4:00 pm close</b>. From those, the app draws the <b>noise bands</b> (cyan): how far NQ normally wanders by each half hour.`],
+    ["10:00 · The check", `The 5-minute candle ending at 10:00 closed <b>${t.side > 0 ? "above the upper" : "below the lower"} band</b>. That's the whole signal: <b>${dir}</b>. Nothing else matters, not the news, not a feeling. In the cockpit, enter the price, click <b>Use this signal</b>.`],
+    ["Place the bracket", `Enter ${dir} with a stop <b>${derived().safeStop} points</b> away. That's beyond the dip 4 in 5 winning trades make before working. No fixed target: the exit is the trail. The trade ticket checks size, risk and your limits before it lets you click.`],
+    ["10:30, 11:00, 11:30 · Trail", `At each check, exit only if the candle closes back ${t.side > 0 ? "below the higher" : "above the lower"} of the band and <b>VWAP</b> (amber line). Otherwise: hands off. Most of the money is made by <b>not</b> exiting early.`],
+    ["12:00 · Hand-off", `Your window ends. Still in the trade? Move the stop to the current trail level (<b>${trail.toFixed(2)}</b>) as a <b>fixed stop</b> and walk away. No new trades after 11:30.`],
+    ["Result", `${t.pts > 0 ? "This one worked" : "This one lost"}: <b class="${t.pts > 0 ? "up-t" : "down-t"}">${t.pts > 0 ? "+" : ""}${t.pts.toFixed(0)} pts</b> (${money0(t.pts*2,1)} per MNQ, full-day system exit). Remember: ~61% of trades lose. The edge is that winners average about twice the losers. Flatten any open trade by 3:55 pm.`]
+  ];
+  $("#sw-title").textContent = `Step ${step + 1} · ${T[step][0]}`; $("#sw-text").innerHTML = T[step][1];
+}
+
+/* ================= Timeline ================= */
+function timeline(){
+  const pr = progress(), drill = (KV.get("drill", []) || []), d90 = drill.filter(x => x.c/x.n >= .9).length, f80 = (KV.get("fidelity", []) || []).filter(x => x.s >= 80).length, sim = realTrades().filter(t => (t.notes || "").includes("cockpit")).length, ev = evalCalc(), d = derived();
+  const ph = [
+    ["Learn the basics", "quiz 7/8 + strategy in 6 steps", pr.qs >= 7, 4],
+    ["Recognize the signal", "3 drill sets 90%+ and 5 replays 80%+", d90 >= 3 && f80 >= 5, 10],
+    ["Execute it live on sim", "10 cockpit trades, 80%+ clean", sim >= 10, 32],
+    ["Eval: first profitable 3 months", `about ${pct(BT.personal.stats.positive_over["63"])} of 3-month stretches end positive`, ev.days >= 63 && ev.prof > 0, 90],
+    ["Pass the eval", `median ${d.pev.p50} sessions from the start`, ev.state === "passed", Math.round(Math.max(0, d.pev.p50 - 63) * 7/5)]
+  ];
+  let t = Date.now(); const out = ph.map(([n, x, done, days]) => { if (!done) t += days * 864e5; return {n, x, done, date: done ? null : new Date(t)}; });
+  return out;
+}
+function renderTimeline(el2){
+  const tl = timeline(), p = profile(), fmt = dt => dt.toLocaleDateString("en-US",{month:"short", day:"numeric", year:"numeric", timeZone:p.tz || "America/New_York"});
+  const prof = tl.find(x => x.n.startsWith("Eval: first"));
+  el2.innerHTML = `<div class="rm">${tl.map((x,i) => `<div class="ph ${x.done ? "done" : tl.findIndex(y => !y.done) === i ? "now" : ""}"><span class="n">${x.done ? "✓" : i+1}</span><div><b style="color:var(--ink)">${x.n}</b><div class="small muted">${x.x}</div></div><span class="mono small">${x.done ? "done" : "~" + fmt(x.date)}</span></div>`).join("")}</div>
+    <p class="small" style="margin-top:10px">${prof && prof.date ? `<b>Projected first profitable 3-month stretch: ~${fmt(prof.date)}</b>, if you keep this pace. ` : ""}Dates move as you finish steps. The first three phases depend on your practice. The last two depend on the market and are shown as medians from 10 years of data. See <b>BEGINNER_REVIEW.md</b> in the repo for how these were measured.</p>`;
 }
 
 /* ================= Research fleet ================= */
@@ -2321,7 +2406,7 @@ function luRun(){
   el("circle",{cx:X(P.length-1), cy:Y(lp.bal), r:6, fill:col, stroke:"var(--bg)", "stroke-width":2, filter:"url(#glow)"}, svg);
   hover(svg, fx => { const i = Math.max(0, Math.min(P.length-1, Math.round((fx - L)/(W - L - Rr)*(P.length-1)))); return {x:X(i), y:Y(P[i].bal), html:`${BT.series_dates[P[i].k]}<br>balance <b class="amb-t">${money0(P[i].bal)}</b><br>max loss limit <span class="down-t">${money0(P[i].mll)}</span>`}; });
   const d0 = BT.series_dates[s0], d1 = BT.series_dates[Math.min(r.end, BT.series_dates.length-1)];
-  $("#lu-cap").innerHTML = `Started ${d0} with ${m} MNQ. <b style="color:${col}">${r.out === "pass" ? "PASSED" : r.out === "fail" ? "FAILED" : "STILL GOING after 500 sessions"}</b> after ${r.days} trading sessions (${d1}). Click again for another random start.`;
+  $("#lu-cap").innerHTML = `Started ${d0} with ${m} MNQ. <b style="color:${col}">${r.out === "pass" ? "PASSED" : r.out === "fail" ? "FAILED" : "STILL GOING after 500 sessions"}</b> after ${r.end - s0 + 1} sessions, ${r.days} of them with a trade (${d1}). Click again for another random start.`;
 }
 
 /* ================= Noise band (Today) ================= */
@@ -2337,8 +2422,8 @@ function renderNoise(){
   if (!(px > 0)){ g.className = "gate warn"; g.innerHTML = "Enter the current price to see the signal."; return; }
   const lbl = `${Math.floor((600+k*30)/60)}:${String((600+k*30)%60).padStart(2,"0")}`, closed = n.mins >= 960 || currentPhase(n).k === "off";
   const when = closed ? `Session closed. Using the ${lbl} check` : cur < 0 ? "At the 10:00 check" : `At the ${lbl} check`;
-  if (px > up){ g.className = "gate ok"; g.innerHTML = `<span class="dot live"></span><div><strong>LONG signal</strong><div class="small">${when}, ${px.toFixed(2)} is ${(px-up).toFixed(1)} pts above the upper band (${up.toFixed(2)}). Trail your exit at the higher of the band and VWAP.</div></div>`; }
-  else if (px < lo){ g.className = "gate stop"; g.innerHTML = `<span class="dot off"></span><div><strong>SHORT signal</strong><div class="small">${when}, ${px.toFixed(2)} is ${(lo-px).toFixed(1)} pts below the lower band (${lo.toFixed(2)}). Trail your exit at the lower of the band and VWAP.</div></div>`; }
+  if (px > up){ g.className = "gate ok"; g.innerHTML = `<span class="dot live"></span><div><strong>LONG signal</strong><div class="small">${when}, ${px.toFixed(2)} is ${(px-up).toFixed(1)} pts above the upper band (${up.toFixed(2)}). Trail your exit at the higher of the band and VWAP.</div><button class="btn buy" data-usesig="1" style="margin-top:8px">Use this signal → trade ticket</button></div>`; }
+  else if (px < lo){ g.className = "gate stop"; g.innerHTML = `<span class="dot off"></span><div><strong>SHORT signal</strong><div class="small">${when}, ${px.toFixed(2)} is ${(lo-px).toFixed(1)} pts below the lower band (${lo.toFixed(2)}). Trail your exit at the lower of the band and VWAP.</div><button class="btn sell" data-usesig="-1" style="margin-top:8px">Use this signal → trade ticket</button></div>`; }
   else { g.className = "gate warn"; g.innerHTML = `<span class="dot warn"></span><div><strong>Inside the noise</strong><div class="small">${when}, price is between ${lo.toFixed(2)} and ${up.toFixed(2)}. No trade. The move is still normal noise for this time of day.</div></div>`; }
 }
 
@@ -2377,6 +2462,11 @@ function rpNext(){
     if (p.dir > 0){ if (D.l[i] <= p.stop) rpClose(Math.min(D.o[i], p.stop), "Stop"); else if (p.target && D.h[i] >= p.target) rpClose(Math.max(D.o[i], p.target), "Target"); }
     else { if (D.h[i] >= p.stop) rpClose(Math.max(D.o[i], p.stop), "Stop"); else if (p.target && D.l[i] <= p.target) rpClose(Math.min(D.o[i], p.target), "Target"); }
   }
+  if (RP.pos && $("#rp-sysx").checked && D.ub && i >= 5 && (i - 5) % 6 === 0){
+    const k = (i - 5) / 6, dd = derived(), p2 = RP.pos, lvl = p2.dir > 0 ? Math.max(D.ub[k], D.vw[i]) : Math.min(D.lb[k], D.vw[i]), t = 600 + 30*k;
+    if (!p2.handoff && t < dd.weE){ if ((D.c[i] - lvl) * p2.dir < 0) rpClose(D.c[i], "System exit (back through band/VWAP)"); }
+    else if (!p2.handoff){ p2.stop = p2.dir > 0 ? Math.max(p2.stop, lvl) : Math.min(p2.stop, lvl); p2.target = null; p2.handoff = true; $("#rp-msg").innerHTML = `<b>Hand-off at ${etHM(t)}:</b> fixed stop moved to ${p2.stop.toFixed(2)}. It now rides unattended to the close.`; }
+  }
   if (RP.k >= 78){
     if (RP.pos) rpClose(D.c[77], "Close");
     stopPlay();
@@ -2392,7 +2482,8 @@ function rpNext(){
 function gradeReplay(){
   const D = RP.D, box = $("#rp-grade"); box.hidden = false;
   if (D.nog){ box.innerHTML = `<div class="eyebrow">System check</div><h3 style="margin-top:6px">Not graded</h3><p class="small" style="margin-top:6px">This session is a contract-roll or data-edge day the backtest skipped, so there's nothing to compare against.</p>`; return; }
-  const sys = D.sys || [], you = RP.trades.map(t => ({side:t.dir, i:t.i, pnl:t.pnl, pts:t.pts})), used = new Set();
+  const lastIdx = Math.max(6, (Math.min(derived().weE, 720) - 30 - 570) / 5 + 1);   // entries at checks inside your window
+  const sys = (D.sys || []).filter(t => t.i <= lastIdx), you = RP.trades.filter(t => t.i <= lastIdx + 1).map(t => ({side:t.dir, i:t.i, pnl:t.pnl, pts:t.pts})), used = new Set();
   let matched = 0, wrong = 0; const missed = [];
   sys.forEach(st => { const k = you.findIndex((u,idx) => !used.has(idx) && Math.abs(u.i - st.i) <= 2 && u.side === st.side); if (k >= 0){ used.add(k); matched++; } else { const w = you.findIndex((u,idx) => !used.has(idx) && Math.abs(u.i - st.i) <= 2 && u.side !== st.side); if (w >= 0){ used.add(w); wrong++; } else missed.push(st); } });
   const extra = you.length - used.size, denom = sys.length + extra, score = denom === 0 ? 1 : matched / denom;
@@ -2408,7 +2499,36 @@ function gradeReplay(){
   if (matched && youUsd < sysUsd - 20) notes.push("You took the right trades but earned less than the system. You probably exited early or used a tight stop. Let the band/VWAP trail do the work.");
   box.innerHTML = `<div class="card-h"><div><div class="eyebrow">System check · you vs. the proven strategy</div><h3 style="margin-top:6px">${verdict[1]}</h3></div><span class="score"><span class="${score >= .8 ? "glow-up" : score >= .5 ? "amb-t" : "glow-down"}">${Math.round(score*100)}%</span></span></div>
     <div class="stats" style="margin-top:10px;grid-template-columns:repeat(4,minmax(0,1fr))"><div class="stat"><small>System trades</small><b style="font-size:18px">${sys.length}</b></div><div class="stat"><small>You matched</small><b style="font-size:18px">${matched}</b></div><div class="stat"><small>System P&amp;L (${q} ${$("#rp-sym").value})</small><b style="font-size:18px" class="${cls(sysUsd)}">${money0(sysUsd,1)}</b></div><div class="stat"><small>Your P&amp;L</small><b style="font-size:18px" class="${cls(youUsd)}">${money0(youUsd,1)}</b></div></div>
-    <ul class="clean small" style="margin-top:10px">${notes.map(x => `<li>${x}</li>`).join("")}</ul><p class="small muted" style="margin-top:6px">SYS markers on the chart show the system's entries and exits. The score is matched trades ÷ (system trades + your extra trades). Entries within 10 minutes of the signal count as matched.</p>`;
+    <ul class="clean small" style="margin-top:10px">${notes.map(x => `<li>${x}</li>`).join("")}</ul><p class="small muted" style="margin-top:6px">Graded on signals at the checks inside your window (entries through ${etHM(Math.round((lastIdx - 1) * 5 + 570))} ET). SYS markers show the full-day system's trades. The score is matched trades ÷ (system trades + your extra trades). Entries within 10 minutes of the signal count as matched.</p>`;
+}
+/* ---- Signal drill ---- */
+const DR = {set:[], i:0, right:0, answered:false};
+function drBuild(){
+  const d = derived(), lastK = Math.max(0, Math.min(3, Math.floor((Math.min(d.weE, 720) - 30 - 600) / 30))), pool = [];
+  BT.replay.forEach((r, ri) => { if (r.nog || !r.ub) return; const D = decodeDay(r); for (let k = 0; k <= lastK; k++){ const bi = 5 + 6*k, c = D.c[bi]; pool.push({ri, k, ans: c > D.ub[k] ? 1 : c < D.lb[k] ? -1 : 0}); } });
+  const sig = pool.filter(x => x.ans !== 0), no = pool.filter(x => x.ans === 0), pick = (a, n) => { const out = []; for (let j = 0; j < n && a.length; j++) out.push(a.splice(Math.floor(Math.random()*a.length), 1)[0]); return out; };
+  DR.set = [...pick(sig, 11), ...pick(no, 9)].sort(() => Math.random() - .5); DR.i = 0; DR.right = 0; drShow();
+}
+function drShow(){
+  const q = DR.set[DR.i]; if (!q) return; DR.answered = false; const D = decodeDay(BT.replay[q.ri]), n = 6 + 6*q.k;
+  const levels = []; for (let k = 0; k <= q.k; k++){ const i0 = 6*k + (k ? 0 : 0), i1 = Math.min(77, 6 + 6*k - 1); levels.push({y:D.ub[k], color:"var(--cyan)", i0: k ? 6*k : 0, i1, dash:"3 3", w:1.4, fit:k === q.k, hideOff:true, label: k === q.k ? "upper " + D.ub[k].toFixed(2) : ""}, {y:D.lb[k], color:"var(--cyan)", i0: k ? 6*k : 0, i1, dash:"3 3", w:1.4, fit:k === q.k, hideOff:true, label: k === q.k ? "lower " + D.lb[k].toFixed(2) : ""}); }
+  candles($("#dr-chart"), D, n, {vwap:true, levels, lastTag:true, slots:36});
+  $("#dr-q").innerHTML = `It's the <b>${etHM(600 + 30*q.k)}</b> check and you're flat. What do you do?`;
+  $("#dr-prog").textContent = `Question ${DR.i + 1} / ${DR.set.length}`; $("#dr-score").innerHTML = `<span class="amb-t">${DR.right}/${DR.i}</span>`;
+  $("#dr-fb").hidden = true; $("#dr-next").disabled = true; $$("#dr-card [data-dr]").forEach(b => b.disabled = false);
+}
+function drAnswer(a){
+  if (DR.answered) return; DR.answered = true; const q = DR.set[DR.i], D = decodeDay(BT.replay[q.ri]), c = D.c[5 + 6*q.k], ok = a === q.ans; if (ok) DR.right++;
+  const why = q.ans === 1 ? `closed at ${c.toFixed(2)}, <b>above</b> the upper band ${D.ub[q.k].toFixed(2)} → long` : q.ans === -1 ? `closed at ${c.toFixed(2)}, <b>below</b> the lower band ${D.lb[q.k].toFixed(2)} → short` : `closed at ${c.toFixed(2)}, <b>inside</b> the bands (${D.lb[q.k].toFixed(2)}–${D.ub[q.k].toFixed(2)}) → no trade`;
+  const fb = $("#dr-fb"); fb.hidden = false; fb.className = "gate " + (ok ? "ok" : "stop"); fb.innerHTML = `<span class="dot ${ok ? "live" : "off"}"></span><div><strong>${ok ? "Correct" : "Not this time"}</strong><div class="small">The check candle ${why}. Ignore how the chart "looks". Only the close vs. the band counts.</div></div>`;
+  $$("#dr-card [data-dr]").forEach(b => b.disabled = true); $("#dr-next").disabled = false; $("#dr-score").innerHTML = `<span class="amb-t">${DR.right}/${DR.i + 1}</span>`;
+  if (DR.i === DR.set.length - 1){ const hist = KV.get("drill", []) || []; hist.push({c:DR.right, n:DR.set.length, at:Date.now()}); KV.set("drill", hist.slice(-50)); $("#dr-next").textContent = "Start a new set ▸";
+    toast(`Set done: ${DR.right}/${DR.set.length} (${Math.round(DR.right/DR.set.length*100)}%)`); }
+}
+function initDrill(){
+  $("#dr-card").addEventListener("click", e => { const b = e.target.closest("[data-dr]"); if (b) drAnswer(+b.dataset.dr); });
+  $("#dr-next").onclick = () => { if (DR.i >= DR.set.length - 1){ $("#dr-next").textContent = "Next question ▸"; drBuild(); } else { DR.i++; drShow(); } };
+  drBuild();
 }
 function stopPlay(){ clearInterval(RP.timer); RP.timer = null; $("#rp-play").innerHTML = "Play <kbd>Space</kbd>"; }
 function togglePlay(){ if (RP.timer) return stopPlay(); if (RP.k >= 78) return; RP.timer = setInterval(rpNext, 600); $("#rp-play").innerHTML = "Pause <kbd>Space</kbd>"; }
@@ -2439,13 +2559,15 @@ function initReplay(){
   const sc = store.get("rpScore", null); if (sc){ RP.done = sc.done; RP.tot = sc.tot; }
   $("#rp-buy").onclick = () => rpOpen(1); $("#rp-sell").onclick = () => rpOpen(-1); $("#rp-flat").onclick = rpFlat;
   $("#rp-next").onclick = rpNext; $("#rp-new").onclick = newSession; $("#rp-play").onclick = togglePlay;
+  $("#rp-jump").onclick = () => { if (!RP.D) return; do { rpNext(); } while (RP.k < 78 && (RP.k - 6) % 6 !== 0); };
+  const dd0 = derived(); $("#rp-stop").value = dd0.safeStop; $("#rp-tgt").value = 0;
   $("#rp-levels").onchange = renderReplay; $("#rp-bands").onchange = renderReplay;
   $("#rp-send").onclick = async () => {
     for (const t of RP.trades) await saveTrade({date:todayNY(), time:t.time, sym:t.sym, side:t.dir>0?"Long":"Short", qty:t.qty, entry:t.entry, exit:t.exit, stop:t.stop, strategy:"Replay drill", grade:"B", notes:`Replay of ${RP.k>=78?RP.D.date:"hidden session"} · ${t.reason}`});
     $("#rp-send").disabled = true; toast(`Added ${RP.trades.length} trade(s) to the journal`);
   };
   $("#d-to-replay").onclick = () => { showTab("replay"); window.scrollTo({top:0}); };
-  newSession();
+  newSession(); initDrill();
 }
 
 /* ================= Risk tools ================= */
@@ -2676,11 +2798,14 @@ function derived(p = profile()){
   const paceC = contracts, fitC = Math.max(1, Math.floor(capTrade / (safeStop * 2 + fee)));
   contracts = Math.min(paceC, fitC);
   const perTrade = Math.min(capTrade, Math.max(Math.round(dailyStop / 3 / 5) * 5, Math.ceil((contracts * (safeStop * 2 + fee)) / 5) * 5));
+  const stepUp = p.size === "50K" && p.pace !== "fast" && contracts === 1;
+  const evNow = evalCalc(); if (stepUp && evNow.days && evNow.prof >= 1000 && evNow.state === "active") contracts = Math.min(2, Math.max(1, Math.floor(dailyStop / (safeStop * 2 + fee))));
   const row = (BT.lucid.results.noise || []).find(r => r.size === p.size && r.micros === contracts) || {};
+  const pev = BT.personal.eval[stepUp ? "Step-up: 1 MNQ, then 2 at +$1,000" : contracts >= 2 ? "2 MNQ" : "1 MNQ"];
   const off = tzOffsetMin(p.tz), wsE = toMin(p.ws) - off, weE = toMin(p.we) - off;
   const busy = (p.busy || "").split(",").map(x => x.trim().split("-").map(toMin)).filter(x => x.length === 2 && x[0] != null && x[1] != null).map(([a,b]) => [a - off, b - off]);
   const checks = []; for (let m = 600; m <= 930; m += 30){ const inW = m >= wsE && m <= weE, isBusy = busy.some(([a,b]) => m >= a && m < b); checks.push({et:m, local:m + off, ok: inW && !isBusy, busy:isBusy}); }
-  return {S, contracts, safeStop, paceC, dailyStop, perTrade, maxTrades: (p.exp === "new" || p.exp === "videos") ? 3 : 4, streak:2, row, off, wsE, weE, busy, checks, fee:S.fee};
+  return {S, contracts, safeStop, stepUp, pev, paceC, dailyStop, perTrade, maxTrades: (p.exp === "new" || p.exp === "videos") ? 3 : 4, streak:2, row, off, wsE, weE, busy, checks, fee:S.fee};
 }
 function applyProfile(){
   const p = profile(), d = derived(p);
@@ -2718,7 +2843,7 @@ function progress(){
 }
 function renderPlan(){
   const p = profile(), d = derived(p), pr = progress(), name = p.name ? `, ${esc(p.name)}` : "";
-  renderLaunch(p, d, pr);
+  renderLaunch(p, d, pr); renderTimeline($("#tl-body")); $("#tv-stop").textContent = d.safeStop + " points"; $("#tv-ticks").textContent = d.safeStop * 4;
   $("#pl-me").innerHTML = `<dt>Experience</dt><dd>${{new:"Brand new", videos:"Brand new (videos)", some:"Sim / paper", live:"Traded live"}[p.exp] || p.exp}</dd><dt>Trading window</dt><dd>${hm(toMin(p.ws))}–${hm(toMin(p.we))} ${p.tz === "America/New_York" ? "ET" : "local"}</dd><dt>Days</dt><dd>${(p.days || []).join(" ") || "—"}</dd><dt>Free / month</dt><dd>${money0(+p.free || 0)}</dd><dt>Goal</dt><dd style="white-space:normal">${esc(p.goal || "—")}</dd>${p.phrase ? `<dt>Stop phrase</dt><dd style="white-space:normal">“${esc(p.phrase)}”</dd>` : ""}`;
   $("#pl-hello").innerHTML = `Your plan${name}: pass a Lucid ${p.size} eval <span class="grad">safely</span>`;
   const passP = d.row.pass_rate, failP = d.row.fail_rate;
@@ -2727,8 +2852,8 @@ function renderPlan(){
     ["Your size", `${d.contracts} MNQ`, `$${d.contracts*2} per NQ point`],
     ["Daily stop", money0(-d.dailyStop), `then you're done for the day`],
     ["Max risk / trade", money0(d.perTrade), `= ${Math.floor(d.perTrade/(d.contracts*2))} pt stop on ${d.contracts} MNQ`],
-    ["Backtest pass rate", passP != null ? pct(passP) : "—", `${failP != null ? pct(failP) + " failed" : ""}${d.row.med_days ? " · median " + d.row.med_days + " sessions" : ""}`],
-    ["Strategy", "Noise-band", "the only proven one"]
+    ["Eval pass rate (your version)", pct(d.pev.pass_rate), `${pct(d.pev.fail_rate)} fail · median ${d.pev.p50} sessions (~${Math.round(d.pev.p50/21)} months)`],
+    ["Strategy", "Morning + hand-off", `noise-band, fit to ${hm(toMin(p.ws))}–${hm(toMin(p.we))}`]
   ].map(([k,v,e]) => `<div class="stat"><small>${k}</small><b style="font-size:19px">${v}</b><em>${e}</em></div>`).join("");
   // hours chart
   const svg = $("#pl-hours"); svg.innerHTML = ""; const W = 760, L = 20, Rr = 20, X = m => L + (((m % 1440) + 1440) % 1440)/1440*(W - L - Rr), off = d.off;
@@ -2749,7 +2874,8 @@ function renderPlan(){
   const firstCheck = usable[0] ? hm(usable[0].local) : hm(600 + off);
   $("#pl-rules").innerHTML = [
     `Trade only <b>noise-band momentum</b> signals at the :00/:30 checks. Everything else is a no.`,
-    `Size: <b>${d.contracts} MNQ</b>. Never more, not even after a great day.`,
+    d.stepUp ? `Size: <b>1 MNQ</b> until the eval is <b>+$1,000</b>, then <b>2 MNQ</b> (step-up: 50% pass, 10% fail vs 28% fail at 2 from day one). Never more.` : `Size: <b>${d.contracts} MNQ</b>. Never more, not even after a great day.`,
+    `New entries only at the <b>10:00–11:30 ET checks</b>. At <b>${hm(toMin(p.we))}</b> (your window ends), if still in a trade, move the stop to the current band/VWAP level as a <b>fixed stop</b>, then walk away. Flatten from your phone by <b>3:55 pm ET</b>.`,
     `Every trade has a bracket with a stop <b>at least ${d.safeStop} points</b> away (beyond the dip 4 in 5 winners make). Risk per trade ≤ <b>${money0(d.perTrade)}</b>.${d.paceC > d.contracts ? ` That's why your size is ${d.contracts} MNQ, not ${d.paceC}.` : ""}`,
     `Daily stop <b>${money0(-d.dailyStop)}</b>, or <b>${d.streak} losses in a row</b>, and you're done. Close the platform.`,
     `After any losing trade, a <b>10-minute cool-off</b> before the next one. The cockpit enforces it.`,
@@ -2787,7 +2913,8 @@ function renderPlan(){
     [firstCheck, "First check you can take. Enter today's open, prior close and price in the noise-band card. Signal → fill in the trade ticket, and only click in when every check is green."],
     ["In a trade", "Hands off. The bracket manages it. Only exit early at a check that closes back through the band or VWAP."],
     ["After a trade", "Log the exit in the ticket (it goes to your journal). Loss → the 10-minute cool-off starts automatically."],
-    [hm(955 + off), "Flat. Log the day's closing balance in the eval tracker. Grade your trades A/B/C."]
+    [hm(toMin(p.we)), "<b>Hand-off.</b> Still in a trade? Set a fixed stop at today's band/VWAP level (the cockpit shows it), then go. No new entries."],
+    [hm(955 + off), "Flatten any open trade from your phone. Log the day's closing balance in the eval tracker. Grade your trades A/B/C."]
   ].map(([t,x]) => `<div class="rule"><b>${t}</b><span>${x}</span></div>`).join("");
 }
 
@@ -2884,8 +3011,9 @@ function renderHome(){
   $("#ov-qa").onclick = ev2 => { const b = ev2.target.closest("[data-qa]"); if (b) qa[+b.dataset.qa][2](); };
   const t = todayNY(), up = CAL.filter(x => x.d >= t).slice(0, 4), dd = x => Math.round((new Date(x + "T12:00:00Z") - new Date(t + "T12:00:00Z"))/864e5);
   $("#ov-events").innerHTML = up.map(x => `<div class="row small" style="justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--line)"><span><span class="pill ${x.k==="fomc"?"amb":x.k==="cpi"?"down":"cy"}" style="font-size:9px">${x.k.toUpperCase()}</span> ${x.name}</span><span class="mono muted">${dd(x.d) === 0 ? "today" : dd(x.d) + "d"} · ${hm(x.t + d.off)}</span></div>`).join("") || `<p class="small muted">No scheduled releases in the calendar range.</p>`;
-  const nz = SBY.noise;
-  $("#ov-strat").innerHTML = `<b style="color:var(--ink)">Noise-boundary momentum</b><div class="stats" style="margin-top:10px;grid-template-columns:repeat(3,minmax(0,1fr))"><div class="stat"><small>Profit factor</small><b style="font-size:17px">${nz.all.pf.toFixed(2)}</b></div><div class="stat"><small>Win rate</small><b style="font-size:17px">${pct(nz.all.win)}</b></div><div class="stat"><small>Your size</small><b style="font-size:17px">${d.contracts} MNQ</b></div></div><p class="small muted" style="margin-top:8px">7 of 7 proof tests passed. Signals at the :00/:30 checks from 10:00 ET, with stops at least ${d.safeStop} pts away.</p>`;
+  renderTimeline($("#ov-tl"));
+  const nz = SBY.noise, ps = BT.personal.stats;
+  $("#ov-strat").innerHTML = `<b style="color:var(--ink)">Noise-band · morning + hand-off</b><div class="stats" style="margin-top:10px;grid-template-columns:repeat(3,minmax(0,1fr))"><div class="stat"><small>Profit factor</small><b style="font-size:17px">${ps.pf.toFixed(2)}</b></div><div class="stat"><small>Per MNQ / yr</small><b style="font-size:17px">${money0(ps.per_year_mnq)}</b></div><div class="stat"><small>Your size</small><b style="font-size:17px">${d.contracts} MNQ</b></div></div><p class="small muted" style="margin-top:8px">The proven noise-band strategy (7/7 proof tests), fit to your window: entries at 10:00–11:30 checks, a fixed stop at the ${hm(toMin(p.we))} hand-off. Sharpe ${ps.sharpe}, ${ps.up_years}/${ps.years} years positive, stops ≥ ${d.safeStop} pts.</p>`;
   const src = realTrades(), by = dayStats(src), cells = []; let dt = new Date(Date.now() - 27*864e5);
   for (let i = 0; i < 28; i++){ const x = new Date(dt.getTime() + i*864e5); if (x.getUTCDay() === 0 || x.getUTCDay() === 6) continue; cells.push(x.toISOString().slice(0,10)); }
   const mx = Math.max(50, ...cells.map(c => by[c] ? Math.abs(by[c].net) : 0));
@@ -2907,8 +3035,9 @@ function launchGroups(p, d, pr){
     {id:"pre", title:"1 · Before you buy (free)", items:[
       ["quiz", "Score 7/8 or better on the Learn quiz", pr.qs >= 7, "learn"],
       ["ddsim", "Step through all 3 drawdown-simulator scenarios in Learn", null, "learn"],
-      ["replay", "Trade 10 replay sessions using only noise-band signals", pr.rp >= 10, "replay"],
-      ["trades", "Log 30 practice trades with 80%+ graded A", pr.trades >= 30 && pr.aPct >= .8, "journal"],
+      ["drill", "Score 90%+ on 3 signal-drill sets (Replay tab)", ((KV.get("drill", []) || []).filter(x => x.c/x.n >= .9).length) >= 3, "replay"],
+      ["replay", "Score 80%+ on 5 graded replays", ((KV.get("fidelity", []) || []).filter(x => x.s >= 80).length) >= 5, "replay"],
+      ["trades", "Take 10 sim trades through the cockpit ticket, 80%+ graded A", realTrades().filter(t => (t.notes || "").includes("cockpit")).length >= 10 && pr.aPct >= .8, "today"],
       ["cal", `Block ${hm(toMin(p.ws))}–${hm(toMin(p.we))} on your calendar for trading days`, null],
       ["budget", `Set a monthly eval spending cap (yours: ${p.evalmax ? money0(p.evalmax) : "not set"})`, !!p.evalmax, "me"]]},
     {id:"setup", title:"2 · Buy and set up (day 1)", items:[
@@ -3059,11 +3188,13 @@ function renderTicket(){
     const mins = Math.floor((Date.now() - tk.at)/60000), risk = Math.abs(tk.entry - tk.stop) * 2 * tk.qty;
     if (!$("#tt-exit")) $("#tt-open").innerHTML = `<div class="intrade"><div class="row" style="justify-content:space-between"><b style="font-size:18px;color:var(--ink)" class="${tk.side>0?"up-t":"down-t"}">${tk.side>0?"LONG":"SHORT"} ${tk.qty} MNQ @ ${tk.entry.toFixed(2)}</b><span class="mono" id="tt-timer"></span></div>
       <dl class="kv" style="margin-top:10px"><dt>Stop</dt><dd class="down-t">${tk.stop.toFixed(2)} (−${money0(risk)})</dd><dt>Target</dt><dd class="up-t">${tk.tgt ? tk.tgt.toFixed(2) + " (+" + money0(Math.abs(tk.tgt - tk.entry)*2*tk.qty) + ")" : "trailing (band / VWAP)"}</dd><dt>Setup</dt><dd>${esc(tk.setup)}</dd></dl>
+      <div class="gate warn" id="tt-live" style="margin-top:10px"></div>
       <p class="small" style="margin-top:10px">Hands off. The bracket manages the trade. Don't move the stop away. Exit early only at a :00/:30 check that closes back through the band or VWAP.</p>
       <div class="form" style="margin-top:10px"><label class="f">Exit price<input id="tt-exit" type="number" class="mono" step="0.25"></label><label class="f">Did you follow your rules?<select id="tt-grade"><option value="A">A · exactly to plan</option><option value="B">B · small slip</option><option value="C">C · broke a rule</option></select></label></div>
       <div class="f" style="margin-top:8px">Any mistakes?<div class="tagrow" id="tt-tags" style="margin-top:4px">${MTAGS.map(t => `<button type="button" data-tag="${t}" aria-pressed="false">${t}</button>`).join("")}</div></div>
       <div class="row" style="margin-top:10px"><button class="btn primary" id="tt-log">Log exit to journal</button><button class="btn ghost" id="tt-cancel">Didn't fill: cancel</button></div></div>`;
     const tm = $("#tt-timer"); if (tm) tm.textContent = `${mins} min in trade`;
+    const lx = $("#tt-live"); if (lx) lx.innerHTML = liveExit(tk);
     return;
   }
   const c = ticketChecks(), d = derived();
@@ -3072,6 +3203,19 @@ function renderTicket(){
   $("#tt-go").disabled = !c.ok; $("#tt-go").textContent = c.ok ? "I'm in: start the trade" : `Blocked: ${c.out.filter(([v]) => v !== true && v !== "warn").length} check(s) failing`;
 }
 
+function liveExit(tk){
+  const op = val("nb-open"), pdc = val("nb-pdc"), vm = parseFloat($("#nb-vol").value) || 1, n = nyNow(), d = derived();
+  if (!(op > 0 && pdc > 0)) return `<div class="small">Enter today's open and prior close in the noise-band card to see your live exit level.</div>`;
+  let k = 0; BT.sigma.forEach((_,i) => { if (n.mins >= 600 + i*30) k = i; });
+  const sg = BT.sigma[k]/100*vm, band = tk.side > 0 ? Math.max(op, pdc)*(1+sg) : Math.min(op, pdc)*(1-sg);
+  const handoff = n.mins >= d.weE && n.mins < 955;
+  return `<div class="small"><b style="color:var(--ink)">${handoff ? "HAND-OFF NOW:" : "Exit rule:"}</b> ${tk.side > 0 ? "exit if a :00/:30 check closes below" : "exit if a :00/:30 check closes above"} <b class="mono">${band.toFixed(2)}</b> (band) or VWAP, whichever is ${tk.side > 0 ? "higher" : "lower"}. ${handoff ? `Your window has ended: move your stop to that level as a <b>fixed stop</b> in Tradovate and step away. Flatten by 3:55 pm ET.` : `Hand-off at ${hm(d.weE + d.off)}.`}</div>`;
+}
+document.addEventListener("click", e => { const b = e.target.closest("[data-usesig]"); if (!b) return; const side = +b.dataset.usesig, px = val("nb-px"), d = derived();
+  if (store.get("ticket", null)){ toast("You're already in a trade."); return; }
+  (side > 0 ? $("#tt-long") : $("#tt-short")).click(); $("#tt-entry").value = px; $("#tt-stop").value = (px - side * d.safeStop).toFixed(2); $("#tt-tgt").value = ""; $("#tt-qty").value = d.contracts;
+  renderTicket(); $("#tt-card").scrollIntoView({behavior:"smooth", block:"center"}); toast(`Ticket filled: ${side > 0 ? "long" : "short"} ${d.contracts} MNQ, stop ${d.safeStop} pts. Tick the two confirmations.`); });
+
 /* ================= Cockpit: next event, sound, wake lock, compact ================= */
 let wakeLock = null, audioCtx = null, lastBeep = "";
 function beep(freq = 880, ms = 180){ try{ audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)(); const o = audioCtx.createOscillator(), g = audioCtx.createGain(); o.frequency.value = freq; g.gain.value = .08; o.connect(g); g.connect(audioCtx.destination); o.start(); o.stop(audioCtx.currentTime + ms/1000); }catch{} }
@@ -3079,6 +3223,7 @@ function nextEvent(n = nyNow()){
   const d = derived(), ev = [];
   for (let m = 600; m <= 930; m += 30) ev.push([m, "noise-band check", d.checks.find(c => c.et === m)?.ok]);
   newsTimes().forEach(t => ev.push([t - 5, `news blackout starts (${etHM(t)} ET release)`, true]));
+  if (d.weE > 600 && d.weE < 955) ev.push([d.weE, "hand-off: set a fixed stop, no new entries", true]);
   ev.push([955, "flatten everything", true], [960, "cash close", true]);
   const now = n.mins + n.s/60; ev.sort((a,b) => a[0] - b[0]);
   return ev.find(e => e[0] > now) || null;
@@ -3175,7 +3320,7 @@ function cmdBuild(q){
   out.push({grp:"Actions", label:"Review today in the journal", sub:"Journal", run:() => { showTab("journal"); jcSel = todayNY(); jcMonth = todayNY().slice(0,7); renderJCal(); }});
   [["Toggle side-by-side mode", "Cockpit", () => { showTab("today"); $("#cp-compact").click(); }], ["Start a new replay session", "Practice", () => { showTab("replay"); newSession(); }],
    ["Log a trade", "Journal", () => { showTab("journal"); setTimeout(() => $("#jf-entry").focus(), 50); }], ["Turn sound alerts on/off", "Cockpit", () => { showTab("today"); $("#cp-sound").click(); }],
-   ["Edit my profile", "My profile", () => { showTab("me"); setTimeout(() => $("#pf-name").focus(), 50); }], ["Open the launch checklist", "My plan", () => { showTab("plan"); setTimeout(() => $("#lc-card").scrollIntoView({behavior:"smooth"}), 60); }], ["Run the expectancy simulator", "Risk tools", () => { showTab("tools"); }], ["Open my coach notes", "Coach", () => showTab("coach")], ["What can a funded account pay?", "Prop eval", () => { showTab("prop"); setTimeout(() => $("#fd-card").scrollIntoView({behavior:"smooth"}), 80); }]]
+   ["Edit my profile", "My profile", () => { showTab("me"); setTimeout(() => $("#pf-name").focus(), 50); }], ["Open the launch checklist", "My plan", () => { showTab("plan"); setTimeout(() => $("#lc-card").scrollIntoView({behavior:"smooth"}), 60); }], ["Run the expectancy simulator", "Risk tools", () => { showTab("tools"); }], ["Open my coach notes", "Coach", () => showTab("coach")], ["Start a signal drill", "Replay", () => { showTab("replay"); window.scrollTo({top:0}); }], ["Strategy in 6 steps", "Learn", () => { showTab("learn"); setTimeout(() => $("#l-howto").scrollIntoView({behavior:"smooth"}), 80); }], ["What can a funded account pay?", "Prop eval", () => { showTab("prop"); setTimeout(() => $("#fd-card").scrollIntoView({behavior:"smooth"}), 80); }]]
     .forEach(([l, s2, run]) => out.push({grp:"Actions", label:l, sub:s2, run}));
   BT.strats.forEach(st => out.push({grp:"Strategies", label:st.name, sub:`${VNAME[st.verdict]} · PF ${st.all.pf.toFixed(2)}`, run:() => { selStrat = st.key; showTab("lab"); renderDetail(); setTimeout(() => $("#detail").scrollIntoView({behavior:"smooth"}), 60); }}));
   GLOSS.forEach(g => out.push({grp:"Key terms", label:g[0], sub:g[1], run:() => { showTab("learn"); setTimeout(() => { $("#gl-q").value = g[0]; glCat = "All"; renderGloss(); $("#l-terms").scrollIntoView({behavior:"smooth"}); }, 60); }}));
