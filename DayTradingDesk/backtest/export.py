@@ -105,6 +105,21 @@ out["regime"] = json.load(open(os.path.join(D, "regime.json")))
 from strategies_scout import LEDGER
 out["scout"] = LEDGER
 out["edge"] = json.load(open(os.path.join(D, "edge.json")))
+out["funded"] = json.load(open(os.path.join(D, "funded.json")))
+# replay grading: what the proven strategy did on each replay day, and its noise bands at each check
+didx = {str(d["date"]): i for i, d in enumerate(days)}
+ntr = {}
+for t in res["noise"]["trades"]: ntr.setdefault(t["date"], []).append(t)
+for rep in out["replay"]:
+    i = didx[rep["date"]]; d = days[i]; base = rep["base"]
+    q = lambda x: int(round((x - base) / bt.TICK))
+    rep["nog"] = bool(d["roll"] or not np.isfinite(d["pdc"]) or i < 14)
+    rep["sys"] = [[t["side"], t["i"], t["j"], q(t["entry"]), q(t["exit"]), round(t["pts"], 2)] for t in ntr.get(rep["date"], [])]
+    if i >= 14 and np.isfinite(d["pdc"]):
+        sig = np.mean([np.abs(x["c"] / x["o"][0] - 1) for x in days[i - 14:i]], axis=0)
+        op, pdc = d["o"][0], d["pdc"]
+        rep["ub"] = [q(max(op, pdc) * (1 + sig[t])) for t in range(29, 360, 30)]
+        rep["lb"] = [q(min(op, pdc) * (1 - sig[t])) for t in range(29, 360, 30)]
 s = json.dumps(clean(out), separators=(",", ":"))
 open(os.path.join(os.path.dirname(__file__), "..", "bt-data.json"), "w").write(s)
 print("bytes", len(s)); print(json.dumps(out["daystats"]), out["sigma"][:4])
