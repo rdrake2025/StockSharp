@@ -47,6 +47,9 @@ LucidFlex 50K, calendar sessions to pass: 1 MNQ median 385 (42% pass, 7% fail); 
 median 307 (50% pass, 10% fail). `BEGINNER_REVIEW.md` logs a beginner walkthrough of the app, the time to
 profitability before and after the v11 changes, and why.
 
+`backtest/aggressive.py` trades the 50K at 1–10 MNQ and buys a new eval after each blow-up. On the 10–12 schedule:
+5 MNQ ≈ 2.3 tries, median ~12 months; 10 MNQ ≈ 3 tries, median ~5 months. The worst losing streak in the data is 18 trades.
+
 ## Rebuilding
 
 ```
@@ -62,6 +65,7 @@ NQ_DATA=/path/to/data python3 lucid_luck.py   # random-direction baseline for th
 NQ_DATA=/path/to/data python3 funded.py       # funded-account year simulations by size, contracts and payout policy
 NQ_DATA=/path/to/data python3 window.py       # time-window variants of noise-band
 NQ_DATA=/path/to/data python3 personal.py     # morning + hand-off version: stats, eval plans, funded
+NQ_DATA=/path/to/data python3 aggressive.py   # bigger eval size with resets: tries, fees, time to pass
 NQ_DATA=/path/to/data python3 edge.py         # outlook features, range tables, adverse-excursion quantiles
 NQ_DATA=/path/to/data python3 export.py       # writes ../bt-data.json
 cd .. && python3 build.py                 # src/app.html + bt-data.json -> index.html

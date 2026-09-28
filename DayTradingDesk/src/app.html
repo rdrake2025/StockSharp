@@ -606,6 +606,7 @@ body.compact .ticker,body.compact #top-front,body.compact .search-btn span,body.
       <div class="form" style="margin-top:10px">
         <label class="f">Eval size<select id="pf-size"><option>25K</option><option selected>50K</option><option>100K</option><option>150K</option></select></label>
         <label class="f">Priority<select id="pf-pace"><option value="safe">Don't fail (slower)</option><option value="balanced">Balanced</option><option value="fast">Pass faster (riskier)</option></select></label>
+        <label class="f">Eval size in micros (MNQ)<select id="pf-evalmicros"><option value="">Auto from priority</option><option value="2">2 MNQ · $186 risk/trade</option><option value="3">3 MNQ · $280</option><option value="4">4 MNQ · $373</option><option value="5">5 MNQ · $466</option><option value="6">6 MNQ · $559</option><option value="8">8 MNQ · $746</option><option value="10">10 MNQ · $932</option></select></label>
         <label class="f">Platform<select id="pf-platform"><option>Tradovate</option><option>NinjaTrader</option><option>TradingView</option><option>Other</option></select></label>
         <label class="f">Account nickname / number<input id="pf-acct" type="text" placeholder="e.g. LFE-50K-1 (no passwords)"></label>
         <label class="f">Bought on<input id="pf-buy" type="date"></label>
@@ -927,6 +928,11 @@ body.compact .ticker,body.compact #top-front,body.compact .search-btn span,body.
     <p class="lede">A prop evaluation lets you trade the firm's capital after you hit a profit target without breaking its drawdown rules. I replayed each strategy through Lucid's <b>LucidFlex</b> rules starting on every third session from 2015 to 2025, then compared it with the same trades in random directions. The difference between the two is the edge.</p>
   </div>
   <div class="stats" id="lu-strip"></div>
+  <div class="card" style="margin-top:16px" id="ag-card">
+    <div class="card-h"><div><div class="eyebrow">Size up and reset · 50K</div><h3 style="margin-top:6px">Trading bigger in the eval, and buying a new one when it blows up</h3></div><div class="seg" id="ag-seg"><button data-ag="personal" aria-pressed="true">Your hours (10–12)</button><button data-ag="full" aria-pressed="false">Full day</button></div></div>
+    <div class="table-wrap" style="margin-top:10px"><table><thead><tr><th class="n">MNQ</th><th class="n">Risk / trade</th><th class="n">% of drawdown</th><th class="n">Pass, 1 try</th><th class="n">Blow up, 1 try</th><th class="n">Avg tries</th><th class="n">Fees</th><th class="n">Median to pass</th><th class="n">Fastest 25%</th></tr></thead><tbody id="ag-body"></tbody></table></div>
+    <p class="small" style="margin-top:10px" id="ag-note"></p>
+  </div>
   <div class="split" style="margin-top:16px">
     <div class="card">
       <div class="card-h"><h3>Pass rates by size and contracts</h3>
@@ -2362,6 +2368,7 @@ function luEval(ser, s0, micros, S, maxDays = 500){
   return {out:"timeout", days:traded, end:s0 + maxDays - 1, path};
 }
 function renderProp(){
+  renderAggressive();
   const sel = $("#lu-strat"); sel.innerHTML = Object.keys(LU.results).map(k => `<option value="${k}" ${k===luStrat?"selected":""}>${luName(k)}</option>`).join("");
   sel.onchange = e => { luStrat = e.target.value; renderLuTable(); luRun(); };
   $("#lu-size").onclick = e => { const b = e.target.closest("[data-s]"); if (!b) return; luSize = b.dataset.s; $$("#lu-size button").forEach(x => x.setAttribute("aria-pressed", x === b)); renderLuTable(); luRun(); };
@@ -2388,6 +2395,12 @@ function renderLuTable(){
     <p class="small" style="margin-top:10px">${lk ? `Random-direction trading at ${bestEV.micros} MNQ passes <b class="down-t">${pct(lk.pass_rate)}</b> of the time with EV <b class="down-t">${money0(lk.ev,1)}</b>, so the gap is the strategy's edge. ` : ""}${bestEV.ev <= 0 ? '<b class="down-t">No size has positive expected value for this strategy. Skip it for evals.</b>' : `Budget for ${Math.max(1, Math.ceil(1/Math.max(bestEV.pass_rate,.01)))} attempts (${money0(S.fee*Math.ceil(1/Math.max(bestEV.pass_rate,.01)))} in fees at list price) to expect one pass.`}</p>`;
   $("#lu-micros").value = bestEV.micros;
 }
+function renderAggressive(which = "personal"){
+  const A = BT.aggressive[which], fee = BT.lucid.sizes["50K"].fee, mo = x => x == null ? "—" : `${x} (~${Math.round(x/21)} mo)`, my = +profile().evalmicros || 0;
+  $("#ag-body").innerHTML = Object.entries(A.sizes).map(([m, r]) => `<tr${+m === my ? ' style="background:var(--surface-2)"' : ""}><td class="n"><b>${m}</b></td><td class="n">${money0(r.risk_per_trade)}</td><td class="n ${r.pct_of_dd > 20 ? "down-t" : r.pct_of_dd > 10 ? "amb-t" : ""}">${r.pct_of_dd}%</td><td class="n">${pct(r.one_try_pass)}</td><td class="n down-t">${pct(r.one_try_fail)}</td><td class="n">${r.mean_attempts.toFixed(1)}</td><td class="n">${money0(r.mean_attempts * fee)}</td><td class="n"><b>${mo(r.med_sessions)}</b></td><td class="n">${mo(r.p25)}</td></tr>`).join("");
+  $("#ag-note").innerHTML = `Every start date 2015–2025: trade the eval at that size, and when it blows up, buy a new one the next session and keep going. "Median to pass" counts all the tries, in calendar sessions. Worst losing streak in the data: <b>${A.max_losing_streak} losers in a row</b>. At 1 MNQ that's an annoying week; at 8+ MNQ it's two dead accounts. The edge per trade is the same at every size. Bigger size only makes each roll of the dice bigger. That works in an eval (a reset is $${fee}), but not in a funded account or with your own money. Pick your size in <b>My profile → Eval size in micros</b>.`;
+}
+document.addEventListener("click", e => { const b = e.target.closest("[data-ag]"); if (!b) return; $$("#ag-seg button").forEach(x => x.setAttribute("aria-pressed", x === b)); renderAggressive(b.dataset.ag); });
 function luRun(){
   const ser = luSeries(luStrat), svg = $("#lu-path"); svg.innerHTML = "";
   if (!ser){ $("#lu-cap").textContent = "Path replay is available for single strategies."; return; }
@@ -2798,14 +2811,21 @@ function derived(p = profile()){
   const paceC = contracts, fitC = Math.max(1, Math.floor(capTrade / (safeStop * 2 + fee)));
   contracts = Math.min(paceC, fitC);
   const perTrade = Math.min(capTrade, Math.max(Math.round(dailyStop / 3 / 5) * 5, Math.ceil((contracts * (safeStop * 2 + fee)) / 5) * 5));
+  const agM = p.size === "50K" ? (+p.evalmicros || 0) : 0, AG = agM ? BT.aggressive.personal.sizes[agM] : null;
+  if (AG){ const rk = agM * (safeStop * 2 + fee); return finishDerived(p, {S, contracts:agM, safeStop, stepUp:false, aggressive:agM,
+    pev:{pass_rate:AG.one_try_pass, fail_rate:AG.one_try_fail, p50:AG.med_sessions, att:AG.mean_attempts, full:BT.aggressive.full.sizes[agM]},
+    paceC:agM, dailyStop: Math.min(mll - 100, Math.round(2 * rk / 10) * 10), perTrade: Math.ceil(rk / 5) * 5, row:(BT.lucid.results.noise || []).find(r => r.size === p.size && r.micros === agM) || {}}); }
   const stepUp = p.size === "50K" && p.pace !== "fast" && contracts === 1;
   const evNow = evalCalc(); if (stepUp && evNow.days && evNow.prof >= 1000 && evNow.state === "active") contracts = Math.min(2, Math.max(1, Math.floor(dailyStop / (safeStop * 2 + fee))));
   const row = (BT.lucid.results.noise || []).find(r => r.size === p.size && r.micros === contracts) || {};
   const pev = BT.personal.eval[stepUp ? "Step-up: 1 MNQ, then 2 at +$1,000" : contracts >= 2 ? "2 MNQ" : "1 MNQ"];
+  return finishDerived(p, {S, contracts, safeStop, stepUp, pev, paceC, dailyStop, perTrade, row});
+}
+function finishDerived(p, o){
   const off = tzOffsetMin(p.tz), wsE = toMin(p.ws) - off, weE = toMin(p.we) - off;
   const busy = (p.busy || "").split(",").map(x => x.trim().split("-").map(toMin)).filter(x => x.length === 2 && x[0] != null && x[1] != null).map(([a,b]) => [a - off, b - off]);
   const checks = []; for (let m = 600; m <= 930; m += 30){ const inW = m >= wsE && m <= weE, isBusy = busy.some(([a,b]) => m >= a && m < b); checks.push({et:m, local:m + off, ok: inW && !isBusy, busy:isBusy}); }
-  return {S, contracts, safeStop, stepUp, pev, paceC, dailyStop, perTrade, maxTrades: (p.exp === "new" || p.exp === "videos") ? 3 : 4, streak:2, row, off, wsE, weE, busy, checks, fee:S.fee};
+  return {...o, maxTrades: (p.exp === "new" || p.exp === "videos") ? 3 : 4, streak:2, off, wsE, weE, busy, checks, fee:o.S.fee};
 }
 function applyProfile(){
   const p = profile(), d = derived(p);
@@ -2826,7 +2846,7 @@ function fillProfileForm(){
   $("#pf-note").innerHTML = KV.get("profile", null) ? "Saved to this page's database, so it's available wherever you open it." : "Prefilled from your answers: Eastern time, free 10:00 am–12:00 pm, brand new (you've watched videos), about $1,330/month free, LucidFlex 50K. Add anything else, then save.";
   $("#pf-saved").className = "pill " + (KV.get("profile", null) ? "up" : "amb"); $("#pf-saved").textContent = KV.get("profile", null) ? "Saved" : "Not saved yet";
 }
-const PF_FIELDS = ["name","tz","exp","free","ws","we","busy","size","pace","evalmax","tax","data","platform","acct","buy","paid","evals","why","goal","contact","phrase","notes"];
+const PF_FIELDS = ["name","tz","exp","free","ws","we","busy","size","pace","evalmicros","evalmax","tax","data","platform","acct","buy","paid","evals","why","goal","contact","phrase","notes"];
 const PF_NUM = new Set(["free","evalmax","tax","data","paid","evals"]);
 function readProfileForm(){ const o = {}; PF_FIELDS.forEach(k => { const v = $("#pf-" + k)?.value ?? ""; o[k] = PF_NUM.has(k) ? (v === "" ? "" : +v) : String(v).trim(); }); o.days = $$("#pf-days input").filter(c => c.checked).map(c => c.value); return o; }
 function initMe(){
@@ -2852,7 +2872,7 @@ function renderPlan(){
     ["Your size", `${d.contracts} MNQ`, `$${d.contracts*2} per NQ point`],
     ["Daily stop", money0(-d.dailyStop), `then you're done for the day`],
     ["Max risk / trade", money0(d.perTrade), `= ${Math.floor(d.perTrade/(d.contracts*2))} pt stop on ${d.contracts} MNQ`],
-    ["Eval pass rate (your version)", pct(d.pev.pass_rate), `${pct(d.pev.fail_rate)} fail · median ${d.pev.p50} sessions (~${Math.round(d.pev.p50/21)} months)`],
+    d.aggressive ? ["Aggressive eval (resets)", pct(d.pev.pass_rate) + " / try", `${pct(d.pev.fail_rate)} blow up · ~${d.pev.att.toFixed(1)} tries · median ${d.pev.p50} sessions (~${Math.round(d.pev.p50/21)} mo)`] : ["Eval pass rate (your version)", pct(d.pev.pass_rate), `${pct(d.pev.fail_rate)} fail · median ${d.pev.p50} sessions (~${Math.round(d.pev.p50/21)} months)`],
     ["Strategy", "Morning + hand-off", `noise-band, fit to ${hm(toMin(p.ws))}–${hm(toMin(p.we))}`]
   ].map(([k,v,e]) => `<div class="stat"><small>${k}</small><b style="font-size:19px">${v}</b><em>${e}</em></div>`).join("");
   // hours chart
@@ -2874,7 +2894,7 @@ function renderPlan(){
   const firstCheck = usable[0] ? hm(usable[0].local) : hm(600 + off);
   $("#pl-rules").innerHTML = [
     `Trade only <b>noise-band momentum</b> signals at the :00/:30 checks. Everything else is a no.`,
-    d.stepUp ? `Size: <b>1 MNQ</b> until the eval is <b>+$1,000</b>, then <b>2 MNQ</b> (step-up: 50% pass, 10% fail vs 28% fail at 2 from day one). Never more.` : `Size: <b>${d.contracts} MNQ</b>. Never more, not even after a great day.`,
+    d.aggressive ? `Size: <b>${d.aggressive} MNQ</b> (aggressive eval). One loss ≈ <b>${money0(d.perTrade)}</b>, ${Math.round(d.perTrade/20)}% of your $2,000 drawdown. Expect about <b>${d.pev.att.toFixed(1)} tries</b> (~${money0(d.pev.att * d.S.fee)} in fees). Budget the resets <b>before</b> you start, and never add size to "win it back". <b>Once funded, drop to 2 MNQ</b>: a blown funded account can't be reset for $${d.S.fee}.` : d.stepUp ? `Size: <b>1 MNQ</b> until the eval is <b>+$1,000</b>, then <b>2 MNQ</b> (step-up: 50% pass, 10% fail vs 28% fail at 2 from day one). Never more.` : `Size: <b>${d.contracts} MNQ</b>. Never more, not even after a great day.`,
     `New entries only at the <b>10:00–11:30 ET checks</b>. At <b>${hm(toMin(p.we))}</b> (your window ends), if still in a trade, move the stop to the current band/VWAP level as a <b>fixed stop</b>, then walk away. Flatten from your phone by <b>3:55 pm ET</b>.`,
     `Every trade has a bracket with a stop <b>at least ${d.safeStop} points</b> away (beyond the dip 4 in 5 winners make). Risk per trade ≤ <b>${money0(d.perTrade)}</b>.${d.paceC > d.contracts ? ` That's why your size is ${d.contracts} MNQ, not ${d.paceC}.` : ""}`,
     `Daily stop <b>${money0(-d.dailyStop)}</b>, or <b>${d.streak} losses in a row</b>, and you're done. Close the platform.`,
